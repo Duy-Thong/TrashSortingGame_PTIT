@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+/**
+ *
+ * @author vutuyen
+ */
 
 public class RunGame extends JFrame {
     private JLabel timerLabel;
@@ -131,7 +135,7 @@ public class RunGame extends JFrame {
     private void moveTrashItems() {
         TrashItem item = trashItems.get(0);
         item.move();
-        if (item.getY() > getHeight() - 10) {
+        if (item.getY() > getHeight() - 80) {
             trashItems.remove(0);
             HashMap<Integer, String> x_bin = new HashMap<Integer, String>();
             x_bin.put(80, "Red");
@@ -184,18 +188,26 @@ public class RunGame extends JFrame {
      public void userKeyPressed(int keyCode) {
             if (keyCode == 226 || keyCode == 37){
 //              this.itemOnScreen.moveLeft();
+                TrashItem x = trashItems.get(0);
+                if(x.getX() == 280) x.setX(80);
+                else if(x.getX() == 480) x.setX(280);
                 System.out.println("left");
             } else if (keyCode == 227 || keyCode == 39){
 //              this.itemOnScreen.moveRight();
+                TrashItem x = trashItems.get(0);
+                if(x.getX() == 80) x.setX(280);
+                else if(x.getX() == 280) x.setX(480);
                 System.out.println("Right");
             } else if (keyCode == 32 || keyCode == 225 || keyCode == 40){
 //              speedUpDy();
+                TrashItem y = trashItems.get(0);
+                y.setY(getHeight() - 75);
                 System.out.println("Down");
 //            } else if (keyCode == 82 && this.isGameOver) {
 ////              reset();
 //                System.out.println("Over");
-            } else if (keyCode == 88) {
-              System.exit(0);
+//            } else if (keyCode == 88) {
+//              System.exit(0);
             } 
     }
     

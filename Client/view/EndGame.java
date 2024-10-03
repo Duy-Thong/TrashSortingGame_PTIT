@@ -2,7 +2,10 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-
+/**
+ *
+ * @author vutuyen
+ */
 public class EndGame extends JFrame {
     public EndGame(RunGame parentGame, String winner) {
         setTitle("WIN!");

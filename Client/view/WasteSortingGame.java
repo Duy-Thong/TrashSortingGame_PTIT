@@ -4,6 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ *
+ * @author vutuyen
+ */
+
 public class WasteSortingGame extends JFrame {
     
     private RunGame game;
