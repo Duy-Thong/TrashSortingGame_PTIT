@@ -1,3 +1,5 @@
+package view;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,8 +14,8 @@ public class EndGame extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                setBackground(new Color(100, 200, 150)); // Teal-ish background
-                g.setColor(Color.YELLOW);
+//                setBackground(new Color(100, 200, 150)); // Teal-ish background
+//                g.setColor(Color.YELLOW);
                 g.setFont(new Font("Arial", Font.BOLD, 50));
                 g.drawString("WIN!", 150, 100);
             }

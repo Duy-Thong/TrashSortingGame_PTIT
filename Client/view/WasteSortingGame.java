@@ -1,3 +1,5 @@
+package view;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -7,7 +9,7 @@ public class WasteSortingGame extends JFrame {
     private JLabel player1ScoreLabel;
     private JLabel player2ScoreLabel;
     private Timer gameTimer;
-    private int secondsLeft = 30;
+    private int secondsLeft = 120;
     private int player1Score = 0;
     private int player2Score = 0;
 
@@ -26,7 +28,7 @@ public class WasteSortingGame extends JFrame {
     private void setupTopPanel() {
         JPanel topPanel = new JPanel(new GridLayout(1, 3));
         player1ScoreLabel = new JLabel("Player1: 0 points");
-        timerLabel = new JLabel("Time: 30", SwingConstants.CENTER);
+        timerLabel = new JLabel("Time:" + secondsLeft, SwingConstants.CENTER);
         player2ScoreLabel = new JLabel("Player2: 0 points", SwingConstants.RIGHT);
         topPanel.add(player1ScoreLabel);
         topPanel.add(timerLabel);
@@ -36,7 +38,7 @@ public class WasteSortingGame extends JFrame {
 
     private void setupGameArea() {
         JPanel gamePanel = new JPanel();
-        gamePanel.setBackground(new Color(100, 200, 150)); // Teal-ish background
+//        gamePanel.setBackground(new Color(255, 255, 255)); // Teal-ish background
         add(gamePanel, BorderLayout.CENTER);
     }
 
@@ -52,7 +54,7 @@ public class WasteSortingGame extends JFrame {
 
     private JLabel createBinLabel(String color) {
         // Replace "path/to/your/image.png" with the actual path to your bin images
-        ImageIcon icon = new ImageIcon("database/images/bins/container_bin_grey.png");
+        ImageIcon icon = new ImageIcon("/home/vutuyen/NetBeansProjects/JavaApplication8/src/images/trash2.png");
         JLabel label = new JLabel(icon);
         label.setToolTipText(color + " Bin");
         label.addMouseListener(new MouseAdapter() {
@@ -77,7 +79,7 @@ public class WasteSortingGame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 secondsLeft--;
                 timerLabel.setText("Time: " + secondsLeft);
-                if (secondsLeft <= 0) {
+                if (secondsLeft <= 119) {
                     gameTimer.stop();
                     showEndGame();
                 }
@@ -103,7 +105,7 @@ public class WasteSortingGame extends JFrame {
     }
 
     public void restartGame() {
-        secondsLeft = 30;
+        secondsLeft = 120;
         player1Score = 0;
         player2Score = 0;
         player1ScoreLabel.setText("Player1: 0 points");
