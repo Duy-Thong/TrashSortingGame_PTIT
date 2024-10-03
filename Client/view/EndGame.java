@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class EndGame extends JFrame {
-    public EndGame(WasteSortingGame parentGame, String winner) {
+    public EndGame(RunGame parentGame, String winner) {
         setTitle("WIN!");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
