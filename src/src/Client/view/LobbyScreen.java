@@ -43,6 +43,13 @@ public class LobbyScreen {
         gbc.gridy = 1;
         panel.add(btnEnterGame, gbc);
 
+        // Nút Đăng xuất
+        JButton btnLogout = new JButton("Đăng xuất");
+        gbc.gridx = 0; // Cột 0
+        gbc.gridy = 2; // Hàng 2
+        gbc.gridwidth = 2; // Chiếm cả hai cột
+        panel.add(btnLogout, gbc);
+
         // Hành động khi bấm nút Trang cá nhân
         btnProfile.addActionListener(new ActionListener() {
             @Override
@@ -76,6 +83,16 @@ public class LobbyScreen {
             public void actionPerformed(ActionEvent e) {
                 // Chuyển đến màn hình game
                 JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
+            }
+        });
+
+        // Hành động khi bấm nút Đăng xuất
+        btnLogout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Chuyển về màn hình đăng nhập
+                lobbyFrame.dispose(); // Đóng màn hình lobby
+                new LoginScreen(); // Mở lại màn hình đăng nhập
             }
         });
 

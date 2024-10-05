@@ -1,5 +1,7 @@
 package Client.view;
 
+import Client.controller.RegisterController;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -50,6 +52,33 @@ public class RegisterScreen {
         gbc.gridx = 0; // Cột 0
         gbc.gridy = 3; // Hàng 3
         JButton btnSubmit = new JButton("Đăng ký");
+        btnSubmit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText();
+                String password = new String(passwordField.getPassword());
+                String confirmPassword = new String(confirmPasswordField.getPassword());
+
+                // Kiểm tra nếu mật khẩu và xác nhận mật khẩu khớp nhau
+                if (!password.equals(confirmPassword)) {
+                    JOptionPane.showMessageDialog(registerFrame, "Mật khẩu không khớp!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Tạo controller để xử lý đăng ký
+                RegisterController controller = new RegisterController();
+                boolean result = controller.register(username, password);
+
+                // Hiển thị thông báo kết quả
+                if (result) {
+                    JOptionPane.showMessageDialog(registerFrame, "Đăng ký thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    registerFrame.dispose();
+                    new LoginScreen();
+                } else {
+                    JOptionPane.showMessageDialog(registerFrame, "Đăng ký thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         panel.add(btnSubmit, gbc); // Thêm nút Đăng ký
 
         // Nút Trở về

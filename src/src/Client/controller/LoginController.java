@@ -12,6 +12,7 @@ public class LoginController {
         try (DatagramSocket socket = new DatagramSocket()) {
             // Tạo thông điệp dạng: "type=login&username=user&password=pass"
             String message = "type=login&username=" + username + "&password=" + password;
+            System.out.println("Sending: " + message);
             byte[] buffer = message.getBytes();
 
             // Gửi gói tin đến server
