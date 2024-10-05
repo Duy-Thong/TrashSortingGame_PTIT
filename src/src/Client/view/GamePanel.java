@@ -1,6 +1,6 @@
-package ui;
+package Client.view;
 
-import model.WSGame;
+import Client.model.wasteItems.WSGame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -17,7 +17,7 @@ public class GamePanel extends JPanel {
     //<a href="https://www.freepik.com/free-photos-vectors/tree">
     // Tree vector created by upklyak - www.freepik.com</a>
     private static final String imagePath = "src/data/images/background.jpg";
-    private WSGame game;
+    private final WSGame game;
     private Image bgImg;
 
     // Constructs a game panel

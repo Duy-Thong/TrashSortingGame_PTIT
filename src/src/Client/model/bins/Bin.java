@@ -1,12 +1,11 @@
-package model.bins;
+package Client.model.bins;
 
-import model.WSGame;
+import Client.model.wasteItems.WSGame;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-
 public abstract class Bin {
 
     //width & height
@@ -63,7 +62,7 @@ public abstract class Bin {
     }
 
     private void drawString(Graphics g, String str, int x, int y) {
-        g.setColor(color.WHITE);
+        g.setColor(Color.WHITE);
         g.setFont(new Font("Arial Black", 1,14));
         for (String line : name.split("\n"))
             g.drawString(line, x, y += lineHeight);

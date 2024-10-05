@@ -1,4 +1,4 @@
-package model.bins;
+package Client.model.bins;
 
 import java.awt.*;
 

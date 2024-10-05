@@ -1,6 +1,6 @@
-package ui;
+package Client.view;
 
-import model.WSGame;
+import Client.model.wasteItems.WSGame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,12 +9,12 @@ import java.util.Collection;
 
 public class InstructionFrame extends JFrame {
 
-    private JButton startButton;
+    private final JButton startButton;
     Collection<JButton> buttons;
 
     public static final String gameStarts= "Start the Game!";
-    private JPanel instPanel;
-    private Dimension dm = new Dimension(300,240);
+    private final JPanel instPanel;
+    private final Dimension dm = new Dimension(300,240);
 //    JPanel thisPanel;
 
     // construct a instruction panel explaining the rules

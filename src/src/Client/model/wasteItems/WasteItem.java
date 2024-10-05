@@ -1,12 +1,11 @@
-package model.wasteItems;
+package Client.model.wasteItems;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
+import Client.model.bins.Bin;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
-import model.bins.Bin;
 
 public abstract class WasteItem {
   private static int dy;

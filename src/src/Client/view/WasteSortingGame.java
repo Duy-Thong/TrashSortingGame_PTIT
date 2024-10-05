@@ -1,6 +1,6 @@
-package ui;
+package Client.view;
 
-import model.WSGame;
+import Client.model.wasteItems.WSGame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,11 +8,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class WasteSortingGame extends JFrame {
-    private WSGame game;
-    private GamePanel gamePanel;
+    private final WSGame game;
+    private final GamePanel gamePanel;
     private static final int INTERVAL = 5;
     private Timer timer;
-    private ScorePanel scorePanel;
+    private final ScorePanel scorePanel;
 
     // Constructs main window
     // effects: sets up window in which Space Invaders game will be played

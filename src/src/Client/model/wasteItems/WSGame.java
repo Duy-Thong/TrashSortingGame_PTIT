@@ -1,26 +1,15 @@
-package model;
+package Client.model.wasteItems;
 
-import java.awt.Graphics;
+import Client.model.bins.*;
+import Client.view.GameOverFrame;
+import Client.view.WasteSortingGame;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Random;
-import model.bins.Bin;
-import model.bins.FoodScrapBin;
-import model.bins.GarbageBin;
-import model.bins.PaperBin;
-import model.bins.RecyclableContainersBin;
-import model.wasteItems.BananaPeel;
-import model.wasteItems.GlassBottle;
-import model.wasteItems.Letter;
-import model.wasteItems.Magazine;
-import model.wasteItems.MilkBox;
-import model.wasteItems.Newspaper;
-import model.wasteItems.PlasticBag;
-import model.wasteItems.WasteItem;
-import ui.WasteSortingGame;
-import ui.GameOverFrame;
 
 public class WSGame extends Observable {
   public static final int WIDTH = 800;
@@ -136,19 +125,19 @@ public class WSGame extends Observable {
     } 
     switch (i) {
       case 1:
-        return (WasteItem)new Letter(xCoordinate);
+        return new Letter(xCoordinate);
       case 2:
-        return (WasteItem)new BananaPeel(xCoordinate);
+        return new BananaPeel(xCoordinate);
       case 3:
-        return (WasteItem)new GlassBottle(xCoordinate);
+        return new GlassBottle(xCoordinate);
       case 4:
-        return (WasteItem)new PlasticBag(xCoordinate);
+        return new PlasticBag(xCoordinate);
       case 5:
-        return (WasteItem)new MilkBox(xCoordinate);
+        return new MilkBox(xCoordinate);
       case 6:
-        return (WasteItem)new Magazine(xCoordinate);
+        return new Magazine(xCoordinate);
       case 7:
-        return (WasteItem)new Newspaper(xCoordinate);
+        return new Newspaper(xCoordinate);
     } 
     throw new IllegalArgumentException("invalid item");
   }

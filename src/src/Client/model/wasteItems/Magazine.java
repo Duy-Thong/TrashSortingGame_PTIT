@@ -1,4 +1,4 @@
-package model.wasteItems;
+package Client.model.wasteItems;
 
 public class Magazine extends WasteItem {
 

@@ -1,4 +1,4 @@
-package model.wasteItems;
+package Client.model.wasteItems;
 
 public class BananaPeel extends WasteItem {
   public static final String belongsTo = "Food Scrap Bin";

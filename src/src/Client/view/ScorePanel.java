@@ -1,6 +1,6 @@
-package ui;
+package Client.view;
 
-import model.WSGame;
+import Client.model.wasteItems.WSGame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,8 +13,8 @@ public class ScorePanel extends JPanel implements Observer {
     private static final int LBL_WIDTH = 200;
     private static final int LBL_HEIGHT = 30;
 
-    private JLabel correctLbl;
-    private JLabel misplacedLbl;
+    private final JLabel correctLbl;
+    private final JLabel misplacedLbl;
 
     // to construct a score panel
     // effects: set the background color and renders the initial labels;

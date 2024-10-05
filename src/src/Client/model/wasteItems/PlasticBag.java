@@ -1,4 +1,4 @@
-package model.wasteItems;
+package Client.model.wasteItems;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

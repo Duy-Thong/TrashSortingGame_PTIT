@@ -1,19 +1,19 @@
-package ui;
+package Client.view;
 
-import model.WSGame;
+import Client.model.wasteItems.WSGame;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class GameOverFrame extends JFrame {
 
-    private JButton restartButton;
-    private JButton quitButton;
-    private JLabel results;
-    private JPanel gameOverPanel;
-    private int sorted;
-    private int misplaced;
-    private Dimension dm = new Dimension(300, 240);
+    private final JButton restartButton;
+    private final JButton quitButton;
+    private final JLabel results;
+    private final JPanel gameOverPanel;
+    private final int sorted;
+    private final int misplaced;
+    private final Dimension dm = new Dimension(300, 240);
 
 //    JPanel thisPanel;
 
@@ -56,6 +56,7 @@ public class GameOverFrame extends JFrame {
         add(gameOverPanel);
         pack();
     }
+
 
     private void centreOnScreen() {
         Dimension scrn = Toolkit.getDefaultToolkit().getScreenSize();

@@ -1,4 +1,4 @@
-package model.wasteItems;
+package Client.model.wasteItems;
 
 public class Newspaper extends WasteItem {
     private static final String IMAGE_PATH = "src/data/images/waste_items/newspaper.png";

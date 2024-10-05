@@ -1,4 +1,4 @@
-package model.wasteItems;
+package Client.model.wasteItems;
 
 public class GlassBottle extends WasteItem {
     private static final int code = 3;
