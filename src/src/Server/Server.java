@@ -99,17 +99,43 @@ public class Server {
                 }
             }
 
-            // Generate UUID and convert to bytes
-            String uuid = UUID.randomUUID().toString(); // Generate UUID as a string
+            // Generate UUID for the account
+            String accountUUID = UUID.randomUUID().toString();
 
             // Insert the new account
-            String insertQuery = "INSERT INTO account (accountID, username, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())";
-            try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-                insertStmt.setString(1, uuid); // Insert as string
-                insertStmt.setString(2, username);
-                insertStmt.setString(3, password); // Consider using a hashed password
-                insertStmt.executeUpdate();
-                return true; // Registration successful
+            String insertAccountQuery = "INSERT INTO account (accountID, username, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())";
+            try (PreparedStatement insertAccountStmt = conn.prepareStatement(insertAccountQuery)) {
+                insertAccountStmt.setString(1, accountUUID); // Insert as string
+                insertAccountStmt.setString(2, username);
+                insertAccountStmt.setString(3, password); // Consider using a hashed password
+                insertAccountStmt.executeUpdate();
+            }
+
+            // Now create the player record using the accountID
+            return createPlayer(accountUUID);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Return false if an error occurs
+        }
+    }
+
+    private static boolean createPlayer(String accountID) {
+        String url = "jdbc:mysql://localhost:3306/trashsortinggame";
+        String dbUser = "root"; // Change to your database username
+        String dbPassword = ""; // Change to your database password
+
+        try (Connection conn = DriverManager.getConnection(url, dbUser, dbPassword)) {
+            // Generate a new playerID
+            String playerID = UUID.randomUUID().toString();
+
+            // Insert the new player record
+            String insertPlayerQuery = "INSERT INTO player (playerID, accountID, total_games, total_wins, total_score, average_score, created_at, updated_at) VALUES (?, ?, 0, 0, 0, 0, NOW(), NOW())";
+            try (PreparedStatement insertPlayerStmt = conn.prepareStatement(insertPlayerQuery)) {
+                insertPlayerStmt.setString(1, playerID);
+                insertPlayerStmt.setString(2, accountID);
+                insertPlayerStmt.executeUpdate();
+                return true; // Player created successfully
             }
 
         } catch (Exception e) {
