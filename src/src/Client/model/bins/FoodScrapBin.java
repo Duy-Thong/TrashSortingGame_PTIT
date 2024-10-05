@@ -5,7 +5,7 @@ import java.awt.*;
 public class FoodScrapBin extends Bin {
 
     private static final Color COLOR = new Color(16, 188, 83);
-    private static final String IMAGE_PATH = "src/data/images/bins/food_scrap_bin_green.png";
+    private static final String IMAGE_PATH = "src/Client/assets/bins/food_scrap_bin_green.png";
     public FoodScrapBin() {
         super("Food Scrap \nBin",100);
         color = COLOR;

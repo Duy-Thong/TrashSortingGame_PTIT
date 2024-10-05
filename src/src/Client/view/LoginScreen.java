@@ -1,5 +1,7 @@
 package Client.view;
 
+import Client.controller.LoginController;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -43,9 +45,31 @@ public class LoginScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 loginFrame.dispose();
-                new MainScreen();
+                new MainScreen(); // Trở về màn hình chính
             }
         });
+
+        // Thêm sự kiện cho nút Đăng nhập
+        btnSubmit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText();
+                String password = new String(passwordField.getPassword());
+
+                // Gọi LoginController để xử lý logic
+                LoginController loginController = new LoginController();
+                boolean isAuthenticated = loginController.authenticate(username, password);
+
+                if (isAuthenticated) {
+                    JOptionPane.showMessageDialog(loginFrame, "Đăng nhập thành công!");
+                    loginFrame.dispose();
+                    new MainScreen(); // Điều hướng tới màn hình chính sau khi đăng nhập thành công
+                } else {
+                    JOptionPane.showMessageDialog(loginFrame, "Tên đăng nhập hoặc mật khẩu không chính xác!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
         panel.add(btnBack, gbc);
         loginFrame.add(panel);
         loginFrame.setVisible(true);

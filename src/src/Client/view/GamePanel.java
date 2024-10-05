@@ -16,7 +16,7 @@ public class GamePanel extends JPanel {
 
     //<a href="https://www.freepik.com/free-photos-vectors/tree">
     // Tree vector created by upklyak - www.freepik.com</a>
-    private static final String imagePath = "src/data/images/background.jpg";
+    private static final String imagePath = "src/Client/assets/background.jpg";
     private final WSGame game;
     private Image bgImg;
 

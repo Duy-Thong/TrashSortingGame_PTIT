@@ -5,7 +5,7 @@ import java.awt.*;
 public class PaperBin extends Bin {
 
     private static final Color COLOR = new Color(46, 81, 175);
-    private static final String IMAGE_PATH = "src/data/images/bins/paper_bin_blue.png";
+    private static final String IMAGE_PATH = "src/Client/assets/bins/paper_bin_blue.png";
     public PaperBin() {
         super("Paper Bin",500);
         this.color = COLOR;

@@ -5,7 +5,7 @@ import java.awt.*;
 public class GarbageBin extends Bin {
 
     private static final Color COLOR = new Color(23, 23, 23);
-    private static final String IMAGE_PATH = "src/data/images/bins/garbage_bin.png";
+    private static final String IMAGE_PATH = "src/Client/assets/bins/garbage_bin.png";
 
     public GarbageBin() {
         super("Garbage Bin",700);
