@@ -6,7 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LobbyScreen {
-    public LobbyScreen() {
+    private final String playerID; // Add playerID field
+
+    // Constructor accepting playerID
+    public LobbyScreen(String playerID) {
+        this.playerID = playerID;
+
         // Tạo JFrame cho màn hình lobby
         JFrame lobbyFrame = new JFrame("Lobby");
         lobbyFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -43,12 +48,23 @@ public class LobbyScreen {
         gbc.gridy = 1;
         panel.add(btnEnterGame, gbc);
 
+        // Nút Đăng xuất
+        JButton btnLogout = new JButton("Đăng xuất");
+        gbc.gridx = 0; // Cột 0
+        gbc.gridy = 2; // Hàng 2
+        gbc.gridwidth = 2; // Chiếm cả hai cột
+        panel.add(btnLogout, gbc);
+
+        // Hành động khi bấm nút Trang cá nhân
         // Hành động khi bấm nút Trang cá nhân
         btnProfile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Chuyển đến màn hình Trang cá nhân
-                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Trang cá nhân");
+                // Chuyển đến màn hình Trang cá nhân và in ra playerID
+//                JOptionPane.showMessageDialog(lobbyFrame, "Player ID: " + playerID);
+                // Here you can also open the Profile screen
+                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem Profile cá nhân");
+                new ProfileScreen(playerID);
             }
         });
 
@@ -57,7 +73,7 @@ public class LobbyScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Chuyển đến màn hình Xem lịch sử
-                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử");
+                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử của playerID: " + playerID);
             }
         });
 
@@ -76,6 +92,16 @@ public class LobbyScreen {
             public void actionPerformed(ActionEvent e) {
                 // Chuyển đến màn hình game
                 JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
+            }
+        });
+
+        // Hành động khi bấm nút Đăng xuất
+        btnLogout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Chuyển về màn hình đăng nhập
+                lobbyFrame.dispose(); // Đóng màn hình lobby
+                new LoginScreen(); // Mở lại màn hình đăng nhập
             }
         });
 
