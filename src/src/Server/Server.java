@@ -50,7 +50,7 @@ public class Server {
                 case "register":
                     username = parts[1].split("=")[1];
                     password = parts[2].split("=")[1];
-                    response = register(username, password) ? "registration success" : "registration failure";
+                    response = register(username, password) ? "registration_success" : "registration failure";
                     break;
                 case "getAccountID":
                     username = parts[1].split("=")[1];
