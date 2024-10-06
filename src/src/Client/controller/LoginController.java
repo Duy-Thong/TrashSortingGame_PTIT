@@ -33,4 +33,50 @@ public class LoginController {
             return false;
         }
     }
+
+    public String getAccountIDByUsername(String username) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            // Tạo thông điệp dạng: "type=getAccountID&username=user"
+            String message = "type=getAccountID&username=" + username;
+            System.out.println("Sending: " + message);
+            byte[] buffer = message.getBytes();
+
+            // Gửi gói tin đến server
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+
+            // Nhận phản hồi từ server
+            byte[] responseBuffer = new byte[1024];
+            DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
+            socket.receive(responsePacket);
+            return new String(responsePacket.getData(), 0, responsePacket.getLength());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getPlayerIDByAccountID(String accountID) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            // Tạo thông điệp dạng: "type=getPlayerID&accountID=uuid"
+            String message = "type=getPlayerID&accountID=" + accountID;
+            System.out.println("Sending: " + message);
+            byte[] buffer = message.getBytes();
+
+            // Gửi gói tin đến server
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+
+            // Nhận phản hồi từ server
+            byte[] responseBuffer = new byte[1024];
+            DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
+            socket.receive(responsePacket);
+            return new String(responsePacket.getData(), 0, responsePacket.getLength());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

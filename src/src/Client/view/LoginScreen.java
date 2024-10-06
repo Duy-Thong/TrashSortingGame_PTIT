@@ -69,8 +69,14 @@ public class LoginScreen {
                 // Xác thực tài khoản
                 try {
                     if (loginController.authenticate(username, password)) {
+                        // Query accountID from username
+                        String accountID = loginController.getAccountIDByUsername(username);
+
+                        // Query playerID using accountID
+                        String playerID = loginController.getPlayerIDByAccountID(accountID);
+
                         loginFrame.dispose(); // Đóng màn hình đăng nhập
-                        new LobbyScreen(); // Chuyển đến màn hình hướng dẫn
+                        new LobbyScreen(playerID); // Pass playerID to LobbyScreen
                     } else {
                         JOptionPane.showMessageDialog(loginFrame, "Tên đăng nhập hoặc mật khẩu không đúng", "Lỗi đăng nhập", JOptionPane.ERROR_MESSAGE);
                     }

@@ -6,7 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LobbyScreen {
-    public LobbyScreen() {
+    private final String playerID; // Add playerID field
+
+    // Constructor accepting playerID
+    public LobbyScreen(String playerID) {
+        this.playerID = playerID;
+
         // Tạo JFrame cho màn hình lobby
         JFrame lobbyFrame = new JFrame("Lobby");
         lobbyFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -51,11 +56,16 @@ public class LobbyScreen {
         panel.add(btnLogout, gbc);
 
         // Hành động khi bấm nút Trang cá nhân
+        // Hành động khi bấm nút Trang cá nhân
         btnProfile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Chuyển đến màn hình Trang cá nhân
-                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Trang cá nhân");
+                // Chuyển đến màn hình Trang cá nhân và in ra playerID
+//                JOptionPane.showMessageDialog(lobbyFrame, "Player ID: " + playerID);
+                // Here you can also open the Profile screen
+                Profile profileScreen = new Profile(playerID); // Create the Profile screen with playerID
+                profileScreen.setVisible(true); // Make the Profile screen visible
+
             }
         });
 
@@ -64,7 +74,7 @@ public class LobbyScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Chuyển đến màn hình Xem lịch sử
-                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử");
+                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử của playerID: " + playerID);
             }
         });
 
