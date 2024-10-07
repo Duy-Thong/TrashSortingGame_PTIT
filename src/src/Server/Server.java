@@ -1,5 +1,8 @@
 package Server;
 
+import Client.controller.ProfileController;
+import Server.model.Player;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.sql.Connection;
@@ -62,7 +65,14 @@ public class Server {
                     break;
                 case "profile":
                     String playerID = parts[1].split("=")[1];
-                    response = getPlayerProfile(playerID);
+                    Player player = getPlayerProfile(playerID);
+                    if (player != null) {
+                        response = String.format("username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d",
+                                player.getUsername(), player.getTotalGames(),
+                                player.getTotalWins(), player.getTotalScore(), player.getAverageScore());
+                    } else {
+                        response = "error: player not found";
+                    }
                     break;
                 default:
                     response = "error: unknown request";
@@ -183,9 +193,9 @@ public class Server {
         }
     }
 
-    private static String getPlayerProfile(String playerID) {
+    private static Player getPlayerProfile(String playerID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT p.total_games, p.total_wins, p.total_score, p.average_score, a.username, a.created_at "
+            String query = "SELECT p.total_games, p.total_wins, p.total_score, p.average_score, a.username "
                     + "FROM player p "
                     + "JOIN account a ON p.accountID = a.accountID "
                     + "WHERE p.playerID = ?";
@@ -194,18 +204,20 @@ public class Server {
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     String username = rs.getString("username");
-                    String totalGames = rs.getString("total_games");
-                    String totalWins = rs.getString("total_wins");
-                    String totalScore = rs.getString("total_score");
-                    String avgScore = rs.getString("average_score");
-                    String createdAt = rs.getString("created_at");
-                    return username + "&" + totalGames + "&" + totalWins + "&" + totalScore + "&" + avgScore + "&" + createdAt;
+                    int totalGames = rs.getInt("total_games");
+                    int totalWins = rs.getInt("total_wins");
+                    int totalScore = rs.getInt("total_score");
+                    int avgScore = rs.getInt("average_score");
+
+                    // Trả về một đối tượng Player với các thông tin đã lấy
+                    return new Player(username, totalGames, totalWins, totalScore, avgScore);
                 }
-                return "error: player not found";
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return "error: server error";
+            return null; // Hoặc trả về một đối tượng lỗi nếu cần
         }
+        return null; // Trả về null nếu không tìm thấy hoặc có lỗi
     }
+
 }

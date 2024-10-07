@@ -63,9 +63,8 @@ public class LobbyScreen {
                 // Chuyển đến màn hình Trang cá nhân và in ra playerID
 //                JOptionPane.showMessageDialog(lobbyFrame, "Player ID: " + playerID);
                 // Here you can also open the Profile screen
-                Profile profileScreen = new Profile(playerID); // Create the Profile screen with playerID
-                profileScreen.setVisible(true); // Make the Profile screen visible
-
+                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem Profile cá nhân");
+                new ProfileScreen(playerID);
             }
         });
 
