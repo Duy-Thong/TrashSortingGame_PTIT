@@ -1,12 +1,12 @@
 package Server.model;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 public class PlayerGame {
     private String playerID;
     private String gameID;
-    private LocalDateTime joinTime;
-    private LocalDateTime leaveTime;
+    private Timestamp joinTime;
+    private Timestamp leaveTime;
     private Integer playDuration; // in seconds
     private int score;
     private String result; // 'win', 'lose', 'draw'
@@ -14,7 +14,7 @@ public class PlayerGame {
 
     public PlayerGame() {}
 
-    public PlayerGame(String playerID, String gameID, LocalDateTime joinTime, LocalDateTime leaveTime, Integer playDuration, int score, String result, boolean isFinal) {
+    public PlayerGame(String playerID, String gameID, Timestamp joinTime, Timestamp leaveTime, Integer playDuration, int score, String result, boolean isFinal) {
         this.playerID = playerID;
         this.gameID = gameID;
         this.joinTime = joinTime;
@@ -41,19 +41,19 @@ public class PlayerGame {
         this.gameID = gameID;
     }
 
-    public LocalDateTime getJoinTime() {
+    public Timestamp getJoinTime() {
         return joinTime;
     }
 
-    public void setJoinTime(LocalDateTime joinTime) {
+    public void setJoinTime(Timestamp joinTime) {
         this.joinTime = joinTime;
     }
 
-    public LocalDateTime getLeaveTime() {
+    public Timestamp getLeaveTime() {
         return leaveTime;
     }
 
-    public void setLeaveTime(LocalDateTime leaveTime) {
+    public void setLeaveTime(Timestamp leaveTime) {
         this.leaveTime = leaveTime;
     }
 
@@ -89,4 +89,3 @@ public class PlayerGame {
         this.isFinal = isFinal;
     }
 }
-

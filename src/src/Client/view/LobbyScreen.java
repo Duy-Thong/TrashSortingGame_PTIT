@@ -73,7 +73,8 @@ public class LobbyScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Chuyển đến màn hình Xem lịch sử
-                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử của playerID: " + playerID);
+                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử người chơi");
+                new HistoryScreen(playerID);
             }
         });
 

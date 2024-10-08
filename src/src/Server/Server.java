@@ -2,13 +2,14 @@ package Server;
 
 import Client.controller.ProfileController;
 import Server.model.Player;
+import Server.model.PlayerGame;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class Server {
@@ -67,13 +68,40 @@ public class Server {
                     String playerID = parts[1].split("=")[1];
                     Player player = getPlayerProfile(playerID);
                     if (player != null) {
-                        response = String.format("username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d",
-                                player.getUsername(), player.getTotalGames(),
-                                player.getTotalWins(), player.getTotalScore(), player.getAverageScore());
+                        response = String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&createdAt=%s&updatedAt=%s",
+                                player.getPlayerID(), player.getUsername(), player.getTotalGames(),
+                                player.getTotalWins(), player.getTotalScore(), player.getAverageScore(),
+                                player.getCreatedAt().toString(), player.getUpdatedAt().toString());
                     } else {
                         response = "error: player not found";
                     }
                     break;
+                case "history":
+                    // Lấy playerID từ yêu cầu
+                    playerID = parts[1].split("=")[1];
+
+                    // Lấy lịch sử người chơi
+                    List<PlayerGame> historyList = getPlayerHistory(playerID);
+
+                    // Đóng gói lịch sử vào chuỗi để gửi về client
+                    StringBuilder responseBuilder = new StringBuilder();
+
+                    // Kiểm tra nếu lịch sử không rỗng
+                    if (historyList.isEmpty()) {
+                        responseBuilder.append("error: no history found for player");
+                    } else {
+                        for (PlayerGame game : historyList) {
+                            responseBuilder.append(String.format("gameID=%s&joinTime=%s&leaveTime=%s&playDuration=%d&score=%d&result=%s&isFinal=%b|",
+                                    game.getGameID(), game.getJoinTime(), game.getLeaveTime(), game.getPlayDuration(),
+                                    game.getScore(), game.getResult(), game.isFinal()));
+                        }
+                    }
+
+                    // Gửi phản hồi về cho client
+                    response = responseBuilder.toString();
+                    System.out.println("Response to client: " + response);
+                    break;
+
                 default:
                     response = "error: unknown request";
             }
@@ -195,7 +223,7 @@ public class Server {
 
     private static Player getPlayerProfile(String playerID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT p.total_games, p.total_wins, p.total_score, p.average_score, a.username "
+            String query = "SELECT p.total_games, p.total_wins, p.total_score, p.average_score, a.username, p.created_at, p.updated_at "
                     + "FROM player p "
                     + "JOIN account a ON p.accountID = a.accountID "
                     + "WHERE p.playerID = ?";
@@ -208,9 +236,11 @@ public class Server {
                     int totalWins = rs.getInt("total_wins");
                     int totalScore = rs.getInt("total_score");
                     int avgScore = rs.getInt("average_score");
+                    Timestamp createdAt = rs.getTimestamp("created_at");  // Lấy timestamp cho created_at
+                    Timestamp updatedAt = rs.getTimestamp("updated_at");  // Lấy timestamp cho updated_at
 
-                    // Trả về một đối tượng Player với các thông tin đã lấy
-                    return new Player(username, totalGames, totalWins, totalScore, avgScore);
+                    // Trả về đối tượng Player với các thông tin đã lấy
+                    return new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, createdAt, updatedAt);
                 }
             }
         } catch (Exception e) {
@@ -220,4 +250,35 @@ public class Server {
         return null; // Trả về null nếu không tìm thấy hoặc có lỗi
     }
 
+    public static List<PlayerGame> getPlayerHistory(String playerID) {
+        List<PlayerGame> historyList = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT gameID, join_time, leave_time, play_duration, score, result, is_final " +
+                    "FROM player_game " +
+                    "WHERE playerID = ? " +
+                    "ORDER BY join_time DESC"; // Sắp xếp theo thời gian tham gia
+
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, playerID);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    String gameID = rs.getString("gameID");
+                    Timestamp joinTime = rs.getTimestamp("join_time");
+                    Timestamp leaveTime = rs.getTimestamp("leave_time");
+                    Integer playDuration = rs.getInt("play_duration");
+                    int score = rs.getInt("score");
+                    String result = rs.getString("result");
+                    boolean isFinal = rs.getBoolean("is_final");
+
+                    // Thêm đối tượng PlayerGame vào danh sách
+                    historyList.add(new PlayerGame(playerID, gameID, joinTime, leaveTime, playDuration, score, result, isFinal));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return historyList; // Trả về danh sách PlayerGame
+    }
 }

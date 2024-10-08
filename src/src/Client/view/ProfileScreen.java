@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 
 public class ProfileScreen extends JFrame {
     private JButton backButton;
@@ -87,6 +88,11 @@ public class ProfileScreen extends JFrame {
             addLabelAndValue(infoPanel, gbc, "Tổng bàn thắng:", String.valueOf(player.getTotalWins()), 2);
             addLabelAndValue(infoPanel, gbc, "Tổng điểm:", String.valueOf(player.getTotalScore()), 3);
             addLabelAndValue(infoPanel, gbc, "Điểm trung bình:", String.valueOf(player.getAverageScore()), 4);
+            // Hiển thị thời gian tạo tài khoản (createdAt)
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String createdAtStr = dateFormat.format(player.getCreatedAt());
+
+            addLabelAndValue(infoPanel, gbc, "Ngày tạo:", createdAtStr, 5);
         } else {
             JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin cá nhân.");
         }

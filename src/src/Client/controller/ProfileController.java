@@ -3,6 +3,9 @@ package Client.controller;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.sql.Timestamp;
+import java.util.Date;
+
 import Client.model.Player;
 
 public class ProfileController {
@@ -30,28 +33,19 @@ public class ProfileController {
             String[] playerData = response.split("&");
 
             // Kiểm tra xem dữ liệu trả về có đúng định dạng không
-            if (playerData.length == 5) {
+            if (playerData.length == 8) {  // Nếu có đầy đủ các trường dữ liệu
+                String playerId = playerData[0].split("=")[1];
+                String username = playerData[1].split("=")[1];
+                int totalGames = Integer.parseInt(playerData[2].split("=")[1]);
+                int totalWins = Integer.parseInt(playerData[3].split("=")[1]);
+                int totalScore = Integer.parseInt(playerData[4].split("=")[1]);
+                int averageScore = Integer.parseInt(playerData[5].split("=")[1]);
+                // Chuyển đổi chuỗi thành Timestamp
+                Timestamp createdAt = Timestamp.valueOf(playerData[6].split("=")[1]);  // Parse string to Timestamp
+                Timestamp updatedAt = Timestamp.valueOf(playerData[7].split("=")[1]);  // Parse string to Timestamp
 
-                // Tạo một đối tượng Player từ phản hồi
-                String username = playerData[0].split("=")[1]; // Lấy username
-                int totalGames = Integer.parseInt(playerData[1].split("=")[1]); // Lấy totalGames
-                int totalWins = Integer.parseInt(playerData[2].split("=")[1]); // Lấy totalWins
-                int totalScore = Integer.parseInt(playerData[3].split("=")[1]); // Lấy totalScore
-                int averageScore = Integer.parseInt(playerData[4].split("=")[1]); // Lấy averageScore
-                // Lưu ý: Nếu có createdAt, hãy thêm vào model Player nếu cần thiết
+                return new Player(playerId, username, totalGames, totalWins, totalScore, averageScore, createdAt, updatedAt);
 
-                // Đóng gói dữ liệu vào model Player
-                Player player = new Player(
-                        username,  // Username
-                        totalGames,  // Total Games
-                        totalWins,  // Total Wins
-                        totalScore,  // Total Score
-                        averageScore  // Average Score
-                        // Nếu có createdAt thì thêm tham số này
-                );
-
-                // Trả về đối tượng Player sau khi đã đóng gói
-                return player;
             } else {
                 System.out.println("Invalid response from server.");
                 return null;
