@@ -6,6 +6,8 @@ import Client.model.PlayerGame;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 public class HistoryScreen extends JFrame {
@@ -56,6 +58,15 @@ public class HistoryScreen extends JFrame {
         setSize(810, 540);
         setLocationRelativeTo(null);
         setVisible(true);
+
+        // Xử lý sự kiện khi nhấn nút Trở về
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();  // Đóng cửa sổ hiện tại
+                // new LobbyScreen();  // Gọi LobbyScreen nếu đã có (bạn cần thay đổi phần này tùy vào project)
+            }
+        });
     }
 
     // Tạo nút Trở về
@@ -81,5 +92,9 @@ public class HistoryScreen extends JFrame {
         titlePanel.add(titleLabel, BorderLayout.CENTER);
 
         return titlePanel;
+    }
+
+    public JButton getBackButton() {
+        return backButton;
     }
 }
