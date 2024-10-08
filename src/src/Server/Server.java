@@ -5,10 +5,8 @@ import Server.model.Player;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
+import java.util.Date;
 import java.util.UUID;
 
 public class Server {
@@ -67,9 +65,10 @@ public class Server {
                     String playerID = parts[1].split("=")[1];
                     Player player = getPlayerProfile(playerID);
                     if (player != null) {
-                        response = String.format("username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d",
-                                player.getUsername(), player.getTotalGames(),
-                                player.getTotalWins(), player.getTotalScore(), player.getAverageScore());
+                        response = String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&createdAt=%s&updatedAt=%s",
+                                player.getPlayerID(), player.getUsername(), player.getTotalGames(),
+                                player.getTotalWins(), player.getTotalScore(), player.getAverageScore(),
+                                player.getCreatedAt().toString(), player.getUpdatedAt().toString());
                     } else {
                         response = "error: player not found";
                     }
@@ -195,7 +194,7 @@ public class Server {
 
     private static Player getPlayerProfile(String playerID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT p.total_games, p.total_wins, p.total_score, p.average_score, a.username "
+            String query = "SELECT p.total_games, p.total_wins, p.total_score, p.average_score, a.username, p.created_at, p.updated_at "
                     + "FROM player p "
                     + "JOIN account a ON p.accountID = a.accountID "
                     + "WHERE p.playerID = ?";
@@ -208,9 +207,11 @@ public class Server {
                     int totalWins = rs.getInt("total_wins");
                     int totalScore = rs.getInt("total_score");
                     int avgScore = rs.getInt("average_score");
+                    Timestamp createdAt = rs.getTimestamp("created_at");  // Lấy timestamp cho created_at
+                    Timestamp updatedAt = rs.getTimestamp("updated_at");  // Lấy timestamp cho updated_at
 
-                    // Trả về một đối tượng Player với các thông tin đã lấy
-                    return new Player(username, totalGames, totalWins, totalScore, avgScore);
+                    // Trả về đối tượng Player với các thông tin đã lấy
+                    return new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, createdAt, updatedAt);
                 }
             }
         } catch (Exception e) {
