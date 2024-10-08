@@ -2,11 +2,14 @@ package Server;
 
 import Client.controller.ProfileController;
 import Server.model.Player;
+import Server.model.PlayerGame;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class Server {
@@ -73,6 +76,32 @@ public class Server {
                         response = "error: player not found";
                     }
                     break;
+                case "history":
+                    // Lấy playerID từ yêu cầu
+                    playerID = parts[1].split("=")[1];
+
+                    // Lấy lịch sử người chơi
+                    List<PlayerGame> historyList = getPlayerHistory(playerID);
+
+                    // Đóng gói lịch sử vào chuỗi để gửi về client
+                    StringBuilder responseBuilder = new StringBuilder();
+
+                    // Kiểm tra nếu lịch sử không rỗng
+                    if (historyList.isEmpty()) {
+                        responseBuilder.append("error: no history found for player");
+                    } else {
+                        for (PlayerGame game : historyList) {
+                            responseBuilder.append(String.format("gameID=%s&joinTime=%s&leaveTime=%s&playDuration=%d&score=%d&result=%s&isFinal=%b|",
+                                    game.getGameID(), game.getJoinTime(), game.getLeaveTime(), game.getPlayDuration(),
+                                    game.getScore(), game.getResult(), game.isFinal()));
+                        }
+                    }
+
+                    // Gửi phản hồi về cho client
+                    response = responseBuilder.toString();
+                    System.out.println("Response to client: " + response);
+                    break;
+
                 default:
                     response = "error: unknown request";
             }
@@ -221,4 +250,35 @@ public class Server {
         return null; // Trả về null nếu không tìm thấy hoặc có lỗi
     }
 
+    public static List<PlayerGame> getPlayerHistory(String playerID) {
+        List<PlayerGame> historyList = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT gameID, join_time, leave_time, play_duration, score, result, is_final " +
+                    "FROM player_game " +
+                    "WHERE playerID = ? " +
+                    "ORDER BY join_time DESC"; // Sắp xếp theo thời gian tham gia
+
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, playerID);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    String gameID = rs.getString("gameID");
+                    Timestamp joinTime = rs.getTimestamp("join_time");
+                    Timestamp leaveTime = rs.getTimestamp("leave_time");
+                    Integer playDuration = rs.getInt("play_duration");
+                    int score = rs.getInt("score");
+                    String result = rs.getString("result");
+                    boolean isFinal = rs.getBoolean("is_final");
+
+                    // Thêm đối tượng PlayerGame vào danh sách
+                    historyList.add(new PlayerGame(playerID, gameID, joinTime, leaveTime, playDuration, score, result, isFinal));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return historyList; // Trả về danh sách PlayerGame
+    }
 }
