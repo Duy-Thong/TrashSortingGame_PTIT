@@ -101,7 +101,30 @@ public class Server {
                     response = responseBuilder.toString();
                     System.out.println("Response to client: " + response);
                     break;
+                case "rank":
+                    // Lấy danh sách player từ database và sort
+                    List<Player> playerList = getAllPlayers();
 
+                    // Sắp xếp danh sách theo yêu cầu
+                    playerList.sort((p1, p2) -> {
+                        if (p2.getTotalScore() != p1.getTotalScore()) {
+                            return Integer.compare(p2.getTotalScore(), p1.getTotalScore());
+                        } else if (p2.getTotalWins() != p1.getTotalWins()) {
+                            return Integer.compare(p2.getTotalWins(), p1.getTotalWins());
+                        } else {
+                            return Integer.compare(p2.getTotalGames(), p1.getTotalGames());
+                        }
+                    });
+
+                    // Đóng gói dữ liệu
+                    StringBuilder rankResponse = new StringBuilder();
+                    for (Player p : playerList) {
+                        rankResponse.append(String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&createdAt=%s&updatedAt=%s|",
+                                p.getPlayerID(), p.getUsername(), p.getTotalGames(), p.getTotalWins(), p.getTotalScore(), p.getAverageScore(), p.getCreatedAt(), p.getUpdatedAt()));
+                    }
+
+                    response = rankResponse.toString();
+                    break;
                 default:
                     response = "error: unknown request";
             }
@@ -280,5 +303,34 @@ public class Server {
         }
 
         return historyList; // Trả về danh sách PlayerGame
+    }
+
+    // Hàm lấy danh sách tất cả các player từ cơ sở dữ liệu
+    private static List<Player> getAllPlayers() {
+        List<Player> playerList = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT p.playerID, p.total_games, p.total_wins, p.total_score, a.username, p.average_score, p.created_at, p.updated_at  "
+                    + "FROM player p "
+                    + "JOIN account a ON p.accountID = a.accountID";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String playerID = rs.getString("playerID");
+                    String username = rs.getString("username");
+                    int totalGames = rs.getInt("total_games");
+                    int totalWins = rs.getInt("total_wins");
+                    int totalScore = rs.getInt("total_score");
+                    int avgScore = rs.getInt("average_score");
+                    Timestamp createdAt = rs.getTimestamp("created_at");  // Lấy timestamp cho created_at
+                    Timestamp updatedAt = rs.getTimestamp("updated_at");  // Lấy timestamp cho updated_at
+
+                    playerList.add(new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, createdAt, updatedAt));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return playerList;
     }
 }

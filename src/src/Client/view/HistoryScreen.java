@@ -6,8 +6,8 @@ import Client.model.PlayerGame;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class HistoryScreen extends JFrame {
@@ -28,16 +28,30 @@ public class HistoryScreen extends JFrame {
         add(createTitlePanel(), BorderLayout.NORTH);
 
         // Tạo bảng để hiển thị lịch sử
-        String[] columnNames = {"Game ID", "Thời gian tham gia", "Điểm số", "Kết quả"};
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+        String[] columnNames = {"STT", "Game ID", "Thời gian tham gia", "Điểm số", "Kết quả"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Không cho phép chỉnh sửa ô trong bảng
+            }
+        };
+
         JTable historyTable = new JTable(model);
+        historyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Không cho phép chọn hàng
 
         // Lấy lịch sử người chơi và thêm vào bảng
         List<PlayerGame> historyList = historyController.getPlayerHistory(playerId);
+        int stt = 1; // Khởi tạo STT từ 1
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // Định dạng thời gian
+
         for (PlayerGame game : historyList) {
+            // Chuyển đổi thời gian tham gia từ Date sang String
+            String formattedJoinTime = sdf.format(game.getJoinTime());
+
             model.addRow(new Object[]{
+                    stt++, // STT tự động tăng
                     game.getGameID(),
-                    game.getJoinTime(),
+                    formattedJoinTime, // Sử dụng thời gian đã được định dạng
                     game.getScore(),
                     game.getResult()
             });
@@ -46,7 +60,10 @@ public class HistoryScreen extends JFrame {
         // Tạo một panel chứa bảng với khoảng cách
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0)); // Khoảng cách 10px giữa title và bảng
-        tablePanel.add(new JScrollPane(historyTable), BorderLayout.CENTER);
+
+        // Bọc bảng bằng JScrollPane
+        JScrollPane scrollPane = new JScrollPane(historyTable);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
 
         // Thêm panel bảng vào cửa sổ
         add(tablePanel, BorderLayout.CENTER);
@@ -60,12 +77,9 @@ public class HistoryScreen extends JFrame {
         setVisible(true);
 
         // Xử lý sự kiện khi nhấn nút Trở về
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();  // Đóng cửa sổ hiện tại
-                // new LobbyScreen();  // Gọi LobbyScreen nếu đã có (bạn cần thay đổi phần này tùy vào project)
-            }
+        backButton.addActionListener(e -> {
+            dispose();  // Đóng cửa sổ hiện tại
+            // new LobbyScreen();  // Gọi LobbyScreen nếu đã có (bạn cần thay đổi phần này tùy vào project)
         });
     }
 

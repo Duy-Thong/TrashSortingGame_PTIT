@@ -84,6 +84,7 @@ public class LobbyScreen {
             public void actionPerformed(ActionEvent e) {
                 // Chuyển đến màn hình Bảng xếp hạng
                 JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Bảng xếp hạng");
+                new RankScreen();
             }
         });
 

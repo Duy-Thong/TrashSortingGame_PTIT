@@ -26,7 +26,7 @@ public class HistoryController {
             socket.send(packet);
 
             // Nhận phản hồi từ server
-            byte[] responseBuffer = new byte[2048]; // Kích thước buffer lớn hơn để chứa nhiều dữ liệu
+            byte[] responseBuffer = new byte[4096]; // Kích thước buffer lớn hơn để chứa nhiều dữ liệu
             DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
             socket.receive(responsePacket);
 
