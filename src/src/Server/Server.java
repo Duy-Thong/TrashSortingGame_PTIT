@@ -1,14 +1,13 @@
 package Server;
 
-import Client.controller.ProfileController;
 import Server.model.Player;
 import Server.model.PlayerGame;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,25 +67,20 @@ public class Server {
                     String playerID = parts[1].split("=")[1];
                     Player player = getPlayerProfile(playerID);
                     if (player != null) {
-                        response = String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&createdAt=%s&updatedAt=%s",
+                        response = String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s",
                                 player.getPlayerID(), player.getUsername(), player.getTotalGames(),
                                 player.getTotalWins(), player.getTotalScore(), player.getAverageScore(),
-                                player.getCreatedAt().toString(), player.getUpdatedAt().toString());
+                                player.getStatus(), player.getIsPlaying(), player.getCreatedAt().toString());
                     } else {
                         response = "error: player not found";
                     }
                     break;
                 case "history":
-                    // Lấy playerID từ yêu cầu
                     playerID = parts[1].split("=")[1];
 
-                    // Lấy lịch sử người chơi
                     List<PlayerGame> historyList = getPlayerHistory(playerID);
-
-                    // Đóng gói lịch sử vào chuỗi để gửi về client
                     StringBuilder responseBuilder = new StringBuilder();
 
-                    // Kiểm tra nếu lịch sử không rỗng
                     if (historyList.isEmpty()) {
                         responseBuilder.append("error: no history found for player");
                     } else {
@@ -97,15 +91,12 @@ public class Server {
                         }
                     }
 
-                    // Gửi phản hồi về cho client
                     response = responseBuilder.toString();
                     System.out.println("Response to client: " + response);
                     break;
                 case "rank":
-                    // Lấy danh sách player từ database và sort
                     List<Player> playerList = getAllPlayers();
 
-                    // Sắp xếp danh sách theo yêu cầu
                     playerList.sort((p1, p2) -> {
                         if (p2.getTotalScore() != p1.getTotalScore()) {
                             return Integer.compare(p2.getTotalScore(), p1.getTotalScore());
@@ -116,15 +107,46 @@ public class Server {
                         }
                     });
 
-                    // Đóng gói dữ liệu
                     StringBuilder rankResponse = new StringBuilder();
                     for (Player p : playerList) {
-                        rankResponse.append(String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&createdAt=%s&updatedAt=%s|",
-                                p.getPlayerID(), p.getUsername(), p.getTotalGames(), p.getTotalWins(), p.getTotalScore(), p.getAverageScore(), p.getCreatedAt(), p.getUpdatedAt()));
+                        rankResponse.append(String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s|",
+                                p.getPlayerID(), p.getUsername(), p.getTotalGames(), p.getTotalWins(), p.getTotalScore(), p.getAverageScore(), p.getStatus(), p.getIsPlaying(), p.getCreatedAt()));
                     }
 
                     response = rankResponse.toString();
                     break;
+                case "friends":
+                    playerID = parts[1].split("=")[1];
+                    List<Player> friendsList = getListFriends(playerID);
+                    StringBuilder responseFriends = new StringBuilder();
+
+                    if (friendsList.isEmpty()) {
+                        responseFriends.append("error: no history found for player");
+                    } else {
+                        for (Player p : friendsList) {
+                            responseFriends.append(String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s|",
+                                    p.getPlayerID(), p.getUsername(), p.getTotalGames(), p.getTotalWins(), p.getTotalScore(), p.getAverageScore(), p.getStatus(), p.getIsPlaying(), p.getCreatedAt()));
+                        }
+                    }
+
+                    response = responseFriends.toString();
+                    System.out.println("Response to client: " + response);
+                    break;
+//                case "invite":
+//                    String currentPlayerID = parts[1].split("=")[1];
+//                    String invitedPlayerID = parts[2].split("=")[1];
+//
+//                    InetAddress invitedPlayerAddress = InetAddress.getByName("IP_INVITED_PLAYER");
+//                    DatagramPacket invitePacket = new DatagramPacket(message.getBytes(), message.length(),
+//                            invitedPlayerAddress, INVITED_PLAYER_PORT);
+//                    socket.send(invitePacket);
+//
+//                    // Gửi phản hồi về currentPlayer
+//                    String responseMessage = "Lời mời đã được gửi đến " + invitedPlayerID + "!";
+//                    DatagramPacket responsePacket = new DatagramPacket(responseMessage.getBytes(),
+//                            responseMessage.length(), packet.getAddress(), packet.getPort());
+//                    socket.send(responsePacket);
+//                    break;
                 default:
                     response = "error: unknown request";
             }
@@ -246,7 +268,7 @@ public class Server {
 
     private static Player getPlayerProfile(String playerID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT p.total_games, p.total_wins, p.total_score, p.average_score, a.username, p.created_at, p.updated_at "
+            String query = "SELECT p.total_games, p.total_wins, p.total_score, p.average_score, a.username, p.status, p.isPlaying, p.created_at "
                     + "FROM player p "
                     + "JOIN account a ON p.accountID = a.accountID "
                     + "WHERE p.playerID = ?";
@@ -259,11 +281,12 @@ public class Server {
                     int totalWins = rs.getInt("total_wins");
                     int totalScore = rs.getInt("total_score");
                     int avgScore = rs.getInt("average_score");
+                    int status = rs.getInt("status");
+                    int isPlaying = rs.getInt("isPlaying");
                     Timestamp createdAt = rs.getTimestamp("created_at");  // Lấy timestamp cho created_at
-                    Timestamp updatedAt = rs.getTimestamp("updated_at");  // Lấy timestamp cho updated_at
 
                     // Trả về đối tượng Player với các thông tin đã lấy
-                    return new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, createdAt, updatedAt);
+                    return new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, status, isPlaying, createdAt);
                 }
             }
         } catch (Exception e) {
@@ -309,9 +332,9 @@ public class Server {
     private static List<Player> getAllPlayers() {
         List<Player> playerList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT p.playerID, p.total_games, p.total_wins, p.total_score, a.username, p.average_score, p.created_at, p.updated_at  "
-                    + "FROM player p "
-                    + "JOIN account a ON p.accountID = a.accountID";
+            String query = "SELECT p.playerID, p.total_games, p.total_wins, p.total_score, a.username, p.average_score, p.status, p.isPlaying, p.created_at"
+                    + " FROM player p"
+                    + " JOIN account a ON p.accountID = a.accountID";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
@@ -321,10 +344,45 @@ public class Server {
                     int totalWins = rs.getInt("total_wins");
                     int totalScore = rs.getInt("total_score");
                     int avgScore = rs.getInt("average_score");
+                    int status = rs.getInt("status");
+                    int isPlaying = rs.getInt("isPlaying");
                     Timestamp createdAt = rs.getTimestamp("created_at");  // Lấy timestamp cho created_at
-                    Timestamp updatedAt = rs.getTimestamp("updated_at");  // Lấy timestamp cho updated_at
 
-                    playerList.add(new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, createdAt, updatedAt));
+                    playerList.add(new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, status, isPlaying, createdAt));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return playerList;
+    }
+
+    // Hàm lấy danh sách tất cả các friends từ cơ sở dữ liệu
+    private static List<Player> getListFriends(String playerId) {
+        List<Player> playerList = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            // Thay đổi câu truy vấn để lấy bạn bè online trừ bản thân
+            String query = "SELECT p.playerID, p.total_games, p.total_wins, p.total_score, a.username, p.average_score, p.status, p.isPlaying, p.created_at "
+                    + "FROM player p "
+                    + "JOIN account a ON p.accountID = a.accountID "
+                    + "WHERE p.status = 1 AND p.isPlaying = 0 AND p.playerID != ?"; // Lọc ra bạn bè online và không phải là bản thân
+
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, playerId); // Thiết lập giá trị playerID vào câu truy vấn
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String friendID = rs.getString("playerID");
+                    String username = rs.getString("username");
+                    int totalGames = rs.getInt("total_games");
+                    int totalWins = rs.getInt("total_wins");
+                    int totalScore = rs.getInt("total_score");
+                    int avgScore = rs.getInt("average_score");
+                    int status = rs.getInt("status");
+                    int isPlaying = rs.getInt("isPlaying");
+                    Timestamp createdAt = rs.getTimestamp("created_at");  // Lấy timestamp cho created_at
+
+                    playerList.add(new Player(friendID, username, totalGames, totalWins, totalScore, avgScore, status, isPlaying, createdAt));
                 }
             }
         } catch (Exception e) {

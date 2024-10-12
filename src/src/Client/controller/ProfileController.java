@@ -33,18 +33,20 @@ public class ProfileController {
             String[] playerData = response.split("&");
 
             // Kiểm tra xem dữ liệu trả về có đúng định dạng không
-            if (playerData.length == 8) {  // Nếu có đầy đủ các trường dữ liệu
+            if (playerData.length == 9) {  // Nếu có đầy đủ các trường dữ liệu
                 String playerId = playerData[0].split("=")[1];
                 String username = playerData[1].split("=")[1];
                 int totalGames = Integer.parseInt(playerData[2].split("=")[1]);
                 int totalWins = Integer.parseInt(playerData[3].split("=")[1]);
                 int totalScore = Integer.parseInt(playerData[4].split("=")[1]);
                 int averageScore = Integer.parseInt(playerData[5].split("=")[1]);
-                // Chuyển đổi chuỗi thành Timestamp
-                Timestamp createdAt = Timestamp.valueOf(playerData[6].split("=")[1]);  // Parse string to Timestamp
-                Timestamp updatedAt = Timestamp.valueOf(playerData[7].split("=")[1]);  // Parse string to Timestamp
+                int status = Integer.parseInt(playerData[6].split("=")[1]);
+                int isPlaying = Integer.parseInt(playerData[7].split("=")[1]);
 
-                return new Player(playerId, username, totalGames, totalWins, totalScore, averageScore, createdAt, updatedAt);
+                // Chuyển đổi chuỗi thành Timestamp
+                Timestamp createdAt = Timestamp.valueOf(playerData[8].split("=")[1]);  // Parse string to Timestamp
+
+                return new Player(playerId, username, totalGames, totalWins, totalScore, averageScore, status, isPlaying, createdAt);
 
             } else {
                 System.out.println("Invalid response from server.");

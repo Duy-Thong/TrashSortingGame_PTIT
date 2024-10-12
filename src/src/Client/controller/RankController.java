@@ -38,17 +38,30 @@ public class RankController {
             // Duyệt qua từng bản ghi xếp hạng và tạo đối tượng Player
             for (String record : playerDataList) {
                 String[] playerData = record.split("&");
-                if (playerData.length == 8) {  // Kiểm tra nếu dữ liệu đầy đủ
+                if (playerData.length == 9) {  // Kiểm tra nếu dữ liệu đầy đủ
                     String playerID = playerData[0].split("=")[1];
                     String username = playerData[1].split("=")[1];
                     int totalGames = Integer.parseInt(playerData[2].split("=")[1]);
                     int totalWins = Integer.parseInt(playerData[3].split("=")[1]);
                     int totalScore = Integer.parseInt(playerData[4].split("=")[1]);
                     int averageScore = Integer.parseInt(playerData[5].split("=")[1]);
+                    int status = Integer.parseInt(playerData[6].split("=")[1]);
+                    int isPlaying = Integer.parseInt(playerData[7].split("=")[1]);
+
                     // Chuyển đổi chuỗi thành Timestamp
-                    Timestamp createdAt = Timestamp.valueOf(playerData[6].split("=")[1]);  // Parse string to Timestamp
-                    Timestamp updatedAt = Timestamp.valueOf(playerData[7].split("=")[1]);  // Parse string to Timestamp
-                    topPlayers.add(new Player(playerID, username, totalGames, totalWins, totalScore, averageScore, createdAt, updatedAt));
+                    String timestampStr = playerData[8].split("=")[1];
+
+                    // Kiểm tra và bổ sung phần thời gian nếu thiếu
+                    if (timestampStr.length() == 10) {  // Nếu chỉ có yyyy-MM-dd
+                        timestampStr += " 00:00:00";    // Thêm thời gian mặc định
+                    }
+
+                    try {
+                        Timestamp createdAt = Timestamp.valueOf(timestampStr);  // Parse string to Timestamp
+                        topPlayers.add(new Player(playerID, username, totalGames, totalWins, totalScore, averageScore, status, isPlaying, createdAt));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Invalid timestamp format: " + timestampStr);
+                    }
                 }
             }
         } catch (Exception e) {

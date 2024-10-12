@@ -94,6 +94,7 @@ public class LobbyScreen {
             public void actionPerformed(ActionEvent e) {
                 // Chuyển đến màn hình game
                 JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
+                new InviteScreen(playerID);
             }
         });
 

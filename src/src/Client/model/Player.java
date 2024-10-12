@@ -9,19 +9,21 @@ public class Player {
     private int totalWins;
     private int totalScore;
     private int averageScore;
+    private int status;
+    private int isPlaying;
     private Timestamp createdAt;
-    private Timestamp updatedAt;
 
     // Constructor
-    public Player(String playerID, String username, int totalGames, int totalWins, int totalScore, int averageScore, Timestamp createdAt, Timestamp updatedAt) {
+    public Player(String playerID, String username, int totalGames, int totalWins, int totalScore, int averageScore, int status, int isPlaying, Timestamp createdAt) {
         this.playerID = playerID;
         this.username = username;
         this.totalGames = totalGames;
         this.totalWins = totalWins;
         this.totalScore = totalScore;
         this.averageScore = averageScore;
+        this.status = status;
+        this.isPlaying = isPlaying;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     // Getters and Setters
@@ -73,19 +75,27 @@ public class Player {
         this.averageScore = averageScore;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getIsPlaying() {
+        return isPlaying;
+    }
+
+    public void setIsPlaying(int isPlaying) {
+        this.isPlaying = isPlaying;
+    }
+
     public Timestamp getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }
