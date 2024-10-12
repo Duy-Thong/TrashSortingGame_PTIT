@@ -2,7 +2,7 @@ package Client.view;
 
 import Client.controller.LoginController;
 import Client.model.Account;
-import Client.view.admin.MainAdmin;
+import Client.view.admin.AdminDashboardScreen;
 
 import javax.swing.*;
 import java.awt.*;
@@ -81,7 +81,7 @@ public class LoginScreen {
                         loginFrame.dispose(); // Đóng màn hình đăng nhập
                         String role = account.getRole();
                         if (role.equals("admin")) {
-                            new MainAdmin(accountID); // Mở
+                            new AdminDashboardScreen(accountID); // Mở
                         } else {
                             new LobbyScreen(playerID); // Mở
                         }

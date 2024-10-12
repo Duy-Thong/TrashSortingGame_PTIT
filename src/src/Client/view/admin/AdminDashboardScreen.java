@@ -7,10 +7,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MainAdmin {
+public class AdminDashboardScreen {
     private String accountID; // Store the admin's account ID
 
-    public MainAdmin(String accountID) {
+    public AdminDashboardScreen(String accountID) {
         this.accountID = accountID;
 
         JFrame adminFrame = new JFrame("Admin Dashboard");
@@ -43,12 +43,12 @@ public class MainAdmin {
 
         // Button to view logs
         gbc.gridy = 2;
-        JButton btnViewLogs = new JButton("View Logs");
+        JButton btnViewLogs = new JButton("Item Management");
         btnViewLogs.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Open log viewing window
-                openLogViewer();
+                openItemManagement();
             }
         });
         panel.add(btnViewLogs, gbc);
@@ -72,11 +72,11 @@ public class MainAdmin {
 
     private void openUserManagement() {
         // Implement user management logic here
-        JOptionPane.showMessageDialog(null, "User management functionality is not implemented yet.", "Information", JOptionPane.INFORMATION_MESSAGE);
+        new UserManagementScreen();
     }
 
-    private void openLogViewer() {
+    private void openItemManagement() {
         // Implement log viewer logic here
-        JOptionPane.showMessageDialog(null, "Log viewer functionality is not implemented yet.", "Information", JOptionPane.INFORMATION_MESSAGE);
+//        new ItemManagementScreen();
     }
 }
