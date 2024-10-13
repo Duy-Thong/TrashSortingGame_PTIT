@@ -25,10 +25,10 @@ public class RunGame extends JFrame {
     private Random random = new Random();
     private ArrayList<TrashItem> trashItems = new ArrayList<>();
     public static HashMap<String, Image> trashImages = new HashMap<>();
-    
+
 
     // Loop game
-    public RunGame() {             
+    public RunGame() {
         setTitle("Waste Sorting Game");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -39,19 +39,19 @@ public class RunGame extends JFrame {
         setupGameArea();
         setupTopPanel();
         setupBinPanel();
-        setupTimer();     
+        setupTimer();
     }
-    
+
     // Load image trash
     private void loadTrashImages() {
         String[] types = {"Paper", "Plastic", "Metal"};
         for (String type : types) {
-            ImageIcon icon = new ImageIcon("/home/vutuyen/NetBeansProjects/JavaApplication8/src/images/trash2.png");
+            ImageIcon icon = new ImageIcon("src/src/Client/image/trash2.png");
             trashImages.put(type, icon.getImage());
         }
     }
-    
-    // set main game 
+
+    // set main game
     private void setupGameArea() {
         gamePanel = new JPanel(){
             @Override
@@ -61,10 +61,10 @@ public class RunGame extends JFrame {
                     trashItems.get(0).draw(g, trashImages);
                 }
             }
-        };       
+        };
         add(gamePanel, BorderLayout.CENTER);
     }
-    
+
     // set up topbar game
     private void setupTopPanel() {
         JPanel topPanel = new JPanel(new GridLayout(1, 3));
@@ -76,9 +76,9 @@ public class RunGame extends JFrame {
         topPanel.add(player2ScoreLabel);
         add(topPanel, BorderLayout.NORTH);
     }
-    
-    
-    
+
+
+
     // Set up location Bin
     private void setupBinPanel() {
         JPanel binPanel = new JPanel(new GridLayout(1, 3));
@@ -89,7 +89,7 @@ public class RunGame extends JFrame {
         }
         add(binPanel, BorderLayout.SOUTH);
     }
-    
+
     // Handler KeyBoards
      private class KeyHandler extends KeyAdapter {
         @Override
@@ -97,7 +97,7 @@ public class RunGame extends JFrame {
             userKeyPressed(e.getKeyCode());
         }
     }
-    
+
      // set Timer game and Trash
     private void setupTimer() {
         gameTimer = new Timer(100, (ActionEvent e) -> {
@@ -110,17 +110,17 @@ public class RunGame extends JFrame {
             }
         });
         gameTimer.start();
-        
+
         trashTimer = new Timer(100, (ActionEvent e) -> {
             if(trashItems.isEmpty())
                 addNewTrashItem();
             moveTrashItems();
             gamePanel.repaint();
         });
-        
+
         trashTimer.start();
     }
-    
+
     // add new a item
     private void addNewTrashItem() {
         ArrayList<Integer> locx =new ArrayList<>(Arrays.asList(80, 280, 480));
@@ -129,8 +129,8 @@ public class RunGame extends JFrame {
         String type = types[random.nextInt(types.length)];
         trashItems.add(new TrashItem(x, 0, type));
     }
-    
-    
+
+
     // Trash auto move down
     private void moveTrashItems() {
         TrashItem item = trashItems.get(0);
@@ -145,14 +145,14 @@ public class RunGame extends JFrame {
                 updateScore();
         }
     }
-    
+
     // check answer
     private boolean isCorrectBin(String trashType, String binColor) {
         return (trashType.equals("Paper") && binColor.equals("Yellow")) ||
                (trashType.equals("Plastic") && binColor.equals("Gray")) ||
                (trashType.equals("Metal") && binColor.equals("Red"));
     }
-    
+
     // update score
     private void updateScore() {
         if (player == 1) {
@@ -163,14 +163,14 @@ public class RunGame extends JFrame {
             player2ScoreLabel.setText("Player2: " + player2Score + " points");
         }
     }
-    
+
     // show EndGame
     private void showEndGame() {
         EndGame endGame = new EndGame(this, determineWinner());
         endGame.setVisible(true);
         this.setVisible(false);
     }
-    
+
 
     // Who win?
     private String determineWinner() {
@@ -182,8 +182,8 @@ public class RunGame extends JFrame {
             return "It's a tie!";
         }
     }
-    
-    
+
+
     // Get event game
      public void userKeyPressed(int keyCode) {
             if (keyCode == 226 || keyCode == 37){
@@ -208,13 +208,13 @@ public class RunGame extends JFrame {
 //                System.out.println("Over");
 //            } else if (keyCode == 88) {
 //              System.exit(0);
-            } 
+            }
     }
-    
+
      // Play again
     public void restartGame() {
         secondsLeft = 120;
-        player1Score = 0;        
+        player1Score = 0;
         player2Score = 0;
         player = 1;
         player1ScoreLabel.setText("Player1: 0 points");
@@ -225,5 +225,5 @@ public class RunGame extends JFrame {
         trashTimer.restart();
         this.setVisible(true);
     }
-    
+
 }

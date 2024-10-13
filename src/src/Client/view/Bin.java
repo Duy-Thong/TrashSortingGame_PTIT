@@ -13,7 +13,7 @@ import javax.swing.JLabel;
  */
 public class Bin{
     public static JLabel createBinLabel(String color) {
-        ImageIcon icon = new ImageIcon("/home/vutuyen/NetBeansProjects/JavaApplication8/src/images/trash2.png");
+        ImageIcon icon = new ImageIcon("src/src/Client/image/trash2.png");
         JLabel label = new JLabel(icon);
         label.setToolTipText(color + " Bin");
         return label;
