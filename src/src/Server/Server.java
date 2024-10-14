@@ -2,7 +2,7 @@ package Server;
 
 import Server.model.Player;
 import Server.model.PlayerGame;
-
+import Server.model.ClientInfo;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -16,6 +16,7 @@ public class Server {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/trashsortinggame";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "";
+    private static final List<ClientInfo> clients = new ArrayList<>();
 
     public static void main(String[] args) {
         try (DatagramSocket socket = new DatagramSocket(PORT)) {
@@ -42,6 +43,8 @@ public class Server {
 
             String[] parts = message.split("&");
             String type = parts[0].split("=")[1];
+
+
             String response;
 
             switch (type) {
@@ -49,6 +52,12 @@ public class Server {
                     String username = parts[1].split("=")[1];
                     String password = parts[2].split("=")[1];
                     response = authenticate(username, password) ? "login success" : "login failure";
+                    if (response.equals("login success")) {
+                        String accountID = getAccountID(username);
+                        String playerID = getPlayerID(accountID);
+                        clients.add(new ClientInfo(accountID, playerID, packet.getAddress(), packet.getPort()));
+                        System.out.println("Client " + playerID + " connected from " + packet.getAddress() + ":" + packet.getPort());
+                    }
                     break;
                 case "register":
                     username = parts[1].split("=")[1];
