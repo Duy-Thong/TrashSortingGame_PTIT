@@ -141,6 +141,16 @@ public class Server {
                     response = responseFriends.toString();
                     System.out.println("Response to client: " + response);
                     break;
+                    case "logout":
+                    playerID = parts[1].split("=")[1];
+                    if (logout(playerID)) {
+                        response = "logout success";
+                        System.out.println("Client " + playerID + " disconnected from " + packet.getAddress() + ":" + packet.getPort());
+                    } else {
+                        response = "logout failure";
+                        System.out.println("Client " + playerID + " failed to disconnect from " + packet.getAddress() + ":" + packet.getPort());
+                    }
+                    break;
 //                case "invite":
 //                    String currentPlayerID = parts[1].split("=")[1];
 //                    String invitedPlayerID = parts[2].split("=")[1];
@@ -191,6 +201,20 @@ public class Server {
             e.printStackTrace();
             return false;
         }
+    }
+    public static boolean logout(String playerID) {
+        ClientInfo client = null;
+        for (ClientInfo c : clients) {
+            if (c.getPlayerID().equals(playerID)) {
+                client = c;
+                break;
+            }
+        }
+        if (client != null) {
+            clients.remove(client);
+            return true;
+        }
+        return false;
     }
 
     // Register a new user with username and password

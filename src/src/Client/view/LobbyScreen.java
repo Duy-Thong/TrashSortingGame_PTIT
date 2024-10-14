@@ -1,5 +1,5 @@
 package Client.view;
-
+import Client.controller.LoginController;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 
 public class LobbyScreen {
     private final String playerID; // Add playerID field
-
+    private final LoginController loginController = new LoginController();
     // Constructor accepting playerID
     public LobbyScreen(String playerID) {
         this.playerID = playerID;
@@ -104,6 +104,7 @@ public class LobbyScreen {
             public void actionPerformed(ActionEvent e) {
                 // Chuyển về màn hình đăng nhập
                 lobbyFrame.dispose(); // Đóng màn hình lobby
+                loginController.logout(playerID); // Gửi yêu cầu đăng xuất đến server
                 new LoginScreen(); // Mở lại màn hình đăng nhập
             }
         });

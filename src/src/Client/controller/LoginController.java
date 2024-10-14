@@ -79,4 +79,18 @@ public class LoginController {
             return null;
         }
     }
+    public static void logout(String playerID) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            // Tạo thông điệp dạng: "type=logout&playerID=playerID"
+            String message = "type=logout&playerID=" + playerID;
+            byte[] buffer = message.getBytes();
+
+            // Gửi gói tin đến server
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
