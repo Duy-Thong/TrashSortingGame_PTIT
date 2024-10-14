@@ -2,7 +2,7 @@ package Client.view.admin;
 
 import Client.view.LoginScreen;
 import Client.view.admin.UserManagementScreen;
-
+import Client.controller.LoginController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,10 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class AdminDashboardScreen {
-    private String accountID; // Store the admin's account ID
-
+    private String playerID; // Store the admin's account ID
+    private final LoginController loginController = new LoginController();
     public AdminDashboardScreen(String accountID) {
-        this.accountID = accountID;
+        this.playerID = accountID;
 
         JFrame adminFrame = new JFrame("Admin Dashboard");
         adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -62,6 +62,7 @@ public class AdminDashboardScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Close admin frame and go back to login screen
+                loginController.logout(playerID);
                 adminFrame.dispose();
                 new LoginScreen();
             }
