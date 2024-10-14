@@ -141,21 +141,30 @@ public class Server {
                     response = responseFriends.toString();
                     System.out.println("Response to client: " + response);
                     break;
-//                case "invite":
-//                    String currentPlayerID = parts[1].split("=")[1];
-//                    String invitedPlayerID = parts[2].split("=")[1];
-//
-//                    InetAddress invitedPlayerAddress = InetAddress.getByName("IP_INVITED_PLAYER");
-//                    DatagramPacket invitePacket = new DatagramPacket(message.getBytes(), message.length(),
-//                            invitedPlayerAddress, INVITED_PLAYER_PORT);
-//                    socket.send(invitePacket);
-//
-//                    // Gửi phản hồi về currentPlayer
-//                    String responseMessage = "Lời mời đã được gửi đến " + invitedPlayerID + "!";
-//                    DatagramPacket responsePacket = new DatagramPacket(responseMessage.getBytes(),
-//                            responseMessage.length(), packet.getAddress(), packet.getPort());
-//                    socket.send(responsePacket);
-//                    break;
+                case "invite":
+                    String currentPlayerID = parts[1].split("=")[1];
+                    String invitedPlayerID = parts[2].split("=")[1];
+
+                    // Tìm ClientInfo của user2 (invitedPlayerID)
+                    ClientInfo invitedClient = findClientByPlayerID(invitedPlayerID);
+
+                    if (invitedClient != null) {
+                        // Gửi gói tin lời mời đến invitedPlayer
+                        InetAddress invitedPlayerAddress = invitedClient.getAddress();
+                        int invitedPlayerPort = invitedClient.getPort();
+
+                        String inviteMessage = "Lời mời từ " + currentPlayerID + "!";
+                        DatagramPacket invitePacket = new DatagramPacket(inviteMessage.getBytes(), inviteMessage.length(),
+                                invitedPlayerAddress, invitedPlayerPort);
+                        socket.send(invitePacket);
+
+                        // Gửi phản hồi về currentPlayer
+                        response = "Lời mời đã được gửi đến " + invitedPlayerID + "!";
+                    } else {
+                        // Gửi phản hồi lỗi nếu không tìm thấy invitedPlayer
+                        response = "Không tìm thấy người chơi với ID: " + invitedPlayerID;
+                    }
+                    break;
                 default:
                     response = "error: unknown request";
             }
@@ -399,5 +408,15 @@ public class Server {
         }
 
         return playerList;
+    }
+
+    // Phương thức để tìm ClientInfo dựa trên playerID
+    private static ClientInfo findClientByPlayerID(String playerID) {
+        for (ClientInfo client : clients) {
+            if (client.getPlayerID().equals(playerID)) {
+                return client;
+            }
+        }
+        return null;
     }
 }
