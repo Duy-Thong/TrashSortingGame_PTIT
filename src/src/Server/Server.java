@@ -72,6 +72,10 @@ public class Server {
                     String accountID = parts[1].split("=")[1];
                     response = getPlayerID(accountID);
                     break;
+                case "getAccount":
+                    accountID = parts[1].split("=")[1];
+                    response = getAccountbyID(accountID);
+                    break;
                 case "profile":
                     String playerID = parts[1].split("=")[1];
                     Player player = getPlayerProfile(playerID);
@@ -281,7 +285,36 @@ public class Server {
             return "error: server error";
         }
     }
+    private static String getAccountbyID(String accountID) {
+        if (accountID == null || accountID.isEmpty()) {
+            System.err.println("Error: accountID is null or empty");
+            return null; // or throw an IllegalArgumentException
+        }
 
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT * FROM account WHERE accountID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, accountID);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    // Assuming you have an accountID column
+                    String username = rs.getString("username"); // Assuming you have a username column
+                    String password = rs.getString("password"); // Assuming you have a password column
+                    String role = rs.getString("role"); // Assuming you have a role column
+                    return String.format("username=%s&password=%s&role=%s",
+                            username, password, role);
+                }
+                System.err.println("Error: User not found");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error: Database error - " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Error: Unexpected error occurred - " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
     // Retrieve player ID by account ID
     private static String getPlayerID(String accountID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {

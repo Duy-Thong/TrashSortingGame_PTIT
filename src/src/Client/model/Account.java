@@ -20,6 +20,12 @@ public class Account {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+    public Account(String accountID, String username, String password,String role) {
+        this.accountID = accountID;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
 
     public String getAccountID() {
         return accountID;

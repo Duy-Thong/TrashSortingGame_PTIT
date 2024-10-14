@@ -1,5 +1,5 @@
 package Client.controller;
-
+import Client.model.Account;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -79,6 +79,36 @@ public class LoginController {
             return null;
         }
     }
+    public Account getAccountByAccountID(String accountID) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            // Tạo thông điệp dạng: "type=getAccount&accountID=uuid"
+            String message = "type=getAccount&accountID=" + accountID;
+            System.out.println("Sending: " + message);
+            byte[] buffer = message.getBytes();
+
+            // Gửi gói tin đến server
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+
+            // Nhận phản hồi từ server
+            byte[] responseBuffer = new byte[1024];
+            DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
+            socket.receive(responsePacket);
+            String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
+
+            // Xử lý phản hồi
+            String[] parts = response.split("&");
+            String username = parts[0].split("=")[1];
+            String password = parts[1].split("=")[1];
+            String role = parts[2].split("=")[1];
+            return new Account(accountID, username, password,role);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static void logout(String playerID) {
         try (DatagramSocket socket = new DatagramSocket()) {
             // Tạo thông điệp dạng: "type=logout&playerID=playerID"

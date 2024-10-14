@@ -1,6 +1,8 @@
 package Client.view;
 
 import Client.controller.LoginController;
+import Client.view.admin.AdminDashboardScreen;
+import Client.model.Account;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,9 +76,17 @@ public class LoginScreen {
 
                         // Query playerID using accountID
                         String playerID = loginController.getPlayerIDByAccountID(accountID);
-
-                        loginFrame.dispose(); // Đóng màn hình đăng nhập
-                        new LobbyScreen(playerID); // Pass playerID to LobbyScreen
+                        Account account = loginController.getAccountByAccountID(accountID);
+                        String role = account.getRole();
+                        System.out.println("Role: " + role);
+                        if(role.equals("admin")){
+                            new AdminDashboardScreen(accountID);
+                            loginFrame.dispose();
+                        }
+                        else{
+                            new LobbyScreen(playerID);
+                            loginFrame.dispose();
+                        }
                     } else {
                         JOptionPane.showMessageDialog(loginFrame, "Tên đăng nhập hoặc mật khẩu không đúng", "Lỗi đăng nhập", JOptionPane.ERROR_MESSAGE);
                     }
