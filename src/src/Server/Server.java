@@ -52,13 +52,16 @@ public class Server {
                     String username = parts[1].split("=")[1];
                     String password = parts[2].split("=")[1];
                     response = authenticate(username, password) ? "login success" : "login failure";
+
                     if (response.equals("login success")) {
                         String accountID = getAccountID(username);
                         String playerID = getPlayerID(accountID);
+                        // Lưu thông tin client
                         clients.add(new ClientInfo(accountID, playerID, packet.getAddress(), packet.getPort()));
                         System.out.println("Client " + playerID + " connected from " + packet.getAddress() + ":" + packet.getPort());
                     }
                     break;
+
                 case "register":
                     username = parts[1].split("=")[1];
                     password = parts[2].split("=")[1];
@@ -77,9 +80,7 @@ public class Server {
                     Player player = getPlayerProfile(playerID);
                     if (player != null) {
                         response = String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s",
-                                player.getPlayerID(), player.getUsername(), player.getTotalGames(),
-                                player.getTotalWins(), player.getTotalScore(), player.getAverageScore(),
-                                player.getStatus(), player.getIsPlaying(), player.getCreatedAt().toString());
+                                player.getPlayerID(), player.getUsername(), player.getTotalGames(), player.getTotalWins(), player.getTotalScore(), player.getAverageScore(), player.getStatus(), player.getIsPlaying(), player.getCreatedAt().toString());
                     } else {
                         response = "error: player not found";
                     }
@@ -95,13 +96,11 @@ public class Server {
                     } else {
                         for (PlayerGame game : historyList) {
                             responseBuilder.append(String.format("gameID=%s&joinTime=%s&leaveTime=%s&playDuration=%d&score=%d&result=%s&isFinal=%b|",
-                                    game.getGameID(), game.getJoinTime(), game.getLeaveTime(), game.getPlayDuration(),
-                                    game.getScore(), game.getResult(), game.isFinal()));
+                                    game.getGameID(), game.getJoinTime(), game.getLeaveTime(), game.getPlayDuration(), game.getScore(), game.getResult(), game.isFinal()));
                         }
                     }
 
                     response = responseBuilder.toString();
-                    System.out.println("Response to client: " + response);
                     break;
                 case "rank":
                     List<Player> playerList = getAllPlayers();
@@ -139,37 +138,32 @@ public class Server {
                     }
 
                     response = responseFriends.toString();
-                    System.out.println("Response to client: " + response);
-                    break;
-                case "invite":
-                    String currentPlayerID = parts[1].split("=")[1];
-                    String invitedPlayerID = parts[2].split("=")[1];
-
-                    // Tìm ClientInfo của user2 (invitedPlayerID)
-                    ClientInfo invitedClient = findClientByPlayerID(invitedPlayerID);
-
-                    if (invitedClient != null) {
-                        // Gửi gói tin lời mời đến invitedPlayer
-                        InetAddress invitedPlayerAddress = invitedClient.getAddress();
-                        int invitedPlayerPort = invitedClient.getPort();
-
-                        String inviteMessage = "Lời mời từ " + currentPlayerID + "!";
-                        DatagramPacket invitePacket = new DatagramPacket(inviteMessage.getBytes(), inviteMessage.length(),
-                                invitedPlayerAddress, invitedPlayerPort);
-                        socket.send(invitePacket);
-
-                        // Gửi phản hồi về currentPlayer
-                        response = "Lời mời đã được gửi đến " + invitedPlayerID + "!";
-                    } else {
-                        // Gửi phản hồi lỗi nếu không tìm thấy invitedPlayer
-                        response = "Không tìm thấy người chơi với ID: " + invitedPlayerID;
-                    }
                     break;
                 default:
                     response = "error: unknown request";
             }
 
             sendResponse(response, packet, socket);
+
+            if (type.equals("invite")) {
+                String currentPlayerID = parts[1].split("=")[1];
+                String invitedPlayerID = parts[2].split("=")[1];
+
+                ClientInfo invitedClient = findClientByPlayerID(invitedPlayerID);
+
+                if (invitedClient != null) {
+                    InetAddress invitedPlayerAddress = invitedClient.getAddress();
+                    int invitedPlayerPort = invitedClient.getPort();
+
+                    String inviteMessage = "type=invited&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID;
+                    DatagramPacket invitePacket = new DatagramPacket(inviteMessage.getBytes(), inviteMessage.length(),
+                            invitedPlayerAddress, invitedPlayerPort);
+                    socket.send(invitePacket);
+                    System.out.println("Response to client: " + inviteMessage);
+                } else {
+                    System.out.println("Không tìm thấy người chơi với ID: " + invitedPlayerID);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             sendResponse("error: server error", packet, socket);
@@ -414,6 +408,7 @@ public class Server {
     private static ClientInfo findClientByPlayerID(String playerID) {
         for (ClientInfo client : clients) {
             if (client.getPlayerID().equals(playerID)) {
+                System.out.println("Đã tìm thấy client: " + client.getPlayerID() + "&" + client.getAddress() + "&" + client.getPort());
                 return client;
             }
         }

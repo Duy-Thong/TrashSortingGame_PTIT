@@ -48,8 +48,6 @@ public class InviteScreen extends JFrame {
         // Lấy danh sách người chơi có status = 1 và isPlaying = 0
         loadListFriends(playerID);
 
-        inviteController.receiveInvite(playerID);
-
         // Tùy chỉnh giao diện
         setSize(810, 540);
         setLocationRelativeTo(null);

@@ -2,21 +2,18 @@ package Client.controller;
 
 import Client.model.Player;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.net.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane; // Thêm import để sử dụng JOptionPane
-import javax.swing.Timer;
+import javax.swing.*;
 
 public class InviteController {
-    private static final String SERVER_ADDRESS = "26.29.9.206"; // Địa chỉ server
-    private static final int SERVER_PORT = 12345; // Cổng server
+    private static final String SERVER_ADDRESS = "26.29.9.206";
+    private static final int SERVER_PORT = 12345;
 
-    private List<Player> availablePlayers; // Danh sách bạn bè có sẵn
-    private long inviteTimeout = 30000; // Thời gian mời (30 giây)
+    private List<Player> availablePlayers;
+    private long inviteTimeout = 60000;
 
     // Hàm lấy danh sách người chơi có status = 1 và isPlaying = 0 từ server
     public void getListFriends(String playerID, AvailablePlayersCallback callback) {
@@ -40,7 +37,7 @@ public class InviteController {
             for (String record : playerDataList) {
                 String[] playerData = record.split("&");
                 if (playerData.length == 9) {
-                    String friendID = playerData[0].split("=")[1]; // Đổi tên biến thành friendID
+                    String friendID = playerData[0].split("=")[1];
                     String username = playerData[1].split("=")[1];
                     int totalGames = Integer.parseInt(playerData[2].split("=")[1]);
                     int totalWins = Integer.parseInt(playerData[3].split("=")[1]);
@@ -72,6 +69,9 @@ public class InviteController {
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
             socket.send(packet);
 
+            // Hiển thị thông báo rằng lời mời đã được gửi
+            JOptionPane.showMessageDialog(null, "Lời mời đã được gửi đến " + invitedPlayerID + "!");
+
             // Bắt đầu đếm ngược thời gian chờ
             Timer timer = new Timer((int) inviteTimeout, e -> {
                 callback.onInviteTimeout(invitedPlayerID);
@@ -79,47 +79,79 @@ public class InviteController {
             timer.setRepeats(false);
             timer.start();
 
-            // Hiển thị thông báo rằng lời mời đã được gửi
-            JOptionPane.showMessageDialog(null, "Lời mời đã được gửi đến " + invitedPlayerID + "!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+            // Nhận phản hồi đồng bộ
+            socket.setSoTimeout((int) inviteTimeout); // Thiết lập thời gian chờ
+            try {
+                byte[] responseBuffer = new byte[1024];
+                DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
+                socket.receive(responsePacket); // Chờ nhận phản hồi
 
-    // Hàm nhận lời mời từ server
-    public void receiveInvite(String currentPlayerID) {
-        try (DatagramSocket socket = new DatagramSocket(SERVER_PORT)) { // Lắng nghe lời mời trên cổng
-            byte[] responseBuffer = new byte[2048];
-            DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
-            while (true) { // Vòng lặp vô hạn để liên tục lắng nghe lời mời
-                socket.receive(responsePacket);
-                String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
-                handleReceivedInvite(response);
+                String responseMessage = new String(responsePacket.getData(), 0, responsePacket.getLength());
+                if (responseMessage.equals("accepted")) {
+                    callback.onInviteAccepted(invitedPlayerID);
+                } else if (responseMessage.equals("declined")) {
+                    callback.onInviteDeclined(invitedPlayerID);
+                }
+
+                // Dừng bộ đếm thời gian khi nhận được phản hồi
+                timer.stop();
+            } catch (SocketTimeoutException e) {
+                // Xử lý trường hợp hết thời gian chờ mà không nhận được phản hồi
+                callback.onInviteTimeout(invitedPlayerID);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // Xử lý lời mời nhận được
-    private void handleReceivedInvite(String response) {
-        String[] parts = response.split("&");
-        String invitedPlayerID = parts[1].split("=")[1];
-        showInvitationPopup(invitedPlayerID);
+    // Luồng lắng nghe lời mời
+    static class InviteListener implements Runnable {
+        @Override
+        public void run() {
+            try (DatagramSocket socket = new DatagramSocket(12346)) {
+                byte[] buffer = new byte[1024];
+
+                while (true) {
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                    socket.receive(packet); // Nhận gói tin từ server
+
+                    String receivedMessage = new String(packet.getData(), 0, packet.getLength());
+                    String[] parts = receivedMessage.split("&"); // Phân tách thông điệp
+
+                    if (parts[0].equals("type=invited")) {
+                        String senderId = parts[1].split("=")[1]; // ID người gửi
+                        String receiverId = parts[2].split("=")[1]; // ID người nhận
+
+                        // Hiển thị popup mời chơi
+                        showInvitePopup(senderId, receiverId);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private void showInvitationPopup(String invitedPlayerID) {
-        int response = JOptionPane.showConfirmDialog(null, invitedPlayerID + " đã mời bạn chơi game!",
-                "Lời mời chơi game", JOptionPane.YES_NO_OPTION);
+    // Phương thức hiển thị popup lời mời
+    public static void showInvitePopup(String senderId, String receiverId) {
+        SwingUtilities.invokeLater(() -> {
+            int response = JOptionPane.showConfirmDialog(null,
+                    "Người chơi " + senderId + " mời bạn tham gia trò chơi. Bạn có chấp nhận không?",
+                    "Lời mời chơi game", JOptionPane.YES_NO_OPTION);
 
-        // Kiểm tra phản hồi của người chơi
-        if (response == JOptionPane.YES_OPTION) {
-            // Thực hiện hành động khi chấp nhận lời mời
-            // Callback có thể được sử dụng ở đây nếu cần thiết
-            System.out.println(invitedPlayerID + " đã chấp nhận lời mời!");
-        } else {
-            System.out.println(invitedPlayerID + " đã từ chối lời mời!");
-        }
+            String replyMessage = (response == JOptionPane.YES_OPTION)
+                    ? "invite_response;from=" + receiverId + ";status=accepted"
+                    : "invite_response;from=" + receiverId + ";status=declined";
+
+            try (DatagramSocket socket = new DatagramSocket(SERVER_PORT)){
+                InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+                byte[] sendData = replyMessage.getBytes();
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, SERVER_PORT);
+                socket.send(sendPacket);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     // Callback interface cho danh sách người chơi
