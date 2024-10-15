@@ -26,7 +26,7 @@ public class WasteSortingGame extends JFrame {
         JPanel ok = new JPanel(new GridLayout(1, 1));
         JButton button = new JButton("OK");
         button.addActionListener((ActionEvent e) -> {
-          game = new RunGame();
+          game = new RunGame(1,1);
           this.setVisible(false);
           game.setVisible(true);
         });

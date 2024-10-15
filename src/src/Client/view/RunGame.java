@@ -1,8 +1,12 @@
 package Client.view;
 
+import Client.controller.UDPClient;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,7 +16,8 @@ import java.util.Random;
  * @author vutuyen
  */
 
-public class RunGame extends JFrame {
+public class RunGame extends JFrame implements UDPClient.updateUI{
+    private UDPClient client;
     private JLabel timerLabel;
     private JLabel player1ScoreLabel;
     private JLabel player2ScoreLabel;
@@ -25,21 +30,29 @@ public class RunGame extends JFrame {
     private Random random = new Random();
     private ArrayList<TrashItem> trashItems = new ArrayList<>();
     public static HashMap<String, Image> trashImages = new HashMap<>();
-
-
+    public int roomId;
+    public int idPlayer;
     // Loop game
-    public RunGame() {
+    public RunGame(int roomId, int idPlayer) {
         setTitle("Waste Sorting Game");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-
+        this.roomId = roomId;
+        this.idPlayer = idPlayer;
         addKeyListener(new KeyHandler());
         loadTrashImages();
         setupGameArea();
         setupTopPanel();
         setupBinPanel();
         setupTimer();
+        try {
+            client = new UDPClient("localhost",12345);
+            client.setmUpdateUI(this);
+            client.listenForResponses();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Load image trash
@@ -88,6 +101,11 @@ public class RunGame extends JFrame {
             binPanel.add(binLabel);
         }
         add(binPanel, BorderLayout.SOUTH);
+    }
+
+    @Override
+    public void updateScorePlayer() {
+        updateScorePlayer2();
     }
 
     // Handler KeyBoards
@@ -158,11 +176,20 @@ public class RunGame extends JFrame {
         if (player == 1) {
             player1Score += 10;
             player1ScoreLabel.setText("Player1: " + player1Score + " points");
-        } else {
-            player2Score += 10;
-            player2ScoreLabel.setText("Player2: " + player2Score + " points");
+            client.sendScoreUpdate(player,player1Score,roomId);
         }
+//        else {
+//            player2Score += 10;
+//            player2ScoreLabel.setText("Player2: " + player2Score + " points");
+//            client.sendScoreUpdate(player,player2Score,roomId);
+//        }
     }
+
+    private void updateScorePlayer2(){
+        player2Score += 10;
+        player2ScoreLabel.setText("Player2: " + player2Score + " points");
+    }
+
 
     // show EndGame
     private void showEndGame() {
