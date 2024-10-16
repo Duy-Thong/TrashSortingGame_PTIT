@@ -76,7 +76,7 @@ public class LoginScreen {
                         String playerID = loginController.getPlayerIDByAccountID(accountID);
 
                         loginFrame.dispose(); // Đóng màn hình đăng nhập
-                        new LobbyScreen(playerID); // Pass playerID to LobbyScreen
+                        new LobbyScreen(playerID, username); // Pass playerID to LobbyScreen
                     } else {
                         JOptionPane.showMessageDialog(loginFrame, "Tên đăng nhập hoặc mật khẩu không đúng", "Lỗi đăng nhập", JOptionPane.ERROR_MESSAGE);
                     }

@@ -15,6 +15,12 @@ public class InviteController {
     private List<Player> availablePlayers;
     private int inviteTimeout = 60000;
 
+    private String username;
+
+    public InviteController(String username) {
+        this.username = username;
+    }
+
     // Hàm lấy danh sách người chơi có status = 1 và isPlaying = 0 từ server
     public void getListFriends(String playerID, AvailablePlayersCallback callback) {
         try (DatagramSocket socket = new DatagramSocket()) {
@@ -60,9 +66,9 @@ public class InviteController {
     }
 
     // Gửi yêu cầu mời người chơi
-    public void invitePlayer(String currentPlayerID, String invitedPlayerID, String invitePlayerName, InviteCallback callback) {
+    public void invitePlayer(String currentPlayerID, String invitedPlayerID, InviteCallback callback) {
         try (DatagramSocket socket = new DatagramSocket()) {
-            String message = "type=invite&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitePlayerName=" + invitePlayerName;
+            String message = "type=invite&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitePlayerName=" + username;
             byte[] buffer = message.getBytes();
             InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);

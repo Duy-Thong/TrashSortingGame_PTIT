@@ -7,10 +7,12 @@ import java.awt.event.ActionListener;
 
 public class LobbyScreen {
     private final String playerID; // Add playerID field
+    private final String username;
 
     // Constructor accepting playerID
-    public LobbyScreen(String playerID) {
+    public LobbyScreen(String playerID, String username) {
         this.playerID = playerID;
+        this.username = username;
 
         // Tạo JFrame cho màn hình lobby
         JFrame lobbyFrame = new JFrame("Lobby");
@@ -56,7 +58,6 @@ public class LobbyScreen {
         panel.add(btnLogout, gbc);
 
         // Hành động khi bấm nút Trang cá nhân
-        // Hành động khi bấm nút Trang cá nhân
         btnProfile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -94,7 +95,7 @@ public class LobbyScreen {
             public void actionPerformed(ActionEvent e) {
                 // Chuyển đến màn hình game
                 JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
-                new InviteScreen(playerID);
+                new InviteScreen(playerID, username);
             }
         });
 

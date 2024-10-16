@@ -100,25 +100,22 @@ public class Server {
                     updatePlayerIsPlaying(invitedPlayerID, true);
 
                     // Gửi gói tin thông báo tạo game cho hai người chơi
-                    String notificationMessage = "accepted&gameID=" + gameID + "&player1=" + currentPlayerID + "&player2=" + invitedPlayerID;
+                    response = "type=accepted&gameID=" + gameID + "&player1=" + currentPlayerID + "&player2=" + invitedPlayerID;
+                    sendResponse(response, packet, socket);
+
+                    String notificationMessage = "type=accepted&gameID=" + gameID + "&player1=" + currentPlayerID + "&player2=" + invitedPlayerID;
                     byte[] sendData = notificationMessage.getBytes();
-
-                    DatagramPacket player1Packet = new DatagramPacket(sendData, sendData.length, player1Address, player1Port);
-                    socket.send(player1Packet);
-
                     DatagramPacket player2Packet = new DatagramPacket(sendData, sendData.length, player2Address, 12346);
                     socket.send(player2Packet);
 
                     System.out.println("Game started and notification sent to both players.");
                 } else {
-                    String notificationMessage = "declined&player1=" + currentPlayerID;
-                    byte[] sendData = notificationMessage.getBytes();
-
-                    DatagramPacket player1Packet = new DatagramPacket(sendData, sendData.length, player1Address, player1Port);
-                    socket.send(player1Packet);
+                    response = "type=declined&player1=" + currentPlayerID;
+                    sendResponse(response, packet, socket);
                     System.out.println("Player " + currentPlayerID + " declined the invite.");
                 }
             }
+
             else {
                 switch (type) {
                     case "login":
