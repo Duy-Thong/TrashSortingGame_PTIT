@@ -60,9 +60,9 @@ public class InviteController {
     }
 
     // Gửi yêu cầu mời người chơi
-    public void invitePlayer(String currentPlayerID, String invitedPlayerID, String invitedPlayerName, InviteCallback callback) {
+    public void invitePlayer(String currentPlayerID, String invitedPlayerID, String invitePlayerName, InviteCallback callback) {
         try (DatagramSocket socket = new DatagramSocket()) {
-            String message = "type=invite&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitedPlayerName=" + invitedPlayerName;
+            String message = "type=invite&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitePlayerName=" + invitePlayerName;
             byte[] buffer = message.getBytes();
             InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
@@ -155,13 +155,14 @@ public class InviteController {
                     ? "invite_response;from=" + receiverId + ";status=accepted"
                     : "invite_response;from=" + receiverId + ";status=declined";
 
-            try (DatagramSocket socket = new DatagramSocket()) { // Sử dụng cổng bất kỳ (không cần SERVER_PORT ở đây)
+            try (DatagramSocket socket = new DatagramSocket()) {
                 InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
                 // Chỉnh sửa message để gửi
-                String message = "type=responseInvite&senderID=" + senderId + "&receiverId" + receiverId + "&status=" + (response == JOptionPane.YES_OPTION ? "accepted" : "declined");
+                String message = "type=response&senderID=" + senderId + "&receiverId=" + receiverId + "&status=" + (response == JOptionPane.YES_OPTION ? "accepted" : "declined");
                 byte[] sendData = message.getBytes();
                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, SERVER_PORT);
                 socket.send(sendPacket);
+                System.out.println("Sent response: " + message);
             } catch (Exception e) {
                 e.printStackTrace();
             }

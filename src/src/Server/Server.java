@@ -70,7 +70,7 @@ public class Server {
                 }
             }
 
-            else if (type.equals("responseInvite")) {
+            else if (type.equals("response")) {
                 String currentPlayerID = parts[1].split("=")[1];
                 String invitedPlayerID = parts[2].split("=")[1];
                 String status = parts[3].split("=")[1];
