@@ -1,6 +1,5 @@
 package Server;
 
-import Server.model.Account;
 import Server.model.Player;
 import Server.model.PlayerGame;
 import Server.model.ClientInfo;
@@ -156,15 +155,6 @@ public class Server {
                         System.out.println("Client " + playerID + " failed to disconnect from " + packet.getAddress() + ":" + packet.getPort());
                     }
                     break;
-                    case "getAllAccount":
-                        List<Account> accountList = getAllAccount();
-                        StringBuilder responseAccount = new StringBuilder();
-                        for (Account a : accountList) {
-                            responseAccount.append(String.format("accountID=%s&username=%s&role=%s|",
-                                    a.getAccountID(), a.getUsername(), a.getRole()));
-                        }
-                        response = responseAccount.toString();
-                        break;
 //                case "invite":
 //                    String currentPlayerID = parts[1].split("=")[1];
 //                    String invitedPlayerID = parts[2].split("=")[1];
@@ -467,23 +457,5 @@ public class Server {
         }
 
         return playerList;
-    }
-    private static List<Account> getAllAccount() {
-        List<Account> accountList = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT accountID, username, role FROM account";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    String accountID = rs.getString("accountID");
-                    String username = rs.getString("username");
-                    String role = rs.getString("role");
-                    accountList.add(new Account(accountID, username, "", role)); // Assuming password is not sent in this response
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return accountList;
     }
 }

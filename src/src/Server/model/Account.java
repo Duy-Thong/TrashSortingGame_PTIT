@@ -6,25 +6,17 @@ public class Account {
     private String accountID;
     private String username;
     private String password;
-    private String role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public Account() {}
 
-    public Account(String accountID, String username, String password,String role, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Account(String accountID, String username, String password, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.accountID = accountID;
         this.username = username;
         this.password = password;
-        this.role = role;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-    public Account(String accountID, String username, String password,String role) {
-        this.accountID = accountID;
-        this.username = username;
-        this.password = password;
-        this.role = role;
     }
 
     public String getAccountID() {
@@ -49,14 +41,6 @@ public class Account {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public LocalDateTime getCreatedAt() {

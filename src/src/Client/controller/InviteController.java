@@ -12,7 +12,7 @@ import javax.swing.JOptionPane; // Thêm import để sử dụng JOptionPane
 import javax.swing.Timer;
 
 public class InviteController {
-    private static final String SERVER_ADDRESS = "localhost"; // Địa chỉ server
+    private static final String SERVER_ADDRESS = "26.79.24.79"; // Địa chỉ server
     private static final int SERVER_PORT = 12345; // Cổng server
 
     private List<Player> availablePlayers; // Danh sách bạn bè có sẵn
