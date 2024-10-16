@@ -5,7 +5,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class LoginController {
-    private static final String SERVER_ADDRESS = "localhost"; // Thay đổi nếu server chạy trên một máy khác
+    private static final String SERVER_ADDRESS = "26.79.24.79"; // Thay đổi nếu server chạy trên một máy khác
     private static final int SERVER_PORT = 12345;
 
     public boolean authenticate(String username, String password) {
