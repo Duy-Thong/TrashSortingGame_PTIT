@@ -175,6 +175,27 @@ public class Server {
                         response = "delete failure";
                     }
                     break;
+                    case "updateAccount":
+                    accountID = parts[1].split("=")[1];
+                    username = parts[2].split("=")[1];
+                    password = parts[3].split("=")[1];
+                    String role = parts[4].split("=")[1];
+                    if (updateAccount(accountID, username, password, role)) {
+                        response = "update success";
+                    } else {
+                        response = "update failure";
+                    }
+                    break;
+                case "addAccount":
+                    username = parts[1].split("=")[1];
+                    password = parts[2].split("=")[1];
+                    role = parts[3].split("=")[1];
+                    if (addAccount(username, password, role)) {
+                        response = "add success";
+                    } else {
+                        response = "add failure";
+                    }
+                    break;
 //                case "invite":
 //                    String currentPlayerID = parts[1].split("=")[1];
 //                    String invitedPlayerID = parts[2].split("=")[1];
@@ -508,6 +529,60 @@ public class Server {
             e.printStackTrace();
             return false;
         }
+    }
+    private static boolean updateAccount(String accountID, String username, String password, String role) {
+        if (isUsernameExists(username)) {
+            return false; // Tên đăng nhập đã tồn tại, không thêm tài khoản
+        }
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "UPDATE account SET username = ?, password = ?, role = ?, updated_at = NOW() WHERE accountID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                stmt.setString(2, password);
+                stmt.setString(3, role);
+                stmt.setString(4, accountID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    private static boolean addAccount(String username, String password, String role) {
+        // Kiểm tra xem tên đăng nhập đã tồn tại chưa
+        if (isUsernameExists(username)) {
+            return false; // Tên đăng nhập đã tồn tại, không thêm tài khoản
+        }
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String accountID = UUID.randomUUID().toString();
+            String query = "INSERT INTO account (accountID, username, password, role, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, accountID);
+                stmt.setString(2, username);
+                stmt.setString(3, password);
+                stmt.setString(4, role);
+                return stmt.executeUpdate() > 0; // Thêm thành công
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Thêm thất bại
+        }
+    }
+    private static boolean isUsernameExists(String username) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT COUNT(*) FROM account WHERE username = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Nếu số lượng lớn hơn 0, tên đăng nhập đã tồn tại
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false; // Mặc định là không tồn tại
     }
 
 

@@ -1,5 +1,6 @@
 package Client.controller.admin;
 
+import Client.controller.LoginController;
 import Client.model.Account;
 
 import java.net.DatagramPacket;
@@ -11,7 +12,7 @@ import java.util.List;
 public class AccountManagementController {
     private static final String SERVER_ADDRESS = "26.79.24.79"; // Thay đổi nếu server chạy trên máy khác
     private static final int SERVER_PORT = 12345;
-
+    private static final LoginController loginController = new LoginController();
     // Hàm lấy danh sách tất cả các account từ cơ sở dữ liệu
     public static List<Account> getAllAccount() {
         List<Account> accountList = new ArrayList<>();
@@ -67,5 +68,37 @@ public class AccountManagementController {
             e.printStackTrace();
         }
     }
+    public static Account getAccountByID(String accountID) {
+        Account account = loginController.getAccountByAccountID(accountID);
+        return account;
+    }
+    public static void updateAccount(String accountID, String username, String password, String role) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            // Tạo gọi tin định nghĩa này
+            String message = "type=updateAccount&accountID=" + accountID + "&username=" + username + "&password=" + password + "&role=" + role;
+            byte[] buffer = message.getBytes();
+            // Gửi gói tin định nghĩa được server
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    public boolean addAccount(String username, String password, String role) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            // Tạo gọi tin định nghĩa này
+            String message = "type=addAccount&username=" + username + "&password=" + password + "&role=" + role;
+            byte[] buffer = message.getBytes();
+            // Gửi gói tin định nghĩa không server
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
 }

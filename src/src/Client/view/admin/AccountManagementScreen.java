@@ -29,11 +29,13 @@ public class AccountManagementScreen extends JFrame {
         JButton btnEdit = new JButton("Edit");
         JButton btnDelete = new JButton("Delete");
         JButton btnRefresh = new JButton("Refresh");
+        JButton btnBack = new JButton("Back");
 
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnEdit);
         buttonPanel.add(btnDelete);
         buttonPanel.add(btnRefresh);
+        buttonPanel.add(btnBack);
 
         // Create table for account data
         String[] columnNames = {"Account ID", "Username", "Password", "Role"};
@@ -50,7 +52,14 @@ public class AccountManagementScreen extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Handle add account action
-                // Example: new AddAccountDialog(AccountManagementScreen.this).setVisible(true);
+                new AddAccountDialog(AccountManagementScreen.this).setVisible(true);
+                loadAccountData();
+            }
+        });
+        btnBack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
             }
         });
 
@@ -61,7 +70,8 @@ public class AccountManagementScreen extends JFrame {
                 int selectedRow = accountTable.getSelectedRow();
                 if (selectedRow != -1) {
                     String accountID = (String) tableModel.getValueAt(selectedRow, 0);
-                    // Example: new EditAccountDialog(AccountManagementScreen.this, accountID).setVisible(true);
+                    new EditAccountDialog(AccountManagementScreen.this, accountID).setVisible(true);
+                    loadAccountData();
                 } else {
                     JOptionPane.showMessageDialog(AccountManagementScreen.this, "Please select an account to edit.");
                 }
