@@ -1,7 +1,6 @@
 package Client.view.admin;
 
 import Client.view.LoginScreen;
-import Client.view.admin.UserManagementScreen;
 import Client.controller.LoginController;
 
 import javax.swing.*;
@@ -75,7 +74,7 @@ public class AdminDashboardScreen {
 
     private void openUserManagement() {
         // Implement user management logic here
-        new UserManagementScreen();
+        new AccountManagementScreen();
     }
 
     private void openItemManagement() {
