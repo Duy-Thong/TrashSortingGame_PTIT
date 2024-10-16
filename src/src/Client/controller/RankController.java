@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RankController {
-    private static final String SERVER_ADDRESS = "26.79.24.79"; // Thay đổi nếu server chạy trên máy khác
+    private static final String SERVER_ADDRESS = "localhost"; // Thay đổi nếu server chạy trên máy khác
     private static final int SERVER_PORT = 12345;
 
     // Hàm lấy danh sách top người chơi từ server

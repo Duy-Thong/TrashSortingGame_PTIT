@@ -5,7 +5,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class RegisterController {
-    private static final String SERVER_ADDRESS = "26.79.24.79"; // Địa chỉ server
+    private static final String SERVER_ADDRESS = "localhost"; // Địa chỉ server
     private static final int SERVER_PORT = 12345; // Cổng server
 
     public boolean register(String username, String password) {

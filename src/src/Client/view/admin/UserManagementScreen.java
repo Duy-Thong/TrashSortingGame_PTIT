@@ -1,7 +1,7 @@
 package Client.view.admin;
 
-import Client.controller.UserController;
-import Client.model.User;
+import Client.controller.admin.UserManagementController;
+import Client.model.Account;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,10 +13,10 @@ import java.util.List;
 public class UserManagementScreen extends JFrame {
     private JTable userTable;
     private DefaultTableModel tableModel;
-    private UserController userController;
+    private UserManagementController userController;
 
     public UserManagementScreen() {
-        userController = new UserController();
+        userController = new UserManagementController();
 
         setTitle("User Management");
         setSize(800, 600);
@@ -103,11 +103,11 @@ public class UserManagementScreen extends JFrame {
         tableModel.setRowCount(0);
 
         // Fetch user data from server
-        List<User> users = userController.getAllUsers();
+        List<Account> accounts = userController.getAllAccount();
 
         // Add data to model
-        for (User user : users) {
-            tableModel.addRow(new Object[]{user.getUserID(), user.getUsername(), user.getRole()});
+        for (Account account: accounts) {
+            tableModel.addRow(new Object[]{account.getAccountID(), account.getUsername(), account.getRole()});
         }
     }
 }
