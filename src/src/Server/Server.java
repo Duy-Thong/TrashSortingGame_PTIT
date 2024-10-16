@@ -60,7 +60,7 @@ public class Server {
                     InetAddress invitedPlayerAddress = invitedClient.getAddress();
                     int invitedPlayerPort = 12346;
 
-                    String inviteMessage = "type=invited&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitedPlayerName=" + invitedPlayerName;
+                    String inviteMessage = "type=invited&currentPlayerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitedPlayerName=" + invitedPlayerName;
                     DatagramPacket invitePacket = new DatagramPacket(inviteMessage.getBytes(), inviteMessage.length(),
                             invitedPlayerAddress, invitedPlayerPort);
                     socket.send(invitePacket);
@@ -75,12 +75,12 @@ public class Server {
                 String invitedPlayerID = parts[2].split("=")[1];
                 String status = parts[3].split("=")[1];
 
-                ClientInfo inviteClient = findClientByPlayerID(currentPlayerID);
+                ClientInfo currentClient = findClientByPlayerID(currentPlayerID);
                 ClientInfo invitedClient = findClientByPlayerID(invitedPlayerID);
 
-                InetAddress player1Address = inviteClient.getAddress();
-                int player1Port = inviteClient.getPort();
-                InetAddress player2Address = invitedClient.getAddress();
+                InetAddress currentAddress = currentClient.getAddress();
+                int currentPort = 12344;
+                InetAddress invitedAddress = invitedClient.getAddress();
 
                 if (status.equals("accepted")) {
                     System.out.println("Player " + invitedPlayerID + " accepted the invite. Creating a new game...");
@@ -100,19 +100,27 @@ public class Server {
                     updatePlayerIsPlaying(invitedPlayerID, true);
 
                     // Gửi gói tin thông báo tạo game cho hai người chơi
-                    response = "type=accepted&gameID=" + gameID + "&player1=" + currentPlayerID + "&player2=" + invitedPlayerID;
-                    sendResponse(response, packet, socket);
-
                     String notificationMessage = "type=accepted&gameID=" + gameID + "&player1=" + currentPlayerID + "&player2=" + invitedPlayerID;
                     byte[] sendData = notificationMessage.getBytes();
-                    DatagramPacket player2Packet = new DatagramPacket(sendData, sendData.length, player2Address, 12346);
+
+                    DatagramPacket player1Packet = new DatagramPacket(sendData, sendData.length, currentAddress, currentPort);
+                    socket.send(player1Packet);
+                    System.out.println("Player1: " + currentAddress + ":" + currentPort);
+
+                    DatagramPacket player2Packet = new DatagramPacket(sendData, sendData.length, invitedAddress, 12346);
                     socket.send(player2Packet);
+                    System.out.println("Player2: " + invitedAddress);
 
                     System.out.println("Game started and notification sent to both players.");
                 } else {
-                    response = "type=declined&player1=" + currentPlayerID;
-                    sendResponse(response, packet, socket);
-                    System.out.println("Player " + currentPlayerID + " declined the invite.");
+                    String notificationMessage = "type=declined&player1=" + currentPlayerID;
+                    byte[] sendData = notificationMessage.getBytes();
+
+                    DatagramPacket player1Packet = new DatagramPacket(sendData, sendData.length, currentAddress, currentPort);
+                    socket.send(player1Packet);
+
+                    System.out.println("Player " + invitedPlayerID + " declined the invite.");
+                    System.out.println("Player1: " + currentAddress + ":" + currentPort);
                 }
             }
 
@@ -469,7 +477,7 @@ public class Server {
     private static String createNewGame() {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String gameID = UUID.randomUUID().toString();
-            String insertGameQuery = "INSERT INTO game (gameID, status, startTime, endTime, totalScore) VALUES (?, ?, ?, ?, 0)";
+            String insertGameQuery = "INSERT INTO game (gameID, status, start_time, end_time, total_score) VALUES (?, ?, ?, ?, 0)";
             try (PreparedStatement insertGameStmt = conn.prepareStatement(insertGameQuery)) {
                 insertGameStmt.setString(1, gameID);
                 insertGameStmt.setString(2, "pending");
@@ -487,7 +495,7 @@ public class Server {
 
     private static void savePlayerGame(PlayerGame playerGame) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String insertPlayerGameQuery = "INSERT INTO player_game (playerID, gameID, joinTime, leaveTime, playDuration, score, result, isFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String insertPlayerGameQuery = "INSERT INTO player_game (playerID, gameID, join_time, leave_time, play_duration, score, result, is_final) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement insertPlayerGameStmt = conn.prepareStatement(insertPlayerGameQuery)) {
                 insertPlayerGameStmt.setString(1, playerGame.getPlayerID());
                 insertPlayerGameStmt.setString(2, playerGame.getGameID());

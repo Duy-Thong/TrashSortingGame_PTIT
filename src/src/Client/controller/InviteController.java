@@ -11,6 +11,7 @@ import javax.swing.*;
 public class InviteController {
     private static final String SERVER_ADDRESS = "26.29.9.206";
     private static final int SERVER_PORT = 12345;
+    private static final int CLIENT_PORT = 12344;
 
     private List<Player> availablePlayers;
     private int inviteTimeout = 60000;
@@ -66,8 +67,8 @@ public class InviteController {
     }
 
     // Gửi yêu cầu mời người chơi
-    public void invitePlayer(String currentPlayerID, String invitedPlayerID, InviteCallback callback) {
-        try (DatagramSocket socket = new DatagramSocket()) {
+    public void invitePlayer(String currentPlayerID, String invitedPlayerID, String invitedPlayerName, InviteCallback callback) {
+        try (DatagramSocket socket = new DatagramSocket(CLIENT_PORT)) {
             String message = "type=invite&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitePlayerName=" + username;
             byte[] buffer = message.getBytes();
             InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
@@ -76,6 +77,9 @@ public class InviteController {
             // Gửi lời mời
             socket.send(packet);
             System.out.println("Invitation sent to " + invitedPlayerID);
+
+            // Hiển thị thông báo rằng lời mời đã được gửi
+            JOptionPane.showMessageDialog(null, "Lời mời đã được gửi đến người chơi " + invitedPlayerName + "!");
 
             // Đặt thời gian chờ cho việc nhận
             socket.setSoTimeout(inviteTimeout);
@@ -156,10 +160,6 @@ public class InviteController {
                     "Lời mời chơi game",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
                     null, options, options[0]); // options[0] là nút mặc định "Đồng ý"
-
-            String replyMessage = (response == 0)
-                    ? "invite_response;from=" + receiverId + ";status=accepted"
-                    : "invite_response;from=" + receiverId + ";status=declined";
 
             try (DatagramSocket socket = new DatagramSocket()) {
                 InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);

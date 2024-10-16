@@ -70,12 +70,13 @@ public class InviteScreen extends JFrame {
             int selectedRow = playerTable.getSelectedRow();
             if (selectedRow != -1) {
                 String playerID = playerTable.getValueAt(selectedRow, 0).toString();
+                String playerName = playerTable.getValueAt(selectedRow, 1).toString();
 
                 // Ẩn nút mời
                 inviteButton.setEnabled(false);
 
                 // Gọi phương thức invitePlayer trong controller
-                inviteController.invitePlayer(currentPlayerID, playerID, new InviteController.InviteCallback() {
+                inviteController.invitePlayer(currentPlayerID, playerID, playerName, new InviteController.InviteCallback() {
                     @Override
                     public void onInviteTimeout(String playerID) {
                         // Kích hoạt lại nút mời khi hết thời gian chờ
