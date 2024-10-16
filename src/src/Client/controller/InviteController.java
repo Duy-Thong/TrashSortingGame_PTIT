@@ -13,7 +13,7 @@ public class InviteController {
     private static final int SERVER_PORT = 12345;
 
     private List<Player> availablePlayers;
-    private long inviteTimeout = 60000;
+    private int inviteTimeout = 60000;
 
     // Hàm lấy danh sách người chơi có status = 1 và isPlaying = 0 từ server
     public void getListFriends(String playerID, AvailablePlayersCallback callback) {
@@ -60,43 +60,41 @@ public class InviteController {
     }
 
     // Gửi yêu cầu mời người chơi
-    public void invitePlayer(String currentPlayerID, String invitedPlayerID, InviteCallback callback) {
+    public void invitePlayer(String currentPlayerID, String invitedPlayerID, String invitedPlayerName, InviteCallback callback) {
         try (DatagramSocket socket = new DatagramSocket()) {
-            String message = "type=invite&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID;
+            String message = "type=invite&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitedPlayerName=" + invitedPlayerName;
             byte[] buffer = message.getBytes();
-
             InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+
+            // Gửi lời mời
             socket.send(packet);
+            System.out.println("Invitation sent to " + invitedPlayerID);
 
-            // Hiển thị thông báo rằng lời mời đã được gửi
-            JOptionPane.showMessageDialog(null, "Lời mời đã được gửi đến " + invitedPlayerID + "!");
+            // Đặt thời gian chờ cho việc nhận
+            socket.setSoTimeout(inviteTimeout);
+            System.out.println("Waiting for response for " + inviteTimeout + " milliseconds...");
 
-            // Bắt đầu đếm ngược thời gian chờ
-            Timer timer = new Timer((int) inviteTimeout, e -> {
-                callback.onInviteTimeout(invitedPlayerID);
-            });
-            timer.setRepeats(false);
-            timer.start();
-
-            // Nhận phản hồi đồng bộ
-            socket.setSoTimeout((int) inviteTimeout); // Thiết lập thời gian chờ
             try {
-                byte[] responseBuffer = new byte[1024];
-                DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
-                socket.receive(responsePacket); // Chờ nhận phản hồi
+                byte[] receiveBuffer = new byte[1024];
+                DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+                socket.receive(receivePacket);
 
-                String responseMessage = new String(responsePacket.getData(), 0, responsePacket.getLength());
-                if (responseMessage.equals("accepted")) {
+                // Xử lý phản hồi từ server
+                String responseMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
+                System.out.println("Received response: " + responseMessage);
+
+                String[] parts = responseMessage.split("&");
+
+                if (parts[0].equals("type=accepted")) {
+                    System.out.println("Invite accepted by " + invitedPlayerID);
                     callback.onInviteAccepted(invitedPlayerID);
-                } else if (responseMessage.equals("declined")) {
+                } else if (parts[0].equals("type=declined")) {
+                    System.out.println("Invite declined by " + invitedPlayerID);
                     callback.onInviteDeclined(invitedPlayerID);
                 }
-
-                // Dừng bộ đếm thời gian khi nhận được phản hồi
-                timer.stop();
             } catch (SocketTimeoutException e) {
-                // Xử lý trường hợp hết thời gian chờ mà không nhận được phản hồi
+                System.out.println("No response from " + invitedPlayerID + " after timeout.");
                 callback.onInviteTimeout(invitedPlayerID);
             }
         } catch (Exception e) {
@@ -108,22 +106,30 @@ public class InviteController {
     static class InviteListener implements Runnable {
         @Override
         public void run() {
-            try (DatagramSocket socket = new DatagramSocket(12346)) {
+            int port = 12346;
+            try (DatagramSocket socket = new DatagramSocket(port)) {
+                System.out.println("Client đang lắng nghe trên cổng: "+ port);
                 byte[] buffer = new byte[1024];
 
                 while (true) {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                    socket.receive(packet); // Nhận gói tin từ server
+                    socket.receive(packet);
 
                     String receivedMessage = new String(packet.getData(), 0, packet.getLength());
-                    String[] parts = receivedMessage.split("&"); // Phân tách thông điệp
+                    String[] parts = receivedMessage.split("&");
 
                     if (parts[0].equals("type=invited")) {
-                        String senderId = parts[1].split("=")[1]; // ID người gửi
-                        String receiverId = parts[2].split("=")[1]; // ID người nhận
+                        String senderId = parts[1].split("=")[1];
+                        String receiverId = parts[2].split("=")[1];
+                        String senderName = parts[3].split("=")[1];
 
                         // Hiển thị popup mời chơi
-                        showInvitePopup(senderId, receiverId);
+                        showInvitePopup(senderId, receiverId, senderName);
+                    }
+                    else {
+                        String gameId = parts[1].split("=")[1];
+                        String senderId = parts[2].split("=")[1];
+                        String receiverId = parts[3].split("=")[1];
                     }
                 }
             } catch (Exception e) {
@@ -133,19 +139,27 @@ public class InviteController {
     }
 
     // Phương thức hiển thị popup lời mời
-    public static void showInvitePopup(String senderId, String receiverId) {
+    public static void showInvitePopup(String senderId, String receiverId, String senderName) {
         SwingUtilities.invokeLater(() -> {
-            int response = JOptionPane.showConfirmDialog(null,
-                    "Người chơi " + senderId + " mời bạn tham gia trò chơi. Bạn có chấp nhận không?",
-                    "Lời mời chơi game", JOptionPane.YES_NO_OPTION);
+            System.out.println("Displaying popup for invite from: " + senderId);
 
-            String replyMessage = (response == JOptionPane.YES_OPTION)
+            // Tùy chỉnh các nút và văn bản
+            Object[] options = {"Đồng ý", "Từ chối"};
+            int response = JOptionPane.showOptionDialog(null,
+                    "Người chơi " + senderName + " mời bạn tham gia trò chơi. Bạn có chấp nhận không?",
+                    "Lời mời chơi game",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
+                    null, options, options[0]); // options[0] là nút mặc định "Đồng ý"
+
+            String replyMessage = (response == 0)
                     ? "invite_response;from=" + receiverId + ";status=accepted"
                     : "invite_response;from=" + receiverId + ";status=declined";
 
-            try (DatagramSocket socket = new DatagramSocket(SERVER_PORT)){
+            try (DatagramSocket socket = new DatagramSocket()) { // Sử dụng cổng bất kỳ (không cần SERVER_PORT ở đây)
                 InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
-                byte[] sendData = replyMessage.getBytes();
+                // Chỉnh sửa message để gửi
+                String message = "type=responseInvite&senderID=" + senderId + "&receiverId" + receiverId + "&status=" + (response == JOptionPane.YES_OPTION ? "accepted" : "declined");
+                byte[] sendData = message.getBytes();
                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, SERVER_PORT);
                 socket.send(sendPacket);
             } catch (Exception e) {

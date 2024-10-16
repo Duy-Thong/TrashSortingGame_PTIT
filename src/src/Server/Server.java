@@ -1,5 +1,6 @@
 package Server;
 
+import Server.model.Game;
 import Server.model.Player;
 import Server.model.PlayerGame;
 import Server.model.ClientInfo;
@@ -7,6 +8,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,115 +49,18 @@ public class Server {
 
             String response;
 
-            switch (type) {
-                case "login":
-                    String username = parts[1].split("=")[1];
-                    String password = parts[2].split("=")[1];
-                    response = authenticate(username, password) ? "login success" : "login failure";
-
-                    if (response.equals("login success")) {
-                        String accountID = getAccountID(username);
-                        String playerID = getPlayerID(accountID);
-                        // Lưu thông tin client
-                        clients.add(new ClientInfo(accountID, playerID, packet.getAddress(), packet.getPort()));
-                        System.out.println("Client " + playerID + " connected from " + packet.getAddress() + ":" + packet.getPort());
-                    }
-                    break;
-
-                case "register":
-                    username = parts[1].split("=")[1];
-                    password = parts[2].split("=")[1];
-                    response = register(username, password) ? "registration_success" : "registration failure";
-                    break;
-                case "getAccountID":
-                    username = parts[1].split("=")[1];
-                    response = getAccountID(username);
-                    break;
-                case "getPlayerID":
-                    String accountID = parts[1].split("=")[1];
-                    response = getPlayerID(accountID);
-                    break;
-                case "profile":
-                    String playerID = parts[1].split("=")[1];
-                    Player player = getPlayerProfile(playerID);
-                    if (player != null) {
-                        response = String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s",
-                                player.getPlayerID(), player.getUsername(), player.getTotalGames(), player.getTotalWins(), player.getTotalScore(), player.getAverageScore(), player.getStatus(), player.getIsPlaying(), player.getCreatedAt().toString());
-                    } else {
-                        response = "error: player not found";
-                    }
-                    break;
-                case "history":
-                    playerID = parts[1].split("=")[1];
-
-                    List<PlayerGame> historyList = getPlayerHistory(playerID);
-                    StringBuilder responseBuilder = new StringBuilder();
-
-                    if (historyList.isEmpty()) {
-                        responseBuilder.append("error: no history found for player");
-                    } else {
-                        for (PlayerGame game : historyList) {
-                            responseBuilder.append(String.format("gameID=%s&joinTime=%s&leaveTime=%s&playDuration=%d&score=%d&result=%s&isFinal=%b|",
-                                    game.getGameID(), game.getJoinTime(), game.getLeaveTime(), game.getPlayDuration(), game.getScore(), game.getResult(), game.isFinal()));
-                        }
-                    }
-
-                    response = responseBuilder.toString();
-                    break;
-                case "rank":
-                    List<Player> playerList = getAllPlayers();
-
-                    playerList.sort((p1, p2) -> {
-                        if (p2.getTotalScore() != p1.getTotalScore()) {
-                            return Integer.compare(p2.getTotalScore(), p1.getTotalScore());
-                        } else if (p2.getTotalWins() != p1.getTotalWins()) {
-                            return Integer.compare(p2.getTotalWins(), p1.getTotalWins());
-                        } else {
-                            return Integer.compare(p2.getTotalGames(), p1.getTotalGames());
-                        }
-                    });
-
-                    StringBuilder rankResponse = new StringBuilder();
-                    for (Player p : playerList) {
-                        rankResponse.append(String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s|",
-                                p.getPlayerID(), p.getUsername(), p.getTotalGames(), p.getTotalWins(), p.getTotalScore(), p.getAverageScore(), p.getStatus(), p.getIsPlaying(), p.getCreatedAt()));
-                    }
-
-                    response = rankResponse.toString();
-                    break;
-                case "friends":
-                    playerID = parts[1].split("=")[1];
-                    List<Player> friendsList = getListFriends(playerID);
-                    StringBuilder responseFriends = new StringBuilder();
-
-                    if (friendsList.isEmpty()) {
-                        responseFriends.append("error: no history found for player");
-                    } else {
-                        for (Player p : friendsList) {
-                            responseFriends.append(String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s|",
-                                    p.getPlayerID(), p.getUsername(), p.getTotalGames(), p.getTotalWins(), p.getTotalScore(), p.getAverageScore(), p.getStatus(), p.getIsPlaying(), p.getCreatedAt()));
-                        }
-                    }
-
-                    response = responseFriends.toString();
-                    break;
-                default:
-                    response = "error: unknown request";
-            }
-
-            sendResponse(response, packet, socket);
-
             if (type.equals("invite")) {
                 String currentPlayerID = parts[1].split("=")[1];
                 String invitedPlayerID = parts[2].split("=")[1];
+                String invitedPlayerName = parts[3].split("=")[1];
 
                 ClientInfo invitedClient = findClientByPlayerID(invitedPlayerID);
 
                 if (invitedClient != null) {
                     InetAddress invitedPlayerAddress = invitedClient.getAddress();
-                    int invitedPlayerPort = invitedClient.getPort();
+                    int invitedPlayerPort = 12346;
 
-                    String inviteMessage = "type=invited&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID;
+                    String inviteMessage = "type=invited&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitedPlayerName=" + invitedPlayerName;
                     DatagramPacket invitePacket = new DatagramPacket(inviteMessage.getBytes(), inviteMessage.length(),
                             invitedPlayerAddress, invitedPlayerPort);
                     socket.send(invitePacket);
@@ -163,6 +68,155 @@ public class Server {
                 } else {
                     System.out.println("Không tìm thấy người chơi với ID: " + invitedPlayerID);
                 }
+            }
+
+            else if (type.equals("responseInvite")) {
+                String currentPlayerID = parts[1].split("=")[1];
+                String invitedPlayerID = parts[2].split("=")[1];
+                String status = parts[3].split("=")[1];
+
+                ClientInfo inviteClient = findClientByPlayerID(currentPlayerID);
+                ClientInfo invitedClient = findClientByPlayerID(invitedPlayerID);
+
+                InetAddress player1Address = inviteClient.getAddress();
+                int player1Port = inviteClient.getPort();
+                InetAddress player2Address = invitedClient.getAddress();
+
+                if (status.equals("accepted")) {
+                    System.out.println("Player " + invitedPlayerID + " accepted the invite. Creating a new game...");
+
+                    // Tạo game mới
+                    String gameID = createNewGame();
+
+                    // Tạo hai bản ghi PlayerGame cho hai người chơi
+                    Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+                    PlayerGame player1Game = new PlayerGame(currentPlayerID, gameID, currentTime, null, 0, 0, "", false);
+                    PlayerGame player2Game = new PlayerGame(invitedPlayerID, gameID, currentTime, null, 0, 0, "", false);
+                    savePlayerGame(player1Game);
+                    savePlayerGame(player2Game);
+
+                    // Cập nhật trạng thái isPlaying của người chơi
+                    updatePlayerIsPlaying(currentPlayerID, true);
+                    updatePlayerIsPlaying(invitedPlayerID, true);
+
+                    // Gửi gói tin thông báo tạo game cho hai người chơi
+                    String notificationMessage = "accepted&gameID=" + gameID + "&player1=" + currentPlayerID + "&player2=" + invitedPlayerID;
+                    byte[] sendData = notificationMessage.getBytes();
+
+                    DatagramPacket player1Packet = new DatagramPacket(sendData, sendData.length, player1Address, player1Port);
+                    socket.send(player1Packet);
+
+                    DatagramPacket player2Packet = new DatagramPacket(sendData, sendData.length, player2Address, 12346);
+                    socket.send(player2Packet);
+
+                    System.out.println("Game started and notification sent to both players.");
+                } else {
+                    String notificationMessage = "declined&player1=" + currentPlayerID;
+                    byte[] sendData = notificationMessage.getBytes();
+
+                    DatagramPacket player1Packet = new DatagramPacket(sendData, sendData.length, player1Address, player1Port);
+                    socket.send(player1Packet);
+                    System.out.println("Player " + currentPlayerID + " declined the invite.");
+                }
+            }
+            else {
+                switch (type) {
+                    case "login":
+                        String username = parts[1].split("=")[1];
+                        String password = parts[2].split("=")[1];
+                        response = authenticate(username, password) ? "login success" : "login failure";
+
+                        if (response.equals("login success")) {
+                            String accountID = getAccountID(username);
+                            String playerID = getPlayerID(accountID);
+                            // Lưu thông tin client
+                            clients.add(new ClientInfo(accountID, playerID, packet.getAddress(), packet.getPort()));
+                            System.out.println("Client " + playerID + " connected from " + packet.getAddress() + ":" + packet.getPort());
+                        }
+                        break;
+
+                    case "register":
+                        username = parts[1].split("=")[1];
+                        password = parts[2].split("=")[1];
+                        response = register(username, password) ? "registration_success" : "registration failure";
+                        break;
+                    case "getAccountID":
+                        username = parts[1].split("=")[1];
+                        response = getAccountID(username);
+                        break;
+                    case "getPlayerID":
+                        String accountID = parts[1].split("=")[1];
+                        response = getPlayerID(accountID);
+                        break;
+                    case "profile":
+                        String playerID = parts[1].split("=")[1];
+                        Player player = getPlayerProfile(playerID);
+                        if (player != null) {
+                            response = String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s",
+                                    player.getPlayerID(), player.getUsername(), player.getTotalGames(), player.getTotalWins(), player.getTotalScore(), player.getAverageScore(), player.getStatus(), player.getIsPlaying(), player.getCreatedAt().toString());
+                        } else {
+                            response = "error: player not found";
+                        }
+                        break;
+                    case "history":
+                        playerID = parts[1].split("=")[1];
+
+                        List<PlayerGame> historyList = getPlayerHistory(playerID);
+                        StringBuilder responseBuilder = new StringBuilder();
+
+                        if (historyList.isEmpty()) {
+                            responseBuilder.append("error: no history found for player");
+                        } else {
+                            for (PlayerGame game : historyList) {
+                                responseBuilder.append(String.format("gameID=%s&joinTime=%s&leaveTime=%s&playDuration=%d&score=%d&result=%s&isFinal=%b|",
+                                        game.getGameID(), game.getJoinTime(), game.getLeaveTime(), game.getPlayDuration(), game.getScore(), game.getResult(), game.isFinal()));
+                            }
+                        }
+
+                        response = responseBuilder.toString();
+                        break;
+                    case "rank":
+                        List<Player> playerList = getAllPlayers();
+
+                        playerList.sort((p1, p2) -> {
+                            if (p2.getTotalScore() != p1.getTotalScore()) {
+                                return Integer.compare(p2.getTotalScore(), p1.getTotalScore());
+                            } else if (p2.getTotalWins() != p1.getTotalWins()) {
+                                return Integer.compare(p2.getTotalWins(), p1.getTotalWins());
+                            } else {
+                                return Integer.compare(p2.getTotalGames(), p1.getTotalGames());
+                            }
+                        });
+
+                        StringBuilder rankResponse = new StringBuilder();
+                        for (Player p : playerList) {
+                            rankResponse.append(String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s|",
+                                    p.getPlayerID(), p.getUsername(), p.getTotalGames(), p.getTotalWins(), p.getTotalScore(), p.getAverageScore(), p.getStatus(), p.getIsPlaying(), p.getCreatedAt()));
+                        }
+
+                        response = rankResponse.toString();
+                        break;
+                    case "friends":
+                        playerID = parts[1].split("=")[1];
+                        List<Player> friendsList = getListFriends(playerID);
+                        StringBuilder responseFriends = new StringBuilder();
+
+                        if (friendsList.isEmpty()) {
+                            responseFriends.append("error: no history found for player");
+                        } else {
+                            for (Player p : friendsList) {
+                                responseFriends.append(String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s|",
+                                        p.getPlayerID(), p.getUsername(), p.getTotalGames(), p.getTotalWins(), p.getTotalScore(), p.getAverageScore(), p.getStatus(), p.getIsPlaying(), p.getCreatedAt()));
+                            }
+                        }
+
+                        response = responseFriends.toString();
+                        break;
+                    default:
+                        response = "error: unknown request";
+                }
+
+                sendResponse(response, packet, socket);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -413,5 +467,58 @@ public class Server {
             }
         }
         return null;
+    }
+
+    private static String createNewGame() {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String gameID = UUID.randomUUID().toString();
+            String insertGameQuery = "INSERT INTO game (gameID, status, startTime, endTime, totalScore) VALUES (?, ?, ?, ?, 0)";
+            try (PreparedStatement insertGameStmt = conn.prepareStatement(insertGameQuery)) {
+                insertGameStmt.setString(1, gameID);
+                insertGameStmt.setString(2, "pending");
+                insertGameStmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+                insertGameStmt.setTimestamp(4, null);
+                insertGameStmt.executeUpdate();
+                System.out.println("Game created with ID: " + gameID);
+                return gameID;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static void savePlayerGame(PlayerGame playerGame) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String insertPlayerGameQuery = "INSERT INTO player_game (playerID, gameID, joinTime, leaveTime, playDuration, score, result, isFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement insertPlayerGameStmt = conn.prepareStatement(insertPlayerGameQuery)) {
+                insertPlayerGameStmt.setString(1, playerGame.getPlayerID());
+                insertPlayerGameStmt.setString(2, playerGame.getGameID());
+                insertPlayerGameStmt.setTimestamp(3, playerGame.getJoinTime());
+                insertPlayerGameStmt.setTimestamp(4, playerGame.getLeaveTime());
+                insertPlayerGameStmt.setInt(5, playerGame.getPlayDuration());
+                insertPlayerGameStmt.setInt(6, playerGame.getScore());
+                insertPlayerGameStmt.setString(7, playerGame.getResult());
+                insertPlayerGameStmt.setBoolean(8, playerGame.isFinal());
+                insertPlayerGameStmt.executeUpdate();
+                System.out.println("Saved playerGame for playerID: " + playerGame.getPlayerID() + " in gameID: " + playerGame.getGameID());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void updatePlayerIsPlaying(String playerID, boolean isPlaying) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String updatePlayerQuery = "UPDATE player SET isPlaying = ? WHERE playerID = ?";
+            try (PreparedStatement updatePlayerStmt = conn.prepareStatement(updatePlayerQuery)) {
+                updatePlayerStmt.setBoolean(1, isPlaying);
+                updatePlayerStmt.setString(2, playerID);
+                updatePlayerStmt.executeUpdate();
+                System.out.println("Updated player " + playerID + " isPlaying status to: " + isPlaying);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

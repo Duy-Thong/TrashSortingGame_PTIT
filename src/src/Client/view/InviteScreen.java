@@ -70,9 +70,16 @@ public class InviteScreen extends JFrame {
             int selectedRow = playerTable.getSelectedRow();
             if (selectedRow != -1) {
                 String playerID = playerTable.getValueAt(selectedRow, 0).toString();
-                inviteController.invitePlayer(currentPlayerID, playerID, new InviteController.InviteCallback() {
+                String playerName = playerTable.getValueAt(selectedRow, 1).toString();
+
+                // Ẩn nút mời
+                inviteButton.setEnabled(false);
+
+                // Gọi phương thức invitePlayer trong controller
+                inviteController.invitePlayer(currentPlayerID, playerID, playerName, new InviteController.InviteCallback() {
                     @Override
                     public void onInviteTimeout(String playerID) {
+                        // Kích hoạt lại nút mời khi hết thời gian chờ
                         inviteButton.setEnabled(true);
                         JOptionPane.showMessageDialog(InviteScreen.this, "Thời gian mời đã hết, bạn có thể mời lại người chơi.");
                     }
@@ -80,17 +87,16 @@ public class InviteScreen extends JFrame {
                     @Override
                     public void onInviteAccepted(String playerID) {
                         // Xử lý khi lời mời được chấp nhận
+                        inviteButton.setEnabled(true); // Kích hoạt lại nút mời
                         JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi đã chấp nhận lời mời!");
                     }
 
                     @Override
                     public void onInviteDeclined(String playerID) {
-                        // Xử lý khi lời mời bị từ chối
+                        inviteButton.setEnabled(true); // Kích hoạt lại nút mời
                         JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi đã từ chối lời mời.");
                     }
                 });
-
-                inviteButton.setEnabled(false); // Ẩn nút mời
             } else {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn người chơi để mời.");
             }
@@ -98,8 +104,7 @@ public class InviteScreen extends JFrame {
 
         // Action listener cho nút Trở về
         backButton.addActionListener(e -> {
-            // Xử lý khi nhấn nút Trở về (ví dụ: đóng cửa sổ hiện tại)
-            dispose(); // Hoặc có thể điều hướng về màn hình trước đó
+            dispose();
         });
 
         return buttonPanel;
