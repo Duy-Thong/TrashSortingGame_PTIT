@@ -1,12 +1,16 @@
 package Client.view;
 
+import Client.model.Bin;
+import Client.model.TrashItem;
+import Client.controller.Data;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.List;
 /**
  *
  * @author vutuyen
@@ -18,47 +22,68 @@ public class RunGame extends JFrame {
     private JLabel player2ScoreLabel;
     private Timer gameTimer, trashTimer;
     private JPanel gamePanel;
-    private int secondsLeft = 120;
+    private int secondsLeft = 20, frametime = 2000;
     private int player1Score = 0;
     private int player2Score = 0;
     private int player = 1;
+    private int width = 600, height = 400;
     private Random random = new Random();
     private ArrayList<TrashItem> trashItems = new ArrayList<>();
+    private ArrayList<TrashItem> trashItemsDefaul = new ArrayList<>();
+    private ArrayList<Integer> listIndex = new ArrayList<>();
+    private ArrayList<Bin> binItems = new ArrayList<>();
+    private ArrayList<Bin> binItemsDefaul = new ArrayList<>();
     public static HashMap<String, Image> trashImages = new HashMap<>();
     
 
     // Loop game
     public RunGame() {             
         setTitle("Waste Sorting Game");
-        setSize(600, 400);
+        setSize(width, height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         addKeyListener(new KeyHandler());
-        loadTrashImages();
+        loadIndexs();
+        loadTrashs();
+        loadBins();
         setupGameArea();
         setupTopPanel();
-        setupBinPanel();
-        setupTimer();     
+        setupTimer();
     }
     
-    // Load image trash
-    private void loadTrashImages() {
+    // Load trashs, bins, indexs
+    private void loadIndexs(){
+        listIndex.add(80);
+        listIndex.add(280);
+        listIndex.add(480);
+    }
+
+    private void loadTrashs() {
         String[] types = {"Paper", "Plastic", "Metal"};
-        for (String type : types) {
-            ImageIcon icon = new ImageIcon("/home/vutuyen/NetBeansProjects/JavaApplication8/src/images/trash2.png");
-            trashImages.put(type, icon.getImage());
+        List<String> ls = Data.getListTrash();
+        for (int i = 0; i < types.length; i++) {
+            trashItemsDefaul.add(new TrashItem(listIndex.get(i), 0, i, types[i], ls.get(i)));
         }
     }
-    
-    // set main game 
+
+    private void loadBins() {
+        String[] types = {"Paper", "Plastic", "Metal"};
+        List<String> ls = Data.getListBin();
+        for (int i = 0; i < types.length; i++) {
+            binItemsDefaul.add(new Bin(listIndex.get(i), getHeight() - 100, types[i], ls.get(i)));
+        }
+    }
+
+    // set main game
     private void setupGameArea() {
         gamePanel = new JPanel(){
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                if(trashItems.size() >= 1){
-                    trashItems.get(0).draw(g, trashImages);
+                trashItems.getFirst().draw(g);
+                for(int i = 0;i  < binItemsDefaul.size(); i++){
+                    binItemsDefaul.get(i).draw(g);
                 }
             }
         };       
@@ -77,19 +102,6 @@ public class RunGame extends JFrame {
         add(topPanel, BorderLayout.NORTH);
     }
     
-    
-    
-    // Set up location Bin
-    private void setupBinPanel() {
-        JPanel binPanel = new JPanel(new GridLayout(1, 3));
-        String[] binColors = {"Red", "Yellow", "Gray"};
-        for (String color : binColors) {
-            JLabel binLabel = Bin.createBinLabel(color);
-            binPanel.add(binLabel);
-        }
-        add(binPanel, BorderLayout.SOUTH);
-    }
-    
     // Handler KeyBoards
      private class KeyHandler extends KeyAdapter {
         @Override
@@ -100,57 +112,61 @@ public class RunGame extends JFrame {
     
      // set Timer game and Trash
     private void setupTimer() {
-        gameTimer = new Timer(100, (ActionEvent e) -> {
-            secondsLeft--;
+        gameTimer = new Timer(10, (ActionEvent e) -> {
+            frametime --;
+            if (frametime % 100 == 0)
+                secondsLeft--;
             timerLabel.setText("Time: " + secondsLeft);
-            if (secondsLeft <= 0) {
+            if (frametime < 0) {
                 gameTimer.stop();
                 trashTimer.stop();
                 showEndGame();
             }
         });
         gameTimer.start();
-        
-        trashTimer = new Timer(100, (ActionEvent e) -> {
-            if(trashItems.isEmpty())
-                addNewTrashItem();
+
+        trashTimer = new Timer(10, (ActionEvent e) -> {
+            addNewTrashItem();
             moveTrashItems();
             gamePanel.repaint();
         });
-        
+
         trashTimer.start();
     }
-    
-    // add new a item
+    public void loadItemTrash(){
+
+    }
+    // add a new item
     private void addNewTrashItem() {
-        ArrayList<Integer> locx =new ArrayList<>(Arrays.asList(80, 280, 480));
-        int x = locx.get(random.nextInt(0, locx.size()));
-        String[] types = {"Paper", "Plastic", "Metal"};
-        String type = types[random.nextInt(types.length)];
-        trashItems.add(new TrashItem(x, 0, type));
+        if(trashItems.isEmpty() || trashItems.size() <= 10)
+            for(int i = 0; i < 20; i++)
+            {
+                TrashItem item = trashItemsDefaul.get(random.nextInt(0, trashItemsDefaul.size()));
+                trashItems.add(item.copy());
+            }
+
     }
     
     
     // Trash auto move down
     private void moveTrashItems() {
-        TrashItem item = trashItems.get(0);
+        TrashItem item = trashItems.getFirst();
         item.move();
         if (item.getY() > getHeight() - 80) {
-            trashItems.remove(0);
-            HashMap<Integer, String> x_bin = new HashMap<Integer, String>();
-            x_bin.put(80, "Red");
-            x_bin.put(280, "Yellow");
-            x_bin.put(480, "Gray");
-            if( isCorrectBin(item.getType(), x_bin.get(item.getX())))
+            trashItems.removeFirst();
+            if( isCorrectBin(item))
                 updateScore();
         }
     }
     
     // check answer
-    private boolean isCorrectBin(String trashType, String binColor) {
-        return (trashType.equals("Paper") && binColor.equals("Yellow")) ||
-               (trashType.equals("Plastic") && binColor.equals("Gray")) ||
-               (trashType.equals("Metal") && binColor.equals("Red"));
+    private boolean isCorrectBin(TrashItem trash) {
+        for(int i = 0;i < binItemsDefaul.size(); i++)
+        {
+            Bin bin = binItemsDefaul.get(i);
+            return (trash.getType().equals(bin.getType()) && trash.getX() == bin.getX());
+        }
+        return false;
     }
     
     // update score
@@ -187,27 +203,33 @@ public class RunGame extends JFrame {
     // Get event game
      public void userKeyPressed(int keyCode) {
             if (keyCode == 226 || keyCode == 37){
-//              this.itemOnScreen.moveLeft();
                 TrashItem x = trashItems.get(0);
-                if(x.getX() == 280) x.setX(80);
-                else if(x.getX() == 480) x.setX(280);
+                int index = x.getIndex();
+                if(index == 0) {
+                    x.setX(listIndex.getLast());
+                    x.setIndex(listIndex.size() - 1);
+                }
+                else {
+                    x.setX(listIndex.get(index - 1));
+                    x.setIndex(index - 1);
+                }
                 System.out.println("left");
             } else if (keyCode == 227 || keyCode == 39){
-//              this.itemOnScreen.moveRight();
                 TrashItem x = trashItems.get(0);
-                if(x.getX() == 80) x.setX(280);
-                else if(x.getX() == 280) x.setX(480);
+                int index = x.getIndex();
+                if(index == listIndex.size() - 1) {
+                    x.setX(listIndex.getFirst());
+                    x.setIndex(0);
+                }
+                else {
+                    x.setX(listIndex.get(index + 1));
+                    x.setIndex(index + 1);
+                }
                 System.out.println("Right");
             } else if (keyCode == 32 || keyCode == 225 || keyCode == 40){
-//              speedUpDy();
                 TrashItem y = trashItems.get(0);
                 y.setY(getHeight() - 75);
                 System.out.println("Down");
-//            } else if (keyCode == 82 && this.isGameOver) {
-////              reset();
-//                System.out.println("Over");
-//            } else if (keyCode == 88) {
-//              System.exit(0);
             } 
     }
     

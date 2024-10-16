@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import Client.controller.Data;
+import Client.controller.Data.*;
 /**
  *
  * @author vutuyen
@@ -19,6 +21,8 @@ public class WasteSortingGame extends JFrame {
         setLayout(new BorderLayout());
 
         setupStartGame();
+        System.out.println(Data.getListTrash());
+        System.out.println(Data.getListBin());
     }
     
     // Open Game
