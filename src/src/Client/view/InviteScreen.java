@@ -88,13 +88,13 @@ public class InviteScreen extends JFrame {
                     public void onInviteAccepted(String playerID) {
                         // Xử lý khi lời mời được chấp nhận
                         inviteButton.setEnabled(true); // Kích hoạt lại nút mời
-                        JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi đã chấp nhận lời mời!");
+                        JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi "  + playerName + " đã chấp nhận lời mời!");
                     }
 
                     @Override
                     public void onInviteDeclined(String playerID) {
                         inviteButton.setEnabled(true); // Kích hoạt lại nút mời
-                        JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi đã từ chối lời mời.");
+                        JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi " + playerName + " đã từ chối lời mời.");
                     }
                 });
             } else {

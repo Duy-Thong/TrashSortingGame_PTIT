@@ -97,7 +97,10 @@ public class InviteController {
                 String[] parts = responseMessage.split("&");
 
                 if (parts[0].equals("type=accepted")) {
-                    System.out.println("Invite accepted by " + invitedPlayerID);
+                    String gameId = parts[1].split("=")[1];
+                    String senderId = parts[2].split("=")[1];
+                    String receiverId = parts[3].split("=")[1];
+                    System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
                     callback.onInviteAccepted(invitedPlayerID);
                 } else if (parts[0].equals("type=declined")) {
                     System.out.println("Invite declined by " + invitedPlayerID);
@@ -140,6 +143,7 @@ public class InviteController {
                         String gameId = parts[1].split("=")[1];
                         String senderId = parts[2].split("=")[1];
                         String receiverId = parts[3].split("=")[1];
+                        System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
                     }
                 }
             } catch (Exception e) {
