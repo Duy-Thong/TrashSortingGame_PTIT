@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static Client.controller.admin.AccountManagementController.deleteAccount;
+
 public class Server {
     private static final int PORT = 12345;
     private static final String DB_URL = "jdbc:mysql://localhost:3306/trashsortinggame";
@@ -164,6 +166,14 @@ public class Server {
                                 a.getAccountID(), a.getUsername(), a.getPassword(), a.getRole()));
                     }
                     response = responseAccount.toString();
+                    break;
+                    case "deleteAccount":
+                    accountID = parts[1].split("=")[1];
+                    if (deleteAccount(accountID)) {
+                        response = "delete success";
+                    } else {
+                        response = "delete failure";
+                    }
                     break;
 //                case "invite":
 //                    String currentPlayerID = parts[1].split("=")[1];
@@ -487,4 +497,18 @@ public class Server {
         }
         return accountList;
     }
+    private static boolean deleteAccount(String accountID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "DELETE FROM account WHERE accountID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, accountID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 }

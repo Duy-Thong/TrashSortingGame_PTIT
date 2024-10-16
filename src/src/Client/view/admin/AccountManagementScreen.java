@@ -75,7 +75,7 @@ public class AccountManagementScreen extends JFrame {
                 int selectedRow = accountTable.getSelectedRow();
                 if (selectedRow != -1) {
                     String accountID = (String) tableModel.getValueAt(selectedRow, 0);
-                    // Example: deleteAccount(accountID);
+                    deleteAccount(accountID);
                 } else {
                     JOptionPane.showMessageDialog(AccountManagementScreen.this, "Please select an account to delete.");
                 }
@@ -102,5 +102,10 @@ public class AccountManagementScreen extends JFrame {
         for (Account account : accountList) {
             tableModel.addRow(new Object[]{account.getAccountID(), account.getUsername(), account.getPassword(), account.getRole()});
         }
+    }
+
+    private void deleteAccount(String accountID) {
+        accountManagementController.deleteAccount(accountID);
+        loadAccountData();
     }
 }

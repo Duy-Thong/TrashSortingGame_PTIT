@@ -53,4 +53,19 @@ public class AccountManagementController {
         return accountList;
     }
 
+    public static void deleteAccount(String accountID) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            // Tạo gọi tin định nghĩa này
+            String message = "type=deleteAccount&accountID=" + accountID;
+            byte[] buffer = message.getBytes();
+
+            // Gửi gói tin định nghĩa được server
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
