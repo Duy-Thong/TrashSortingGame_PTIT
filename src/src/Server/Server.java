@@ -657,9 +657,24 @@ public class Server {
         }
     }
     private static boolean updateAccount(String accountID, String username, String password, String role) {
-        if (isUsernameExists(username)) {
-            return false; // Tên đăng nhập đã tồn tại, không thêm tài khoản
+        String oldUsername = getAccountbyID(accountID).split("&")[0].split("=")[1];
+        System.out.println("Old Username: " + oldUsername);
+        System.out.println("New Username: " + username);
+
+        if (oldUsername.equals(username)) {
+            return updateAccountInDB(accountID, username, password, role);
+        } else {
+            if (isUsernameExists(username)) {
+                return false;
+            } else {
+                return updateAccountInDB(accountID, username, password, role);
+            }
         }
+    }
+
+
+    // Phương thức để thực hiện cập nhật tài khoản trong cơ sở dữ liệu
+    private static boolean updateAccountInDB(String accountID, String username, String password, String role) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "UPDATE account SET username = ?, password = ?, role = ?, updated_at = NOW() WHERE accountID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -674,6 +689,7 @@ public class Server {
             return false;
         }
     }
+
     private static boolean addAccount(String username, String password, String role) {
         // Kiểm tra xem tên đăng nhập đã tồn tại chưa
         if (isUsernameExists(username)) {
