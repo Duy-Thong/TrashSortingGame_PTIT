@@ -1,11 +1,15 @@
 package Client.view;
 
+import Client.controller.RegisterController;
+import Client.model.Account;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class RegisterScreen {
+    RegisterController registerController = new RegisterController();
     public RegisterScreen() {
         // Tạo frame cho màn hình Đăng ký với kích thước 810x540
         JFrame registerFrame = new JFrame("Đăng ký");
@@ -61,6 +65,30 @@ public class RegisterScreen {
             public void actionPerformed(ActionEvent e) {
                 registerFrame.dispose(); // Đóng màn hình Đăng ký
                 new MainScreen(); // Mở lại màn hình chính
+            }
+        });
+        btnSubmit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText();
+                String password = new String(passwordField.getPassword());
+                String confirmPassword = new String(confirmPasswordField.getPassword());
+                if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Vui lý nhap thong tin!");
+                    return;
+                }
+                if (!password.equals(confirmPassword)) {
+                    JOptionPane.showMessageDialog(null, "Xac nhap mat khau khong hop le!");
+                    return;
+                }
+                if(registerController.register(username, password)) {
+                    JOptionPane.showMessageDialog(null, "Dang ky thanh cong!");
+                    registerFrame.dispose();
+                    new MainScreen();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Dang ky that bai!");
+                }
+
             }
         });
         panel.add(btnBack, gbc); // Thêm nút Trở về

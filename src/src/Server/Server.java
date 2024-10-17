@@ -321,11 +321,12 @@ public class Server {
 
             // Insert new account
             String accountUUID = UUID.randomUUID().toString();
-            String insertAccountQuery = "INSERT INTO account (accountID, username, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())";
+            String insertAccountQuery = "INSERT INTO account (accountID, username, password,role, created_at, updated_at) VALUES (?, ?, ?,?, NOW(), NOW())";
             try (PreparedStatement insertAccountStmt = conn.prepareStatement(insertAccountQuery)) {
                 insertAccountStmt.setString(1, accountUUID);
                 insertAccountStmt.setString(2, username);
                 insertAccountStmt.setString(3, password);
+                insertAccountStmt.setString(4, "player");
                 insertAccountStmt.executeUpdate();
             }
 
