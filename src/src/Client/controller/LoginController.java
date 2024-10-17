@@ -27,7 +27,12 @@ public class LoginController {
 
             // Xử lý phản hồi
             String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
-            return response.equals("login success");
+            if (response.equals("login success")) {
+                new Thread(new InviteController.InviteListener()).start();
+                return true;
+            } else {
+                return false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return false;
