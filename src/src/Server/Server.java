@@ -1,6 +1,7 @@
 package Server;
 
 import Server.model.Game;
+import Server.model.Account;
 import Server.model.Player;
 import Server.model.PlayerGame;
 import Server.model.ClientInfo;
@@ -128,16 +129,13 @@ public class Server {
                         String username = parts[1].split("=")[1];
                         String password = parts[2].split("=")[1];
                         response = authenticate(username, password) ? "login success" : "login failure";
-
                         if (response.equals("login success")) {
                             String accountID = getAccountID(username);
                             String playerID = getPlayerID(accountID);
-                            // Lưu thông tin client
                             clients.add(new ClientInfo(accountID, playerID, packet.getAddress(), packet.getPort()));
                             System.out.println("Client " + playerID + " connected from " + packet.getAddress() + ":" + packet.getPort());
                         }
                         break;
-
                     case "register":
                         username = parts[1].split("=")[1];
                         password = parts[2].split("=")[1];
@@ -151,12 +149,18 @@ public class Server {
                         String accountID = parts[1].split("=")[1];
                         response = getPlayerID(accountID);
                         break;
+                    case "getAccount":
+                        accountID = parts[1].split("=")[1];
+                        response = getAccountbyID(accountID);
+                        break;
                     case "profile":
                         String playerID = parts[1].split("=")[1];
                         Player player = getPlayerProfile(playerID);
                         if (player != null) {
                             response = String.format("playerId=%s&username=%s&totalGames=%d&totalWins=%d&totalScore=%d&averageScore=%d&status=%d&isPlaying=%d&createdAt=%s",
-                                    player.getPlayerID(), player.getUsername(), player.getTotalGames(), player.getTotalWins(), player.getTotalScore(), player.getAverageScore(), player.getStatus(), player.getIsPlaying(), player.getCreatedAt().toString());
+                                    player.getPlayerID(), player.getUsername(), player.getTotalGames(),
+                                    player.getTotalWins(), player.getTotalScore(), player.getAverageScore(),
+                                    player.getStatus(), player.getIsPlaying(), player.getCreatedAt().toString());
                         } else {
                             response = "error: player not found";
                         }
@@ -172,11 +176,13 @@ public class Server {
                         } else {
                             for (PlayerGame game : historyList) {
                                 responseBuilder.append(String.format("gameID=%s&joinTime=%s&leaveTime=%s&playDuration=%d&score=%d&result=%s&isFinal=%b|",
-                                        game.getGameID(), game.getJoinTime(), game.getLeaveTime(), game.getPlayDuration(), game.getScore(), game.getResult(), game.isFinal()));
+                                        game.getGameID(), game.getJoinTime(), game.getLeaveTime(), game.getPlayDuration(),
+                                        game.getScore(), game.getResult(), game.isFinal()));
                             }
                         }
 
                         response = responseBuilder.toString();
+                        System.out.println("Response to client: " + response);
                         break;
                     case "rank":
                         List<Player> playerList = getAllPlayers();
@@ -214,6 +220,55 @@ public class Server {
                         }
 
                         response = responseFriends.toString();
+                        System.out.println("Response to client: " + response);
+                        break;
+                    case "logout":
+                        playerID = parts[1].split("=")[1];
+                        if (logout(playerID)) {
+                            response = "logout success";
+                            System.out.println("Client " + playerID + " disconnected from " + packet.getAddress() + ":" + packet.getPort());
+                        } else {
+                            response = "logout failure";
+                            System.out.println("Client " + playerID + " failed to disconnect from " + packet.getAddress() + ":" + packet.getPort());
+                        }
+                        break;
+                    case "getAllAccount":
+                        List<Account> accountList = getAllAccount();
+                        StringBuilder responseAccount = new StringBuilder();
+                        for (Account a : accountList) {
+                            responseAccount.append(String.format("accountID=%s&username=%s&password=%s&role=%s|",
+                                    a.getAccountID(), a.getUsername(), a.getPassword(), a.getRole()));
+                        }
+                        response = responseAccount.toString();
+                        break;
+                    case "deleteAccount":
+                        accountID = parts[1].split("=")[1];
+                        if (deleteAccount(accountID)) {
+                            response = "delete success";
+                        } else {
+                            response = "delete failure";
+                        }
+                        break;
+                    case "updateAccount":
+                        accountID = parts[1].split("=")[1];
+                        username = parts[2].split("=")[1];
+                        password = parts[3].split("=")[1];
+                        String role = parts[4].split("=")[1];
+                        if (updateAccount(accountID, username, password, role)) {
+                            response = "update success";
+                        } else {
+                            response = "update failure";
+                        }
+                        break;
+                    case "addAccount":
+                        username = parts[1].split("=")[1];
+                        password = parts[2].split("=")[1];
+                        role = parts[3].split("=")[1];
+                        if (addAccount(username, password, role)) {
+                            response = "add success";
+                        } else {
+                            response = "add failure";
+                        }
                         break;
                     default:
                         response = "error: unknown request";
@@ -524,4 +579,135 @@ public class Server {
             e.printStackTrace();
         }
     }
+    public static boolean logout(String playerID) {
+        ClientInfo client = null;
+        for (ClientInfo c : clients) {
+            if (c.getPlayerID().equals(playerID)) {
+                client = c;
+                break;
+            }
+        }
+        if (client != null) {
+            clients.remove(client);
+            return true;
+        }
+        return false;
+    }
+    private static String getAccountbyID(String accountID) {
+        if (accountID == null || accountID.isEmpty()) {
+            System.err.println("Error: accountID is null or empty");
+            return null; // or throw an IllegalArgumentException
+        }
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT * FROM account WHERE accountID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, accountID);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    // Assuming you have an accountID column
+                    String username = rs.getString("username"); // Assuming you have a username column
+                    String password = rs.getString("password"); // Assuming you have a password column
+                    String role = rs.getString("role"); // Assuming you have a role column
+                    return String.format("username=%s&password=%s&role=%s",
+                            username, password, role);
+                }
+                System.err.println("Error: User not found");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error: Database error - " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Error: Unexpected error occurred - " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private static List<Account> getAllAccount() {
+        List<Account> accountList = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT * FROM account";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String accountID = rs.getString("accountID");
+                    String username = rs.getString("username");
+                    String password = rs.getString("password");
+                    String role = rs.getString("role");
+                    accountList.add(new Account(accountID,username, password, role));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return accountList;
+    }
+    private static boolean deleteAccount(String accountID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "DELETE FROM account WHERE accountID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, accountID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    private static boolean updateAccount(String accountID, String username, String password, String role) {
+        if (isUsernameExists(username)) {
+            return false; // Tên đăng nhập đã tồn tại, không thêm tài khoản
+        }
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "UPDATE account SET username = ?, password = ?, role = ?, updated_at = NOW() WHERE accountID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                stmt.setString(2, password);
+                stmt.setString(3, role);
+                stmt.setString(4, accountID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    private static boolean addAccount(String username, String password, String role) {
+        // Kiểm tra xem tên đăng nhập đã tồn tại chưa
+        if (isUsernameExists(username)) {
+            return false; // Tên đăng nhập đã tồn tại, không thêm tài khoản
+        }
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String accountID = UUID.randomUUID().toString();
+            String query = "INSERT INTO account (accountID, username, password, role, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, accountID);
+                stmt.setString(2, username);
+                stmt.setString(3, password);
+                stmt.setString(4, role);
+                return stmt.executeUpdate() > 0; // Thêm thành công
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Thêm thất bại
+        }
+    }
+    private static boolean isUsernameExists(String username) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT COUNT(*) FROM account WHERE username = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Nếu số lượng lớn hơn 0, tên đăng nhập đã tồn tại
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false; // Mặc định là không tồn tại
+    }
+
+
 }
