@@ -133,6 +133,7 @@ public class Server {
                             String accountID = getAccountID(username);
                             String playerID = getPlayerID(accountID);
                             clients.add(new ClientInfo(accountID, playerID, packet.getAddress(), packet.getPort()));
+                            makePlayerOnline(playerID);
                             System.out.println("Client " + playerID + " connected from " + packet.getAddress() + ":" + packet.getPort());
                         }
                         break;
@@ -226,6 +227,7 @@ public class Server {
                         playerID = parts[1].split("=")[1];
                         if (logout(playerID)) {
                             response = "logout success";
+                            makePlayerOffline(playerID);
                             System.out.println("Client " + playerID + " disconnected from " + packet.getAddress() + ":" + packet.getPort());
                         } else {
                             response = "logout failure";
@@ -599,7 +601,6 @@ public class Server {
             System.err.println("Error: accountID is null or empty");
             return null; // or throw an IllegalArgumentException
         }
-
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "SELECT * FROM account WHERE accountID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -708,6 +709,30 @@ public class Server {
             e.printStackTrace();
         }
         return false; // Mặc định là không tồn tại
+    }
+    private static boolean makePlayerOnline(String playerID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "UPDATE player SET status = 1 WHERE playerID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, playerID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    private static boolean makePlayerOffline(String playerID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "UPDATE player SET status = 0 WHERE playerID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, playerID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
