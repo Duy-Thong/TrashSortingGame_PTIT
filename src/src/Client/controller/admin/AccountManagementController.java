@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountManagementController {
-    private static final String SERVER_ADDRESS = "26.29.9.209"; // Thay đổi nếu server chạy trên máy khác
+    private static final String SERVER_ADDRESS = "26.29.9.206"; // Thay đổi nếu server chạy trên máy khác
     private static final int SERVER_PORT = 12345;
     private static final LoginController loginController = new LoginController();
     // Hàm lấy danh sách tất cả các account từ cơ sở dữ liệu
