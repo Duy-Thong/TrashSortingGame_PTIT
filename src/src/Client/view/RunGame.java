@@ -22,7 +22,8 @@ public class RunGame extends JFrame {
     private JLabel player2ScoreLabel;
     private Timer gameTimer, trashTimer;
     private JPanel gamePanel;
-    private int secondsLeft = 20, frametime = 2000;
+    private int TIMER = 2000, TIMEPLAY = 20;
+    private int secondsLeft = TIMEPLAY, frametime = TIMER;
     private int player1Score = 0;
     private int player2Score = 0;
     private int player = 1;
@@ -54,9 +55,13 @@ public class RunGame extends JFrame {
     
     // Load trashs, bins, indexs
     private void loadIndexs(){
-        listIndex.add(80);
-        listIndex.add(280);
-        listIndex.add(480);
+        int nBin = 3;
+        int frameBin = width / nBin;
+        int center = frameBin / 2;
+        for(int i = 0;i < nBin; i++){
+            listIndex.add(frameBin * i + center);
+            System.out.println("x: " + (frameBin * i + center));
+        }
     }
 
     private void loadTrashs() {
@@ -71,7 +76,9 @@ public class RunGame extends JFrame {
         String[] types = {"Paper", "Plastic", "Metal"};
         List<String> ls = Data.getListBin();
         for (int i = 0; i < types.length; i++) {
-            binItemsDefaul.add(new Bin(listIndex.get(i), getHeight() - 100, types[i], ls.get(i)));
+            binItemsDefaul.add(new Bin(listIndex.get(i), getHeight(), types[i], ls.get(i)));
+            Bin tmp = binItemsDefaul.getLast();
+            tmp.setY(getHeight() - tmp.getHeightImage());
         }
     }
 
@@ -235,13 +242,14 @@ public class RunGame extends JFrame {
     
      // Play again
     public void restartGame() {
-        secondsLeft = 120;
+        secondsLeft = TIMEPLAY;
+        frametime = TIMER;
         player1Score = 0;        
         player2Score = 0;
         player = 1;
         player1ScoreLabel.setText("Player1: 0 points");
         player2ScoreLabel.setText("Player2: 0 points");
-        timerLabel.setText("Time: 120");
+        timerLabel.setText("Time: " + secondsLeft);
         trashItems.clear();
         gameTimer.restart();
         trashTimer.restart();

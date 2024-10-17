@@ -48,7 +48,9 @@ public class Bin{
     public void draw(Graphics g) {
         Image img = binImage.getImage();
         if (img != null) {
-            g.drawImage(img, x, y, img.getWidth(null), img.getHeight(null), null);
+            int img_width = img.getWidth(null);
+            int img_height = img.getHeight(null);
+            g.drawImage(img, x - img_width/2, y - img_height/2, img_width, img_height, null);
         }
     }
 
