@@ -10,7 +10,7 @@ import java.util.List;
 import Client.model.PlayerGame;
 
 public class HistoryController {
-    private static final String SERVER_ADDRESS = "localhost"; // Thay đổi nếu server chạy trên máy khác
+    private static final String SERVER_ADDRESS = "26.29.9.209"; // Thay đổi nếu server chạy trên máy khác
     private static final int SERVER_PORT = 12345;
 
     public List<PlayerGame> getPlayerHistory(String playerID) {
