@@ -17,8 +17,20 @@ public class Data {
         List<String> urls = Arrays.asList(
                 "https://cdn3.iconfinder.com/data/icons/font-awesome-regular-1/512/trash-can-64.png",
                 "https://cdn1.iconfinder.com/data/icons/unicons-line-vol-6/24/trash-alt-64.png",
+                "https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/trash-64.png",
                 "https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/trash-64.png"
         );
         return urls;
     }
+
+    public static List<String> getListTypes(){
+        List<String> urls = Arrays.asList(
+                "paper",
+                "plastic",
+                "metal",
+                "bottel"
+        );
+        return urls;
+    }
+
 }

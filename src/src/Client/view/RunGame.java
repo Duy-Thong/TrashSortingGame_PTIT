@@ -32,9 +32,8 @@ public class RunGame extends JFrame {
     private ArrayList<TrashItem> trashItems = new ArrayList<>();
     private ArrayList<TrashItem> trashItemsDefaul = new ArrayList<>();
     private ArrayList<Integer> listIndex = new ArrayList<>();
-    private ArrayList<Bin> binItems = new ArrayList<>();
     private ArrayList<Bin> binItemsDefaul = new ArrayList<>();
-    public static HashMap<String, Image> trashImages = new HashMap<>();
+    private List<String> listTypes = new ArrayList<>();
     
 
     // Loop game
@@ -55,7 +54,8 @@ public class RunGame extends JFrame {
     
     // Load trashs, bins, indexs
     private void loadIndexs(){
-        int nBin = 3;
+        listTypes = Data.getListTypes();
+        int nBin = listTypes.size();
         int frameBin = width / nBin;
         int center = frameBin / 2;
         for(int i = 0;i < nBin; i++){
@@ -65,18 +65,16 @@ public class RunGame extends JFrame {
     }
 
     private void loadTrashs() {
-        String[] types = {"Paper", "Plastic", "Metal"};
         List<String> ls = Data.getListTrash();
-        for (int i = 0; i < types.length; i++) {
-            trashItemsDefaul.add(new TrashItem(listIndex.get(i), 0, i, types[i], ls.get(i)));
+        for (int i = 0; i < ls.size(); i++) {
+            trashItemsDefaul.add(new TrashItem(0, 0, 0, listTypes.get(i), ls.get(i)));
         }
     }
 
     private void loadBins() {
-        String[] types = {"Paper", "Plastic", "Metal"};
         List<String> ls = Data.getListBin();
-        for (int i = 0; i < types.length; i++) {
-            binItemsDefaul.add(new Bin(listIndex.get(i), getHeight(), types[i], ls.get(i)));
+        for (int i = 0; i < listTypes.size(); i++) {
+            binItemsDefaul.add(new Bin(listIndex.get(i), getHeight(), listTypes.get(i), ls.get(i)));
             Bin tmp = binItemsDefaul.getLast();
             tmp.setY(getHeight() - tmp.getHeightImage());
         }
@@ -124,7 +122,7 @@ public class RunGame extends JFrame {
             if (frametime % 100 == 0)
                 secondsLeft--;
             timerLabel.setText("Time: " + secondsLeft);
-            if (frametime < 0) {
+            if (frametime <= 0) {
                 gameTimer.stop();
                 trashTimer.stop();
                 showEndGame();
@@ -149,6 +147,9 @@ public class RunGame extends JFrame {
             for(int i = 0; i < 20; i++)
             {
                 TrashItem item = trashItemsDefaul.get(random.nextInt(0, trashItemsDefaul.size()));
+                int index = listIndex.get(random.nextInt(0, listIndex.size()));
+                item.setX(index);
+                item.setIndex(index);
                 trashItems.add(item.copy());
             }
 
