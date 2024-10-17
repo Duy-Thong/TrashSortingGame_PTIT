@@ -475,7 +475,7 @@ public class Server {
     private static String createNewGame() {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String gameID = UUID.randomUUID().toString();
-            String insertGameQuery = "INSERT INTO game (gameID, status, start_time, end_time, total_score, list_trash_bin, list_trash_item) VALUES (?, ?, ?, ?, 0, null, null)";
+            String insertGameQuery = "INSERT INTO game (gameID, status, start_time, end_time, total_score) VALUES (?, ?, ?, ?, 0)";
             try (PreparedStatement insertGameStmt = conn.prepareStatement(insertGameQuery)) {
                 insertGameStmt.setString(1, gameID);
                 insertGameStmt.setString(2, "pending");
