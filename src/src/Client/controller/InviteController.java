@@ -71,52 +71,64 @@ public class InviteController {
 
     // Gửi yêu cầu mời người chơi
     public void invitePlayer(String currentPlayerID, String invitedPlayerID, String invitedPlayerName, InviteCallback callback) {
-        try (DatagramSocket socket = new DatagramSocket(CLIENT_PORT)) {
-            String message = "type=invite&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitePlayerName=" + username;
-            byte[] buffer = message.getBytes();
-            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                try (DatagramSocket socket = new DatagramSocket(CLIENT_PORT)) {
+                    String message = "type=invite&playerID=" + currentPlayerID + "&invitedPlayerID=" + invitedPlayerID + "&invitePlayerName=" + username;
+                    byte[] buffer = message.getBytes();
+                    InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
 
-            // Gửi lời mời
-            socket.send(packet);
-            System.out.println("Invitation sent to " + invitedPlayerID);
+                    // Gửi lời mời
+                    socket.send(packet);
+                    System.out.println("Invitation sent to " + invitedPlayerID);
 
-            // Hiển thị thông báo rằng lời mời đã được gửi
-            JOptionPane.showMessageDialog(null, "Lời mời đã được gửi đến người chơi " + invitedPlayerName + "!");
+                    // Hiển thị thông báo rằng lời mời đã được gửi
+                    JOptionPane.showMessageDialog(null, "Lời mời đã được gửi đến người chơi " + invitedPlayerName + "!");
 
-            // Đặt thời gian chờ cho việc nhận
-            socket.setSoTimeout(inviteTimeout);
-            System.out.println("Waiting for response for " + inviteTimeout + " milliseconds...");
+                    // Đặt thời gian chờ cho việc nhận
+                    socket.setSoTimeout(inviteTimeout);
+                    System.out.println("Waiting for response for " + inviteTimeout + " milliseconds...");
 
-            try {
-                byte[] receiveBuffer = new byte[1024];
-                DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-                socket.receive(receivePacket);
+                    try {
+                        byte[] receiveBuffer = new byte[1024];
+                        DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+                        socket.receive(receivePacket);
 
-                // Xử lý phản hồi từ server
-                String responseMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
-                System.out.println("Received response: " + responseMessage);
+                        // Xử lý phản hồi từ server
+                        String responseMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
+                        System.out.println("Received response: " + responseMessage);
 
-                String[] parts = responseMessage.split("&");
+                        String[] parts = responseMessage.split("&");
 
-                if (parts[0].equals("type=accepted")) {
-                    String gameId = parts[1].split("=")[1];
-                    String senderId = parts[2].split("=")[1];
-                    String receiverId = parts[3].split("=")[1];
-                    System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
-                    callback.onInviteAccepted(invitedPlayerID);
-                } else if (parts[0].equals("type=declined")) {
-                    System.out.println("Invite declined by " + invitedPlayerID);
-                    callback.onInviteDeclined(invitedPlayerID);
+                        if (parts[0].equals("type=accepted")) {
+                            String gameId = parts[1].split("=")[1];
+                            String senderId = parts[2].split("=")[1];
+                            String receiverId = parts[3].split("=")[1];
+                            System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
+                            callback.onInviteAccepted(invitedPlayerID);
+                        } else if (parts[0].equals("type=declined")) {
+                            System.out.println("Invite declined by " + invitedPlayerID);
+                            callback.onInviteDeclined(invitedPlayerID);
+                        }
+                    } catch (SocketTimeoutException e) {
+                        System.out.println("No response from " + invitedPlayerID + " after timeout.");
+                        callback.onInviteTimeout(invitedPlayerID);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (SocketTimeoutException e) {
-                System.out.println("No response from " + invitedPlayerID + " after timeout.");
-                callback.onInviteTimeout(invitedPlayerID);
+                return null;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+            @Override
+            protected void done() {
+                // Đây là nơi bạn có thể cập nhật lại UI sau khi công việc nền hoàn thành, nếu cần.
+            }
+        }.execute();
     }
+
 
     // Luồng lắng nghe lời mời
     static class InviteListener implements Runnable {
