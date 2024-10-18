@@ -22,7 +22,7 @@ public class RunGame extends JFrame {
     private JLabel player2ScoreLabel;
     private Timer gameTimer, trashTimer;
     private JPanel gamePanel;
-    private int TIMER = 2000, TIMEPLAY = 20;
+    private int TIMER = 500, TIMEPLAY = 5;
     private int secondsLeft = TIMEPLAY, frametime = TIMER;
     private int player1Score = 0;
     private int player2Score = 0;
@@ -67,7 +67,7 @@ public class RunGame extends JFrame {
     private void loadTrashs() {
         List<String> ls = Data.getListTrash();
         for (int i = 0; i < ls.size(); i++) {
-            trashItemsDefaul.add(new TrashItem(0, 0, 0, listTypes.get(i), ls.get(i)));
+            trashItemsDefaul.add(new TrashItem(0, 0, 0, listTypes.get(0), ls.get(i)));
         }
     }
 
