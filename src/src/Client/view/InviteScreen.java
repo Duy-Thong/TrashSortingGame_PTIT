@@ -14,6 +14,7 @@ public class InviteScreen extends JFrame {
     private DefaultTableModel model;
     private JButton inviteButton;
     private JButton backButton; // Declare the Back button
+    private static RunGame game;
 
     public InviteScreen(String playerID, String username) {
         this.inviteController = new InviteController(username);
@@ -87,10 +88,11 @@ public class InviteScreen extends JFrame {
                     @Override
                     public void onInviteAccepted(String playerID) {
                         // Xử lý khi lời mời được chấp nhận
-
                         inviteButton.setEnabled(true); // Kích hoạt lại nút mời
                         JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi "  + playerName + " đã chấp nhận lời mời!");
-
+                        dispose();
+                        // Chuyển sang màn game
+                        new WasteSortingGame();
                     }
 
                     @Override
