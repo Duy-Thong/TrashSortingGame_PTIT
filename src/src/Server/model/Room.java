@@ -2,7 +2,9 @@ package Server.model;
 
 public class Room {
     private String roomId;
+    // player gửi điểm
     private String playerId1;
+    //player nhận điểm;
     private String playerId2;
 
     public Room(String roomId, String playerId1, String playerId2) {

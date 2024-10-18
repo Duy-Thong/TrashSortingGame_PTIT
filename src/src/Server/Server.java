@@ -121,26 +121,29 @@ public class Server {
             }
             else if (type.equals("UPDATE_SCORE")) {
                 System.out.println(message);
-
+                // id player gửi điểm đi
                 String playerId = parts[1].split("=")[1];
                 String newScore = parts[2].split("=")[1];
                 String roomId = parts[3].split("=")[1];
-                System.out.println(playerId);
-                System.out.println(newScore);
-                System.out.println(roomId);
                 response = "type=UPDATE_SCORE&newScore=" + newScore;
                 for (Room room : rooms) {
                     if(room.getRoomId().equals(roomId))
                     {
-                        for(ClientInfo clientInfo : clients){
-                            if(clientInfo.getPlayerID().equals(room.getPlayerId1()))
-                            {
-                                sendToClient(socket,response,clientInfo);
-                                return;
-                            }
+                        ClientInfo invitedClient = findClientByPlayerID(room.getPlayerId2());
+                        if (invitedClient != null) {
+                            InetAddress invitedPlayerAddress = invitedClient.getAddress();
+                            int invitedPlayerPort = 12346;
+                            DatagramPacket invitePacket = new DatagramPacket(response.getBytes(), response.length(),
+                                    invitedPlayerAddress, invitedPlayerPort);
+                            socket.send(invitePacket);
+                            System.out.println("Response to client: " + response);
+                        } else {
+                            System.out.println("Không tìm thấy người chơi với ID: " + room.getPlayerId2());
                         }
+                        break;
                     }
                 }
+
             }
 
             else {
