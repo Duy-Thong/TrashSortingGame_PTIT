@@ -1,6 +1,8 @@
 package Client.controller;
 
 import Client.model.Player;
+import Client.view.RunGame;
+import Client.view.WasteSortingGame;
 
 import java.net.*;
 import java.sql.Timestamp;
@@ -15,6 +17,7 @@ public class InviteController {
 
     private List<Player> availablePlayers;
     private int inviteTimeout = 60000;
+    private static RunGame game;
 
     private String username;
 
@@ -144,6 +147,8 @@ public class InviteController {
                         String senderId = parts[2].split("=")[1];
                         String receiverId = parts[3].split("=")[1];
                         System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
+                        // Chuyển sang màn game
+                        new WasteSortingGame();
                     }
                 }
             } catch (Exception e) {

@@ -23,6 +23,7 @@ public class WasteSortingGame extends JFrame {
         setupStartGame();
         System.out.println(Data.getListTrash());
         System.out.println(Data.getListBin());
+        setVisible(true);
     }
 
     // Open Game
