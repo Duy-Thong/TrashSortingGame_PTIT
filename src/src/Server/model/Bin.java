@@ -15,22 +15,19 @@ import java.net.URL;
  *
  * @author vutuyen
  */
-public class TrashItem {
-    private int x, y = 0;
-    private int step = 1;
-    private int index;
+public class Bin {
     private String type;
+    private int x, y;
     private String url;
-    private int widthImage = 40, heightImage = 40;
-    private ImageIcon trashImages;
+    private ImageIcon binImage;
+    private int widthImage = 64, heightImage = 64;
 
-    public TrashItem(int x, int y, int index, String type, String url) {
+    public Bin(int x, int y, String type, String url) {
+        this.type = type;
         this.x = x;
         this.y = y;
-        this.index = index;
-        this.type = type;
         this.url = url;
-        this.trashImages = urlToImage(this.url);
+        this.binImage = urlToImage(url);
     }
 
     private ImageIcon urlToImage(String urlString){
@@ -47,7 +44,7 @@ public class TrashItem {
     }
 
     public void draw(Graphics g) {
-        Image img = trashImages.getImage();
+        Image img = binImage.getImage();
         if (img != null) {
             int img_width = img.getWidth(null);
             int img_height = img.getHeight(null);
@@ -55,42 +52,13 @@ public class TrashItem {
         }
     }
 
-    public void move() {
-        this.y += step;
-    }
-
-    public TrashItem copy(){
-        return new TrashItem(
+    public Bin copy(){
+        return new Bin(
                 this.x,
                 this.y,
-                this.index,
                 this.type,
                 this.url
         );
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public int getX(){
-        return x;
-    }
-
-    public void setX(int x){
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y){
-        this.y = y;
     }
 
     public String getType() {
@@ -101,20 +69,28 @@ public class TrashItem {
         this.type = type;
     }
 
-    public int getStep() {
-        return step;
+    public int getX() {
+        return x;
     }
 
-    public void setStep(int step) {
-        this.step = step;
+    public void setX(int x) {
+        this.x = x;
     }
 
-    public int getHeightImage() {
-        return heightImage;
+    public int getY() {
+        return y;
     }
 
-    public void setHeightImage(int heightImage) {
-        this.heightImage = heightImage;
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public int getWidthImage() {
@@ -125,11 +101,11 @@ public class TrashItem {
         this.widthImage = widthImage;
     }
 
-    public int getIndex() {
-        return index;
+    public int getHeightImage() {
+        return heightImage;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public void setHeightImage(int heightImage) {
+        this.heightImage = heightImage;
     }
 }

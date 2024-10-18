@@ -143,8 +143,8 @@ public class RunGame extends JFrame {
     }
     // add a new item
     private void addNewTrashItem() {
-        if(trashItems.isEmpty() || trashItems.size() <= 10)
-            for(int i = 0; i < 20; i++)
+        if(trashItems.isEmpty() || trashItems.size() <= 5)
+            for(int i = 0; i < 10; i++)
             {
                 TrashItem item = trashItemsDefaul.get(random.nextInt(0, trashItemsDefaul.size()));
                 int index = listIndex.get(random.nextInt(0, listIndex.size()));
@@ -210,6 +210,7 @@ public class RunGame extends JFrame {
 
     // Get event game
     public void userKeyPressed(int keyCode) {
+        System.out.println(keyCode);
         if (keyCode == 226 || keyCode == 37){
             TrashItem x = trashItems.get(0);
             int index = x.getIndex();

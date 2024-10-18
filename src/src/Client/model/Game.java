@@ -9,12 +9,12 @@ public class Game {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private int totalScore;
-    private List<String> listTrashBin;
-    private List<String> listTrashItem;
+    private List<Bin> listTrashBin;
+    private List<TrashItem> listTrashItem;
 
     public Game() {}
 
-    public Game(String gameID, String status, LocalDateTime startTime, LocalDateTime endTime, int totalScore, List<String> listTrashBin, List<String> listTrashItem) {
+    public Game(String gameID, String status, LocalDateTime startTime, LocalDateTime endTime, int totalScore, List<Bin> listTrashBin, List<TrashItem> listTrashItem) {
         this.gameID = gameID;
         this.status = status;
         this.startTime = startTime;
@@ -64,19 +64,18 @@ public class Game {
         this.totalScore = totalScore;
     }
 
-    public List<String> getListTrashBin() {
+    public List<Bin> getListTrashBin() {
         return listTrashBin;
     }
 
-    public void setListTrashBin(List<String> listTrashBin) {
+    public void setListTrashBin(List<Bin> listTrashBin) {
         this.listTrashBin = listTrashBin;
     }
 
-    public List<String> getListTrashItem() {
+    public List<TrashItem> getListTrashItem() {
         return listTrashItem;
     }
-
-    public void setListTrashItem(List<String> listTrashItem) {
+    public void setListTrashItem(List<TrashItem> listTrashItem) {
         this.listTrashItem = listTrashItem;
     }
 }
