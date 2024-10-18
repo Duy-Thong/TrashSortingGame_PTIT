@@ -36,4 +36,13 @@ public class Room {
     public void setPlayerId2(String playerId2) {
         this.playerId2 = playerId2;
     }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "roomId='" + roomId + '\'' +
+                ", playerId1='" + playerId1 + '\'' +
+                ", playerId2='" + playerId2 + '\'' +
+                '}';
+    }
 }

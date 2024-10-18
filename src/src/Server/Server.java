@@ -126,15 +126,16 @@ public class Server {
                 String newScore = parts[2].split("=")[1];
                 String roomId = parts[3].split("=")[1];
                 response = "type=UPDATE_SCORE&newScore=" + newScore;
+                System.out.println(message);
                 for (Room room : rooms) {
                     if(room.getRoomId().equals(roomId))
                     {
-                        ClientInfo invitedClient = findClientByPlayerID(room.getPlayerId2());
-                        if (invitedClient != null) {
-                            InetAddress invitedPlayerAddress = invitedClient.getAddress();
-                            int invitedPlayerPort = 12346;
+                        String idPlayerTaget = (playerId.equals(room.getPlayerId1())) ? room.getPlayerId2() : room.getPlayerId1();
+                        ClientInfo clientInfo = findClientByPlayerID(idPlayerTaget);
+                        if (clientInfo != null) {
+                            InetAddress invitedPlayerAddress = clientInfo.getAddress();
                             DatagramPacket invitePacket = new DatagramPacket(response.getBytes(), response.length(),
-                                    invitedPlayerAddress, invitedPlayerPort);
+                                    invitedPlayerAddress, 12349);
                             socket.send(invitePacket);
                             System.out.println("Response to client: " + response);
                         } else {
