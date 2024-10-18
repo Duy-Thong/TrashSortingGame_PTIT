@@ -27,7 +27,7 @@ public class RunGame extends JFrame {
     private int player1Score = 0;
     private int player2Score = 0;
     private int player = 1;
-    private int width = 600, height = 400;
+    private int width = 810, height = 540;
     private Random random = new Random();
     private ArrayList<TrashItem> trashItems = new ArrayList<>();
     private ArrayList<TrashItem> trashItemsDefaul = new ArrayList<>();
@@ -41,6 +41,7 @@ public class RunGame extends JFrame {
         setTitle("Waste Sorting Game");
         setSize(width, height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         addKeyListener(new KeyHandler());
@@ -76,7 +77,7 @@ public class RunGame extends JFrame {
         for (int i = 0; i < listTypes.size(); i++) {
             binItemsDefaul.add(new Bin(listIndex.get(i), getHeight(), listTypes.get(i), ls.get(i)));
             Bin tmp = binItemsDefaul.getLast();
-            tmp.setY(getHeight() - tmp.getHeightImage());
+            tmp.setY(getHeight() - 100);
         }
     }
 
@@ -86,8 +87,8 @@ public class RunGame extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                trashItems.getFirst().draw(g);
-                for(int i = 0;i  < binItemsDefaul.size(); i++){
+                if(!trashItems.isEmpty()) trashItems.getFirst().draw(g);
+                for(int i = 0;i  < binItemsDefaul.size(); i++) {
                     binItemsDefaul.get(i).draw(g);
                 }
             }
@@ -143,15 +144,13 @@ public class RunGame extends JFrame {
     }
     // add a new item
     private void addNewTrashItem() {
-        if(trashItems.isEmpty() || trashItems.size() <= 10)
-            for(int i = 0; i < 20; i++)
-            {
-                TrashItem item = trashItemsDefaul.get(random.nextInt(0, trashItemsDefaul.size()));
-                int index = listIndex.get(random.nextInt(0, listIndex.size()));
-                item.setX(index);
-                item.setIndex(index);
-                trashItems.add(item.copy());
-            }
+        if(trashItems.isEmpty()) {
+            TrashItem item = trashItemsDefaul.get(random.nextInt(0, trashItemsDefaul.size()));
+            int index = random.nextInt(0, listIndex.size());
+            item.setX(listIndex.get(index));
+            item.setIndex(index);
+            trashItems.add(item.copy());
+        }
 
     }
 

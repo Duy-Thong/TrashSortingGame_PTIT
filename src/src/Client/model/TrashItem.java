@@ -19,7 +19,7 @@ import java.util.HashMap;
  */
 public class TrashItem{
     private int x, y = 0;
-    private int step = 1;
+    private int step = 10;
     private int index;
     private String type;
     private String url;

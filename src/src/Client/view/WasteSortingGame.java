@@ -16,8 +16,9 @@ public class WasteSortingGame extends JFrame {
     private RunGame game;
     public WasteSortingGame() {
         setTitle("Waste Sorting Game");
-        setSize(600, 400);
+        setSize(810, 540);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         setupStartGame();

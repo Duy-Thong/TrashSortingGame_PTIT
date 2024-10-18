@@ -160,7 +160,7 @@ public class InviteController {
                         String receiverId = parts[3].split("=")[1];
                         System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
                         // Chuyển sang màn game
-                        new WasteSortingGame();
+                        new RunGame().setVisible(true);
                     }
                 }
             } catch (Exception e) {

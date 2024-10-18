@@ -1,6 +1,5 @@
 package Server;
 
-import Server.model.Game;
 import Server.model.Account;
 import Server.model.Player;
 import Server.model.PlayerGame;

@@ -9,8 +9,9 @@ import java.awt.*;
 public class EndGame extends JFrame {
     public EndGame(RunGame parentGame, String winner) {
         setTitle("WIN!");
-        setSize(400, 300);
+        setSize(810, 540);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         JPanel panel = new JPanel() {
@@ -20,7 +21,7 @@ public class EndGame extends JFrame {
 //                setBackground(new Color(100, 200, 150)); // Teal-ish background
 //                g.setColor(Color.YELLOW);
                 g.setFont(new Font("Arial", Font.BOLD, 50));
-                g.drawString("WIN!", 150, 100);
+                g.drawString("WIN!", getWidth()/2 - 50, getHeight()/2 - 50);
             }
         };
         add(panel, BorderLayout.CENTER);
