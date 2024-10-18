@@ -1,70 +1,48 @@
 package Client.view;
 
-import Client.model.wasteItems.WSGame;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
+
+import Client.controller.Data;
+import Client.controller.Data.*;
+/**
+ *
+ * @author vutuyen
+ */
 
 public class WasteSortingGame extends JFrame {
-    private final WSGame game;
-    private final GamePanel gamePanel;
-    private static final int INTERVAL = 5;
-    private Timer timer;
-    private final ScorePanel scorePanel;
 
-    // Constructs main window
-    // effects: sets up window in which Space Invaders game will be played
-    public  WasteSortingGame() {
-        super("Waste Sorting Game");
+    private RunGame game;
+    public WasteSortingGame() {
+        setTitle("Waste Sorting Game");
+        setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        game = new WSGame();
-        gamePanel = new GamePanel(game);
-        scorePanel = new ScorePanel(game);
-        add(gamePanel);
-        add(scorePanel, BorderLayout.NORTH);
-        pack();
-        addKeyListener(new KeyHandler());
-        centreOnScreen();
-        setVisible(true);
-        addTimer();
-        timer.start();
-        game.addObserver(scorePanel);
-}
+        setLayout(new BorderLayout());
 
-    // switch to the given panel
-
-    private void centreOnScreen() {
-        Dimension scrn = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation((scrn.width - getWidth()) / 2, (scrn.height - getHeight()) / 2);
+        setupStartGame();
+        System.out.println(Data.getListTrash());
+        System.out.println(Data.getListBin());
     }
 
-    /*
-     * A key handler to respond to key events
-     */
-    private class KeyHandler extends KeyAdapter {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            game.keyPressed(e.getKeyCode());
-        }
-    }
-
-    // Set up timer
-    // modifies: none
-    // effects:  initializes a timer that updates game each
-    //           INTERVAL milliseconds
-    private void addTimer() {
-        timer = new Timer(INTERVAL, ae -> {
-            game.update(this);
-            gamePanel.repaint();
+    // Open Game
+    private void setupStartGame() {
+        JPanel ok = new JPanel(new GridLayout(1, 1));
+        JButton button = new JButton("OK");
+        button.addActionListener((ActionEvent e) -> {
+            game = new RunGame();
+            this.setVisible(false);
+            game.setVisible(true);
         });
-    }
-    public void stopTimer() {
-        timer.stop();
+        ok.add(button);
+        add(ok, BorderLayout.CENTER);
     }
 
+    // Main
     public static void main(String[] args) {
-        new InstructionFrame();
+        SwingUtilities.invokeLater(() -> {
+            WasteSortingGame home = new WasteSortingGame();
+            home.setVisible(true);
+        });
     }
 }

@@ -1,34 +1,98 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package Client.model;
 
-public class TrashItem {
-    private String itemID;
-    private String name;
-    private String type; // 'organic', 'plastic', 'metal', 'paper'
-    private String imgUrl;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
 
-    public TrashItem() {}
+/**
+ *
+ * @author vutuyen
+ */
+public class TrashItem{
+    private int x, y = 0;
+    private int step = 1;
+    private int index;
+    private String type;
+    private String url;
+    private int widthImage = 40, heightImage = 40;
+    private ImageIcon trashImages;
 
-    public TrashItem(String itemID, String name, String type, String imgUrl) {
-        this.itemID = itemID;
-        this.name = name;
+    public TrashItem(int x, int y, int index, String type, String url) {
+        this.x = x;
+        this.y = y;
+        this.index = index;
         this.type = type;
-        this.imgUrl = imgUrl;
+        this.url = url;
+        this.trashImages = urlToImage(this.url);
     }
 
-    public String getItemID() {
-        return itemID;
+    private ImageIcon urlToImage(String urlString){
+        try {
+            URL url = new URL(urlString);
+            BufferedImage originalImage = ImageIO.read(url);
+            Image scaledImage = originalImage.getScaledInstance(widthImage, heightImage, Image.SCALE_SMOOTH);
+            ImageIcon imageIcon = new ImageIcon(scaledImage);
+            return imageIcon;
+        } catch (IOException e) {
+            System.err.println("Error loading image: " + e.getMessage());
+            return new ImageIcon();
+        }
     }
 
-    public void setItemID(String itemID) {
-        this.itemID = itemID;
+    public void draw(Graphics g) {
+        Image img = trashImages.getImage();
+        if (img != null) {
+            int img_width = img.getWidth(null);
+            int img_height = img.getHeight(null);
+            g.drawImage(img, x - img_width/2, y - img_height/2, img_width, img_height, null);
+        }
     }
 
-    public String getName() {
-        return name;
+    public void move() {
+        this.y += step;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public TrashItem copy(){
+        return new TrashItem(
+                this.x,
+                this.y,
+                this.index,
+                this.type,
+                this.url
+        );
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public int getX(){
+        return x;
+    }
+
+    public void setX(int x){
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y){
+        this.y = y;
     }
 
     public String getType() {
@@ -39,12 +103,35 @@ public class TrashItem {
         this.type = type;
     }
 
-    public String getImgUrl() {
-        return imgUrl;
+    public int getStep() {
+        return step;
     }
 
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
+    public void setStep(int step) {
+        this.step = step;
+    }
+
+    public int getHeightImage() {
+        return heightImage;
+    }
+
+    public void setHeightImage(int heightImage) {
+        this.heightImage = heightImage;
+    }
+
+    public int getWidthImage() {
+        return widthImage;
+    }
+
+    public void setWidthImage(int widthImage) {
+        this.widthImage = widthImage;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }
-
