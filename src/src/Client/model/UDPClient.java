@@ -18,7 +18,7 @@ public class UDPClient {
     // Cập nhật phương thức gửi thông điệp điểm
     public void sendScoreUpdate(String playerId, int newScore, String roomId) {
         try {
-            String message = "type=UPDATE_SCORE&" + playerId + "&" + newScore + "&" + roomId;
+            String message = "type=UPDATE_SCORE&" +"playerId="+ playerId + "&" + "newScore="+ newScore + "&" + "roomId=" + roomId;
             byte[] sendData = message.getBytes();
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
             socket.send(sendPacket);

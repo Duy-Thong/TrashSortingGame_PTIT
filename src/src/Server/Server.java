@@ -1,9 +1,7 @@
 package Server;
 
-import Server.model.Account;
-import Server.model.Player;
-import Server.model.PlayerGame;
-import Server.model.ClientInfo;
+import Server.model.*;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -19,7 +17,7 @@ public class Server {
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "";
     private static final List<ClientInfo> clients = new ArrayList<>();
-
+    private static final List<Room> rooms = new ArrayList<>();
     public static void main(String[] args) {
         try (DatagramSocket socket = new DatagramSocket(PORT)) {
             byte[] buffer = new byte[1024];
@@ -45,7 +43,6 @@ public class Server {
 
             String[] parts = message.split("&");
             String type = parts[0].split("=")[1];
-
 
             String response;
 
@@ -102,6 +99,7 @@ public class Server {
                     // Gửi gói tin thông báo tạo game cho hai người chơi
                     String notificationMessage = "type=accepted&gameID=" + gameID + "&player1=" + currentPlayerID + "&player2=" + invitedPlayerID;
                     byte[] sendData = notificationMessage.getBytes();
+                    rooms.add(new Room(gameID,currentPlayerID,invitedPlayerID));
 
                     DatagramPacket player1Packet = new DatagramPacket(sendData, sendData.length, currentAddress, currentPort);
                     socket.send(player1Packet);
@@ -121,10 +119,28 @@ public class Server {
                     System.out.println("Player1: " + currentAddress + ":" + currentPort);
                 }
             }
-            else if (type.equals("response")) {
-                System.out.println("da nhan");
+            else if (type.equals("UPDATE_SCORE")) {
+                System.out.println(message);
 
-//                sendToAllClients(socket, "hehehe", clientAddress, clientPort);
+                String playerId = parts[1].split("=")[1];
+                String newScore = parts[2].split("=")[1];
+                String roomId = parts[3].split("=")[1];
+                System.out.println(playerId);
+                System.out.println(newScore);
+                System.out.println(roomId);
+                response = "type=UPDATE_SCORE&newScore=" + newScore;
+                for (Room room : rooms) {
+                    if(room.getRoomId().equals(roomId))
+                    {
+                        for(ClientInfo clientInfo : clients){
+                            if(clientInfo.getPlayerID().equals(room.getPlayerId1()))
+                            {
+                                sendToClient(socket,response,clientInfo);
+                                return;
+                            }
+                        }
+                    }
+                }
             }
 
             else {
@@ -755,7 +771,6 @@ public class Server {
         }
     }
 
-    // Gửi tin nhắn đến tất cả các client ngoại trừ client đã gửi
     private static void sendToClient(DatagramSocket socket, String message, ClientInfo client) throws Exception {
         byte[] data = message.getBytes();
         DatagramPacket packet = new DatagramPacket(data, data.length, client.getAddress(), client.getPort());
