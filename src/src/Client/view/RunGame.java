@@ -1,8 +1,10 @@
 package Client.view;
 
+import Client.Constants;
 import Client.model.Bin;
 import Client.model.TrashItem;
 import Client.controller.Data;
+import Client.model.UDPClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +18,7 @@ import java.util.List;
  * @author vutuyen
  */
 
-public class RunGame extends JFrame {
+public class RunGame extends JFrame implements UDPClient.updateUI{
     private JLabel timerLabel;
     private JLabel player1ScoreLabel;
     private JLabel player2ScoreLabel;
@@ -26,7 +28,8 @@ public class RunGame extends JFrame {
     private int secondsLeft = TIMEPLAY, frametime = TIMER;
     private int player1Score = 0;
     private int player2Score = 0;
-    private int player = 1;
+    private String playerId;
+    private String roomId;
     private int width = 810, height = 540;
     private Random random = new Random();
     private ArrayList<TrashItem> trashItems = new ArrayList<>();
@@ -34,16 +37,24 @@ public class RunGame extends JFrame {
     private ArrayList<Integer> listIndex = new ArrayList<>();
     private ArrayList<Bin> binItemsDefaul = new ArrayList<>();
     private List<String> listTypes = new ArrayList<>();
-
+    UDPClient  udpClient;
 
     // Loop game
-    public RunGame() {
+    public RunGame(String roomId, String playerId) {
+        this.roomId = roomId;
+        this.playerId = playerId;
+        try {
+            udpClient = new UDPClient(Constants.IP_SERVER,Constants.PORT);
+            udpClient.setmUpdateUI(this);
+            udpClient.listenForResponses();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         setTitle("Waste Sorting Game");
         setSize(width, height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-
         addKeyListener(new KeyHandler());
         loadIndexs();
         loadTrashs();
@@ -108,6 +119,11 @@ public class RunGame extends JFrame {
         add(topPanel, BorderLayout.NORTH);
     }
 
+    @Override
+    public void updateScorePlayer() {
+        updateScorePlayer2();
+    }
+
     // Handler KeyBoards
     private class KeyHandler extends KeyAdapter {
         @Override
@@ -162,7 +178,7 @@ public class RunGame extends JFrame {
         if (item.getY() > getHeight() - 80) {
             trashItems.removeFirst();
             if( isCorrectBin(item))
-                updateScore();
+                updateScorePlayer1();
         }
     }
 
@@ -177,14 +193,15 @@ public class RunGame extends JFrame {
     }
 
     // update score
-    private void updateScore() {
-        if (player == 1) {
-            player1Score += 10;
-            player1ScoreLabel.setText("Player1: " + player1Score + " points");
-        } else {
-            player2Score += 10;
-            player2ScoreLabel.setText("Player2: " + player2Score + " points");
-        }
+    private void updateScorePlayer1() {
+        player1Score += 10;
+        player1ScoreLabel.setText("Player1: " + player1Score + " points");
+        udpClient.sendScoreUpdate(playerId, player1Score, roomId);
+    }
+
+    private void updateScorePlayer2() {
+        player2Score += 10;
+        player2ScoreLabel.setText("Player2: " + player2Score + " points");
     }
 
     // show EndGame
@@ -246,7 +263,6 @@ public class RunGame extends JFrame {
         frametime = TIMER;
         player1Score = 0;
         player2Score = 0;
-        player = 1;
         player1ScoreLabel.setText("Player1: 0 points");
         player2ScoreLabel.setText("Player2: 0 points");
         timerLabel.setText("Time: " + secondsLeft);

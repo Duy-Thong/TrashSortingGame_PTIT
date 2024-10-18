@@ -121,6 +121,11 @@ public class Server {
                     System.out.println("Player1: " + currentAddress + ":" + currentPort);
                 }
             }
+            else if (type.equals("response")) {
+                System.out.println("da nhan");
+
+//                sendToAllClients(socket, "hehehe", clientAddress, clientPort);
+            }
 
             else {
                 switch (type) {
@@ -750,5 +755,11 @@ public class Server {
         }
     }
 
+    // Gửi tin nhắn đến tất cả các client ngoại trừ client đã gửi
+    private static void sendToClient(DatagramSocket socket, String message, ClientInfo client) throws Exception {
+        byte[] data = message.getBytes();
+        DatagramPacket packet = new DatagramPacket(data, data.length, client.getAddress(), client.getPort());
+        socket.send(packet);
+    }
 
 }

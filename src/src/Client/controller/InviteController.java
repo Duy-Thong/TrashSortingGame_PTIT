@@ -107,7 +107,7 @@ public class InviteController {
                             String senderId = parts[2].split("=")[1];
                             String receiverId = parts[3].split("=")[1];
                             System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
-                            callback.onInviteAccepted(invitedPlayerID);
+                            callback.onInviteAccepted(invitedPlayerID, gameId);
                         } else if (parts[0].equals("type=declined")) {
                             System.out.println("Invite declined by " + invitedPlayerID);
                             callback.onInviteDeclined(invitedPlayerID);
@@ -160,7 +160,7 @@ public class InviteController {
                         String receiverId = parts[3].split("=")[1];
                         System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
                         // Chuyển sang màn game
-                        new RunGame().setVisible(true);
+                        new RunGame(gameId,senderId).setVisible(true);
                     }
                 }
             } catch (Exception e) {
@@ -204,7 +204,7 @@ public class InviteController {
     // Callback interface cho việc mời bạn
     public interface InviteCallback {
         void onInviteTimeout(String playerID);
-        void onInviteAccepted(String playerID);
+        void onInviteAccepted(String playerID, String roomId);
         void onInviteDeclined(String playerID);
     }
 }
