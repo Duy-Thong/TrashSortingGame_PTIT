@@ -120,13 +120,11 @@ public class Server {
                 }
             }
             else if (type.equals("UPDATE_SCORE")) {
-                System.out.println(message);
                 // id player gửi điểm đi
                 String playerId = parts[1].split("=")[1];
                 String newScore = parts[2].split("=")[1];
                 String roomId = parts[3].split("=")[1];
                 response = "type=UPDATE_SCORE&newScore=" + newScore;
-                System.out.println(message);
                 for (Room room : rooms) {
                     if(room.getRoomId().equals(roomId))
                     {
