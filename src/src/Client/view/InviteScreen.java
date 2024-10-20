@@ -93,7 +93,7 @@ public class InviteScreen extends JFrame {
                         dispose();
                         // Chuyển sang màn game
 //                        new WasteSortingGame();
-                        new RunGame(currentPlayerID,roomId).setVisible(true);
+                        new RunGame(roomId,currentPlayerID).setVisible(true);
                     }
 
                     @Override
