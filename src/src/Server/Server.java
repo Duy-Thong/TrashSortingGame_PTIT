@@ -130,14 +130,18 @@ public class Server {
                 for (Room room : rooms) {
                     if(room.getRoomId().equals(roomId))
                     {
-                        String idPlayerTaget = (playerId.equals(room.getPlayerId1())) ? room.getPlayerId2() : room.getPlayerId1();
+                        String idPlayerTaget = "";
+                        if(playerId.equals(room.getPlayerId1())) {
+                            idPlayerTaget = room.getPlayerId2();
+                        } else {
+                            idPlayerTaget = room.getPlayerId1();
+                        }
                         ClientInfo clientInfo = findClientByPlayerID(idPlayerTaget);
                         if (clientInfo != null) {
-                            InetAddress invitedPlayerAddress = clientInfo.getAddress();
-                            DatagramPacket invitePacket = new DatagramPacket(response.getBytes(), response.length(),
-                                    invitedPlayerAddress, 12349);
-                            socket.send(invitePacket);
-                            System.out.println("Response to client: " + response);
+                            DatagramPacket updateScorePacket = new DatagramPacket(response.getBytes(), response.length(),
+                                    clientInfo.getAddress(), 12349);
+                            socket.send(updateScorePacket);
+                            System.out.println("Response to client: "+ clientInfo.getAddress() + "response:" +response);
                         } else {
                             System.out.println("Không tìm thấy người chơi với ID: " + room.getPlayerId2());
                         }
