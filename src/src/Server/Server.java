@@ -163,23 +163,28 @@ public class Server {
                             System.out.println("Client " + playerID + " connected from " + packet.getAddress() + ":" + packet.getPort());
                         }
                         break;
+
                     case "register":
                         username = parts[1].split("=")[1];
                         password = parts[2].split("=")[1];
                         response = register(username, password) ? "registration_success" : "registration failure";
                         break;
+
                     case "getAccountID":
                         username = parts[1].split("=")[1];
                         response = getAccountID(username);
                         break;
+
                     case "getPlayerID":
                         String accountID = parts[1].split("=")[1];
                         response = getPlayerID(accountID);
                         break;
+
                     case "getAccount":
                         accountID = parts[1].split("=")[1];
                         response = getAccountbyID(accountID);
                         break;
+
                     case "profile":
                         String playerID = parts[1].split("=")[1];
                         Player player = getPlayerProfile(playerID);
@@ -192,6 +197,31 @@ public class Server {
                             response = "error: player not found";
                         }
                         break;
+
+                    case "update":
+                        playerID = parts[1].split("=")[1];
+                        String newUsername = parts[2].split("=")[1];
+                        String newPassword = null;  // Khởi tạo newPassword là null
+
+                        // Kiểm tra xem có password trong yêu cầu hay không
+                        if (parts.length > 3 && parts[3].contains("password")) {
+                            newPassword = parts[3].split("=")[1];  // Lấy password nếu có
+                        }
+
+                        String currentUsername = getCurrentUsername(playerID);
+
+                        // Nếu tên đăng nhập mới giống với tên đăng nhập hiện tại, không cần kiểm tra
+                        if (!newUsername.equals(currentUsername)) {
+                            if (isUsernameExists(newUsername)) {
+                                response = "error: username already exists";
+                                break; // Kết thúc case nếu tên đăng nhập đã tồn tại
+                            }
+                        }
+
+                        boolean updated = updatePlayerProfile(playerID, newUsername, newPassword);  // Gọi hàm cập nhật
+                        response = updated ? "success: profile updated" : "error: update failed";
+                        break;
+
                     case "history":
                         playerID = parts[1].split("=")[1];
 
@@ -419,6 +449,26 @@ public class Server {
         }
     }
 
+    private static String getCurrentUsername(String playerID) {
+        String username = null;
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT a.username FROM account a " +
+                    "JOIN player p ON a.accountID = p.accountID " +
+                    "WHERE p.playerID = ?"; // Sử dụng playerID để tìm kiếm
+
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, playerID); // Giả sử playerID là chuỗi. Nếu là số, hãy dùng setInt
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    username = rs.getString("username");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return username;
+    }
+
     private static Player getPlayerProfile(String playerID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "SELECT p.total_games, p.total_wins, p.total_score, p.average_score, a.username, p.status, p.isPlaying, p.created_at "
@@ -447,6 +497,25 @@ public class Server {
             return null; // Hoặc trả về một đối tượng lỗi nếu cần
         }
         return null; // Trả về null nếu không tìm thấy hoặc có lỗi
+    }
+
+    private static boolean updatePlayerProfile(String playerID, String username, String password) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            // Câu lệnh cập nhật username và password cho người chơi
+            String query = "UPDATE account SET username = ?, password = ? " +
+                    "WHERE accountID = (SELECT accountID FROM player WHERE playerID = ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                stmt.setString(2, password);
+                stmt.setString(3, playerID); // Giả sử playerID là chuỗi. Nếu là số, hãy dùng setInt
+
+                int rowsAffected = stmt.executeUpdate();
+                return rowsAffected > 0;  // Trả về true nếu có ít nhất 1 dòng được cập nhật
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public static List<PlayerGame> getPlayerHistory(String playerID) {
@@ -608,6 +677,7 @@ public class Server {
             e.printStackTrace();
         }
     }
+
     public static boolean logout(String playerID) {
         ClientInfo client = null;
         for (ClientInfo c : clients) {
@@ -622,6 +692,7 @@ public class Server {
         }
         return false;
     }
+
     private static String getAccountbyID(String accountID) {
         if (accountID == null || accountID.isEmpty()) {
             System.err.println("Error: accountID is null or empty");
@@ -651,6 +722,7 @@ public class Server {
         }
         return null;
     }
+
     private static List<Account> getAllAccount() {
         List<Account> accountList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
@@ -670,6 +742,7 @@ public class Server {
         }
         return accountList;
     }
+
     private static boolean deleteAccount(String accountID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "DELETE FROM account WHERE accountID = ?";
@@ -682,6 +755,7 @@ public class Server {
             return false;
         }
     }
+
     private static boolean updateAccount(String accountID, String username, String password, String role) {
         String oldUsername = getAccountbyID(accountID).split("&")[0].split("=")[1];
         System.out.println("Old Username: " + oldUsername);
@@ -697,7 +771,6 @@ public class Server {
             }
         }
     }
-
 
     // Phương thức để thực hiện cập nhật tài khoản trong cơ sở dữ liệu
     private static boolean updateAccountInDB(String accountID, String username, String password, String role) {
@@ -737,6 +810,7 @@ public class Server {
             return false; // Thêm thất bại
         }
     }
+
     private static boolean isUsernameExists(String username) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "SELECT COUNT(*) FROM account WHERE username = ?";
@@ -752,6 +826,7 @@ public class Server {
         }
         return false; // Mặc định là không tồn tại
     }
+
     private static boolean makePlayerOnline(String playerID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "UPDATE player SET status = 1 WHERE playerID = ?";
@@ -764,6 +839,7 @@ public class Server {
             return false;
         }
     }
+
     private static boolean makePlayerOffline(String playerID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "UPDATE player SET status = 0 WHERE playerID = ?";
