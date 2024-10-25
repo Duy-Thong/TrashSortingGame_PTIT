@@ -4,6 +4,7 @@ import Client.controller.InviteController;
 import Client.model.Player;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
@@ -13,17 +14,19 @@ public class InviteScreen extends JFrame {
     private JTable playerTable;
     private DefaultTableModel model;
     private JButton inviteButton;
-    private JButton backButton; // Declare the Back button
-    private static RunGame game;
+    private JButton backButton;
+    private JButton refreshButton; // Declare the refresh button
+    private String currentPlayerID; // Add currentPlayerID field
 
     public InviteScreen(String playerID, String username) {
         this.inviteController = new InviteController(username);
+        this.currentPlayerID = playerID; // Initialize currentPlayerID
 
         setTitle("Mời bạn bè");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Thêm tiêu đề
+        // Tạo tiêu đề và nút làm mới
         add(createTitlePanel(), BorderLayout.NORTH);
 
         // Tạo bảng người chơi có thể mời
@@ -43,11 +46,11 @@ public class InviteScreen extends JFrame {
         scrollPane.setPreferredSize(new Dimension(780, 400));
         add(scrollPane, BorderLayout.CENTER);
 
-        // Thêm nút mời và nút trở về
-        add(createButtonPanel(playerID), BorderLayout.SOUTH);
+        // Tạo panel cho nút mời và nút trở về
+        add(createButtonPanel(), BorderLayout.SOUTH);
 
         // Lấy danh sách người chơi có status = 1 và isPlaying = 0
-        loadListFriends(playerID);
+        loadListFriends();
 
         // Tùy chỉnh giao diện
         setSize(810, 540);
@@ -55,17 +58,52 @@ public class InviteScreen extends JFrame {
         setVisible(true);
     }
 
+    // Tạo panel cho tiêu đề và nút "Làm mới"
+    private JPanel createTitlePanel() {
+        JPanel titlePanel = new JPanel(new BorderLayout());
+
+        // Tạo tiêu đề
+        JLabel titleLabel = new JLabel("Danh sách bạn bè", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+
+        // Thêm tiêu đề vào giữa panel
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
+
+        // Tạo nút "Làm mới" với hình ảnh
+        refreshButton = new JButton(new ImageIcon(getClass().getResource("/Client/assets/refresh.png"))); // Thay đổi đường dẫn tới hình ảnh
+        refreshButton.setPreferredSize(new Dimension(40, 40)); // Tùy chỉnh kích thước nút
+        refreshButton.setToolTipText("Làm mới danh sách bạn bè"); // Thiết lập tooltip cho nút refresh
+        refreshButton.setBorderPainted(false); // Xóa đường viền
+        refreshButton.setContentAreaFilled(false); // Không tô màu nền
+        refreshButton.setFocusPainted(false); // Không tô màu viền khi nút được chọn
+
+        // Panel cho nút refresh
+        JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        refreshPanel.add(refreshButton); // Thêm nút refresh vào panel
+
+        // Kết hợp tiêu đề và nút refresh
+        titlePanel.add(refreshPanel, BorderLayout.EAST);
+
+        // Action listener cho nút Refresh
+        refreshButton.addActionListener(e -> {
+            loadListFriends(); // Tải lại danh sách bạn bè khi nút refresh được nhấn
+            JOptionPane.showMessageDialog(this, "Đã làm mới danh sách bạn bè."); // Hiển thị popup sau khi làm mới
+        });
+
+        return titlePanel;
+    }
+
     // Tạo panel cho nút "Mời" và "Trở về"
-    private JPanel createButtonPanel(String currentPlayerID) {
+    private JPanel createButtonPanel() {
         inviteButton = new JButton("Mời");
         inviteButton.setPreferredSize(new Dimension(150, 40));
 
-        backButton = new JButton("Trở về"); // Initialize Back button
+        backButton = new JButton("Trở về");
         backButton.setPreferredSize(new Dimension(150, 40));
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Align buttons to the center
         buttonPanel.add(inviteButton);
-        buttonPanel.add(backButton); // Add Back button to the panel
+        buttonPanel.add(backButton);
 
         inviteButton.addActionListener(e -> {
             int selectedRow = playerTable.getSelectedRow();
@@ -89,11 +127,10 @@ public class InviteScreen extends JFrame {
                     public void onInviteAccepted(String playerID, String roomId) {
                         // Xử lý khi lời mời được chấp nhận
                         inviteButton.setEnabled(true); // Kích hoạt lại nút mời
-                        JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi "  + playerName + " đã chấp nhận lời mời!");
+                        JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi " + playerName + " đã chấp nhận lời mời!");
                         dispose();
                         // Chuyển sang màn game
-//                        new WasteSortingGame();
-                        new RunGame(currentPlayerID,roomId).setVisible(true);
+                        new RunGame(currentPlayerID, roomId).setVisible(true);
                     }
 
                     @Override
@@ -115,21 +152,9 @@ public class InviteScreen extends JFrame {
         return buttonPanel;
     }
 
-    // Tạo panel tiêu đề
-    private JPanel createTitlePanel() {
-        JLabel titleLabel = new JLabel("Danh sách bạn bè", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-
-        JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        titlePanel.add(titleLabel, BorderLayout.CENTER);
-
-        return titlePanel;
-    }
-
     // Tải danh sách người chơi có sẵn
-    private void loadListFriends(String playerID) {
-        inviteController.getListFriends(playerID, new InviteController.AvailablePlayersCallback() {
+    private void loadListFriends() {
+        inviteController.getListFriends(currentPlayerID, new InviteController.AvailablePlayersCallback() {
             @Override
             public void onAvailablePlayersReceived(List<Player> players) {
                 model.setRowCount(0); // Xóa các hàng hiện tại
