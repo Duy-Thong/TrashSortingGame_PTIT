@@ -24,7 +24,7 @@ public class UDPClient {
             byte[] sendData = message.getBytes();
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
             socket.send(sendPacket);
-            System.out.println("Sent " + message + " to " + serverAddress);
+            System.out.println("Sent to sv: " + message + " to " + serverAddress);
         } catch (Exception e) {
             e.printStackTrace();
         }
