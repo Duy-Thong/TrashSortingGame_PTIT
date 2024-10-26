@@ -6,6 +6,7 @@ public class Account {
     private String accountID;
     private String username;
     private String password;
+    private Player player;
     private String role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

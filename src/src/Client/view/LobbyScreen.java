@@ -7,11 +7,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 public class LobbyScreen {
     private final String playerID; // Add playerID field
     private final String username;
     private final LoginController loginController = new LoginController();
+
     // Constructor accepting playerID
     public LobbyScreen(String playerID, String username) {
         this.playerID = playerID;
@@ -26,17 +26,20 @@ public class LobbyScreen {
         // Tạo panel chính
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(20, 20, 20, 20); // Adjusting the spacing between buttons
 
         // Nút Trang cá nhân (hình vuông)
         JButton btnProfile = new JButton("Trang cá nhân");
         btnProfile.setPreferredSize(new Dimension(150, 150)); // Nút hình vuông
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.BOTH;
         panel.add(btnProfile, gbc);
 
         // Nút Xem lịch sử
         JButton btnHistory = new JButton("Xem lịch sử");
+        btnHistory.setPreferredSize(new Dimension(150, 50));
         gbc.gridx = 1;
         gbc.gridy = 0;
         panel.add(btnHistory, gbc);
@@ -55,9 +58,10 @@ public class LobbyScreen {
 
         // Nút Đăng xuất
         JButton btnLogout = new JButton("Đăng xuất");
-        gbc.gridx = 0; // Cột 0
-        gbc.gridy = 2; // Hàng 2
-        gbc.gridwidth = 2; // Chiếm cả hai cột
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2; // Make the button span across both columns
+        gbc.anchor = GridBagConstraints.CENTER;
         panel.add(btnLogout, gbc);
 
         // Hành động khi bấm nút Trang cá nhân
@@ -65,8 +69,6 @@ public class LobbyScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Chuyển đến màn hình Trang cá nhân và in ra playerID
-//                JOptionPane.showMessageDialog(lobbyFrame, "Player ID: " + playerID);
-                // Here you can also open the Profile screen
                 JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem Profile cá nhân");
                 new ProfileScreen(playerID);
             }
