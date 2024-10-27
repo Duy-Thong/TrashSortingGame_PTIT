@@ -11,10 +11,13 @@ import java.text.SimpleDateFormat;
 
 public class ProfileScreen extends JFrame {
     private JButton backButton;
+    private JButton editButton;
     private String playerID;
+    private ProfileController profileController;
 
     public ProfileScreen(String playerID) {
         this.playerID = playerID;
+        this.profileController = new ProfileController();
 
         setTitle("Thông tin cá nhân");
         setSize(810, 540);  // Kích thước cửa sổ
@@ -23,10 +26,12 @@ public class ProfileScreen extends JFrame {
 
         // Tạo các thành phần giao diện
         createBackButton();
+        createEditButton();
         JPanel titlePanel = createTitlePanel();  // Sử dụng titlePanel thay vì chỉ titleLabel
         JPanel infoPanel = createInfoPanel();
 
         JPanel buttonPanel = new JPanel();
+        buttonPanel.add(editButton);
         buttonPanel.add(backButton);
 
         // Thiết lập layout
@@ -36,13 +41,10 @@ public class ProfileScreen extends JFrame {
         add(buttonPanel, BorderLayout.SOUTH);
 
         // Xử lý sự kiện khi nhấn nút Trở về
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();  // Đóng cửa sổ hiện tại
-                // new LobbyScreen();  // Gọi LobbyScreen nếu đã có (bạn cần thay đổi phần này tùy vào project)
-            }
-        });
+        backButton.addActionListener(e -> dispose());
+        // Xử lý sự kiện khi nhấn nút Chỉnh sửa
+
+        editButton.addActionListener(e -> showEditDialog());
 
         setVisible(true);
     }
@@ -50,6 +52,11 @@ public class ProfileScreen extends JFrame {
     private void createBackButton() {
         backButton = new JButton("Trở về");
         backButton.setPreferredSize(new Dimension(150, 40));
+    }
+
+    private void createEditButton() {
+        editButton = new JButton("Chỉnh sửa");
+        editButton.setPreferredSize(new Dimension(150, 40));
     }
 
     private JPanel createTitlePanel() {
@@ -109,6 +116,54 @@ public class ProfileScreen extends JFrame {
         JLabel valueLabel = new JLabel(valueText);
         valueLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         panel.add(valueLabel, gbc);
+    }
+
+    private void showEditDialog() {
+        Player player = profileController.getPlayerProfile(playerID);  // Lấy thông tin người chơi hiện tại
+        if (player == null) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin cá nhân.");
+            return;
+        }
+        // Tạo panel cho hộp thoại chỉnh sửa
+        JPanel editPanel = new JPanel(new GridLayout(2, 4, 10, 10));
+        JTextField usernameField = new JTextField(player.getUsername());  // Điền sẵn tên người dùng hiện tại
+        JPasswordField passwordField = new JPasswordField();
+        editPanel.add(new JLabel("Tên người dùng:"));
+        editPanel.add(usernameField);
+        editPanel.add(new JLabel("Mật khẩu:"));
+        editPanel.add(passwordField);
+        // Hiển thị hộp thoại
+        int result = JOptionPane.showOptionDialog(
+                this,
+                editPanel,
+                "Chỉnh sửa thông tin",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new String[]{"Lưu", "Hủy"},
+                "Lưu"
+        );
+        if (result == JOptionPane.OK_OPTION) {
+            String newUsername = usernameField.getText().trim();
+            String newPassword = new String(passwordField.getPassword()).trim();
+            // Cập nhật thông tin người chơi
+            if (!newUsername.isEmpty()) {
+                updatePlayerInfo(newUsername, newPassword);
+            } else {
+                JOptionPane.showMessageDialog(this, "Tên người dùng không được để trống.");
+            }
+        }
+    }
+    private void updatePlayerInfo(String username, String password) {
+        // Gọi hàm cập nhật thông tin trong ProfileController
+        String response = profileController.updatePlayerProfile(playerID, username, password);
+        if (response.startsWith("success")) {
+            JOptionPane.showMessageDialog(this, "Thông tin đã được cập nhật thành công!");
+        } else if (response.startsWith("error: username already exists")) {
+            JOptionPane.showMessageDialog(this, "Tên người dùng đã được sử dụng, vui lòng chọn tên khác!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi cập nhật thông tin.");
+        }
     }
 
     public JButton getBackButton() {

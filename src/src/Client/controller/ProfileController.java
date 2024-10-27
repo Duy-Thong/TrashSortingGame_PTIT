@@ -58,4 +58,31 @@ public class ProfileController {
             return null;
         }
     }
+
+    // Hàm cập nhật thông tin người chơi trên server
+    public String updatePlayerProfile(String playerID, String newUsername, String newPassword) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            // Tạo thông điệp yêu cầu cập nhật
+            String message = "type=update&playerID=" + playerID + "&username=" + newUsername;
+            if (!newPassword.isEmpty()) {
+                message += "&password=" + newPassword;  // Chỉ gửi password nếu có nhập
+            }
+            System.out.println(message);
+            byte[] buffer = message.getBytes();
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+            // Nhận phản hồi từ server
+            byte[] responseBuffer = new byte[1024];
+            DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
+            socket.receive(responsePacket);
+            // Xử lý phản hồi
+            String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
+            return response;  // Trả về phản hồi từ server
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error: update failed";  // Trả về lỗi nếu có ngoại lệ
+        }
+    }
 }
+
