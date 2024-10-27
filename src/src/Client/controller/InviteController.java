@@ -1,5 +1,6 @@
 package Client.controller;
 
+import Client.Constants;
 import Client.model.Player;
 import Client.view.RunGame;
 import Client.view.WasteSortingGame;
@@ -11,8 +12,8 @@ import java.util.List;
 import javax.swing.*;
 
 public class InviteController {
-    private static final String SERVER_ADDRESS = "localhost";
-    private static final int SERVER_PORT = 12345;
+    private static final String SERVER_ADDRESS = Constants.IP_SERVER; // Thay đổi nếu server chạy trên máy khác
+    private static final int SERVER_PORT = Constants.PORT;
     private static final int CLIENT_PORT = 12344;
 
     private List<Player> availablePlayers;

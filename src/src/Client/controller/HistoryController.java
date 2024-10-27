@@ -7,11 +7,12 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import Client.Constants;
 import Client.model.PlayerGame;
 
 public class HistoryController {
-    private static final String SERVER_ADDRESS = "localhost"; // Thay đổi nếu server chạy trên máy khác
-    private static final int SERVER_PORT = 12345;
+    private static final String SERVER_ADDRESS = Constants.IP_SERVER; // Thay đổi nếu server chạy trên máy khác
+    private static final int SERVER_PORT = Constants.PORT;
 
     public List<PlayerGame> getPlayerHistory(String playerID) {
         List<PlayerGame> historyList = new ArrayList<>();

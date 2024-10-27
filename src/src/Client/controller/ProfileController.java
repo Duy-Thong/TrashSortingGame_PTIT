@@ -6,11 +6,12 @@ import java.net.InetAddress;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import Client.Constants;
 import Client.model.Player;
 
 public class ProfileController {
-    private static final String SERVER_ADDRESS = "localhost"; // Thay đổi nếu server chạy trên máy khác
-    private static final int SERVER_PORT = 12345;
+    private static final String SERVER_ADDRESS = Constants.IP_SERVER; // Thay đổi nếu server chạy trên máy khác
+    private static final int SERVER_PORT = Constants.PORT;
 
     public Player getPlayerProfile(String playerID) {
         try (DatagramSocket socket = new DatagramSocket()) {

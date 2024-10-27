@@ -1,12 +1,13 @@
 package Client.controller;
+import Client.Constants;
 import Client.model.Account;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class LoginController {
-    private static final String SERVER_ADDRESS = "localhost"; // Thay đổi nếu server chạy trên một máy khác
-    private static final int SERVER_PORT = 12345;
+    private static final String SERVER_ADDRESS = Constants.IP_SERVER; // Thay đổi nếu server chạy trên máy khác
+    private static final int SERVER_PORT = Constants.PORT;
 
     public boolean authenticate(String username, String password) {
         try (DatagramSocket socket = new DatagramSocket()) {

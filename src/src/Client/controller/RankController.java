@@ -1,5 +1,6 @@
 package Client.controller;
 
+import Client.Constants;
 import Client.model.Player;
 
 import java.net.DatagramPacket;
@@ -10,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RankController {
-    private static final String SERVER_ADDRESS = "localhost"; // Thay đổi nếu server chạy trên máy khác
-    private static final int SERVER_PORT = 12345;
+    private static final String SERVER_ADDRESS = Constants.IP_SERVER; // Thay đổi nếu server chạy trên máy khác
+    private static final int SERVER_PORT = Constants.PORT;
 
     // Hàm lấy danh sách top người chơi từ server
     public List<Player> getRank() {

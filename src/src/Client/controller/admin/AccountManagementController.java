@@ -1,5 +1,6 @@
 package Client.controller.admin;
 
+import Client.Constants;
 import Client.controller.LoginController;
 import Client.model.Account;
 
@@ -10,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountManagementController {
-    private static final String SERVER_ADDRESS = "localhost"; // Thay đổi nếu server chạy trên máy khác
-    private static final int SERVER_PORT = 12345;
+    private static final String SERVER_ADDRESS = Constants.IP_SERVER; // Thay đổi nếu server chạy trên máy khác
+    private static final int SERVER_PORT = Constants.PORT;
     private static final LoginController loginController = new LoginController();
     // Hàm lấy danh sách tất cả các account từ cơ sở dữ liệu
     public static List<Account> getAllAccount() {

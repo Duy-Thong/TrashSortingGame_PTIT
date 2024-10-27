@@ -1,12 +1,14 @@
 package Client.controller;
 
+import Client.Constants;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class RegisterController {
-    private static final String SERVER_ADDRESS = "localhost"; // Địa chỉ server
-    private static final int SERVER_PORT = 12345; // Cổng server
+    private static final String SERVER_ADDRESS = Constants.IP_SERVER; // Thay đổi nếu server chạy trên máy khác
+    private static final int SERVER_PORT = Constants.PORT; // Cổng server
 
     public boolean register(String username, String password) {
         try (DatagramSocket socket = new DatagramSocket()) {
