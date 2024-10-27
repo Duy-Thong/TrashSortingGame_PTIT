@@ -6,26 +6,47 @@ import Client.model.PlayerGame;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class HistoryScreen extends JFrame {
     private String playerId; // Player ID được truyền từ màn hình trước
     private HistoryController historyController;
     private JButton backButton; // Nút Trở về
+    Font pixelFont;
 
-    public HistoryScreen(String playerId) {
+    public HistoryScreen(String playerId, String username) {
         this.playerId = playerId;
         this.historyController = new HistoryController();
+
+        // Tải font pixel
+        try {
+            InputStream is = getClass().getClassLoader().getResourceAsStream("Client/assets/FVF.ttf");
+            if (is != null) {
+                pixelFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(10f);
+                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                ge.registerFont(pixelFont);
+            } else {
+                System.out.println("Tệp phông chữ không được tìm thấy.");
+            }
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+        }
 
         // Đặt tiêu đề cho cửa sổ
         setTitle("Lịch sử người chơi");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Thêm tiêu đề
-        add(createTitlePanel(), BorderLayout.NORTH);
+        // Sử dụng BackgroundPanel cho ảnh nền
+        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_lobby.gif")).getImage());
+        backgroundPanel.setLayout(new BorderLayout());
+
+        // Tạo panel tiêu đề
+        JPanel titlePanel = createTitlePanel();
+        backgroundPanel.add(titlePanel, BorderLayout.NORTH);
 
         // Tạo bảng để hiển thị lịch sử
         String[] columnNames = {"STT", "Game ID", "Thời gian tham gia", "Điểm số", "Kết quả"};
@@ -38,6 +59,10 @@ public class HistoryScreen extends JFrame {
 
         JTable historyTable = new JTable(model);
         historyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Không cho phép chọn hàng
+        historyTable.setFont(pixelFont); // Đặt font cho bảng
+
+        // Thiết lập font cho tiêu đề cột
+        historyTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f)); // Đặt font cho tiêu đề cột
 
         // Lấy lịch sử người chơi và thêm vào bảng
         List<PlayerGame> historyList = historyController.getPlayerHistory(playerId);
@@ -57,19 +82,23 @@ public class HistoryScreen extends JFrame {
             });
         }
 
-        // Tạo một panel chứa bảng với khoảng cách
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0)); // Khoảng cách 10px giữa title và bảng
-
-        // Bọc bảng bằng JScrollPane
+        // Bọc bảng bằng JScrollPane và thêm khoảng cách 5px bên trái và phải
         JScrollPane scrollPane = new JScrollPane(historyTable);
-        tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Thêm panel bảng vào cửa sổ
-        add(tablePanel, BorderLayout.CENTER);
+        // Tạo JPanel để bao quanh scrollPane và thêm khoảng cách bên trong
+        JPanel panelTable = new JPanel(new BorderLayout());
+        panelTable.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15)); // Khoảng cách 5px bên trái và phải
+        panelTable.setOpaque(false); // Đặt không có màu nền để hòa vào ảnh nền
+        panelTable.add(scrollPane, BorderLayout.CENTER); // Thêm JScrollPane vào panelTable
 
-        // Thêm nút Trở về
-        add(createBackButton(), BorderLayout.SOUTH);
+        backgroundPanel.add(panelTable, BorderLayout.CENTER); // Thêm panelTable vào backgroundPanel
+
+        // Tạo nút Trở về
+        JPanel buttonPanel = createBackButton();
+        backgroundPanel.add(buttonPanel, BorderLayout.SOUTH); // Thêm nút vào backgroundPanel
+
+        // Thêm backgroundPanel vào cửa sổ
+        add(backgroundPanel);
 
         // Tùy chỉnh giao diện
         setSize(810, 540);
@@ -78,37 +107,54 @@ public class HistoryScreen extends JFrame {
 
         // Xử lý sự kiện khi nhấn nút Trở về
         backButton.addActionListener(e -> {
-            dispose();  // Đóng cửa sổ hiện tại
-            // new LobbyScreen();  // Gọi LobbyScreen nếu đã có (bạn cần thay đổi phần này tùy vào project)
+            dispose();
+            new LobbyScreen(playerId, username);
         });
+    }
+
+    // Tạo panel tiêu đề
+    private JPanel createTitlePanel() {
+        JLabel titleLabel = new JLabel("Lịch sử người chơi", JLabel.CENTER);
+        titleLabel.setFont(pixelFont.deriveFont(Font.BOLD, 16f)); // Đặt font cho tiêu đề
+
+        // Tạo một panel để chứa titleLabel và thêm khoảng cách bên trên
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));  // Khoảng cách 10px bên trên
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
+        titlePanel.setOpaque(false); // Đặt panel không có màu nền
+
+        return titlePanel;
     }
 
     // Tạo nút Trở về
     private JPanel createBackButton() {
         backButton = new JButton("Trở về");
         backButton.setPreferredSize(new Dimension(150, 40));
+        backButton.setFont(pixelFont.deriveFont(12f)); // Đặt font cho nút
+        backButton.setBackground(Color.RED); // Đặt màu nền thành đỏ
+        backButton.setForeground(Color.WHITE); // Đặt màu chữ thành trắng
+        backButton.setFocusPainted(false); // Tắt hiệu ứng focus
 
         // Tạo một panel để chứa nút và căn giữa
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setOpaque(false); // Đặt panel không có màu nền
         buttonPanel.add(backButton);
 
         return buttonPanel;
     }
 
-    // Tạo panel tiêu đề
-    private JPanel createTitlePanel() {
-        JLabel titleLabel = new JLabel("Lịch sử người chơi", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+    // Tạo lớp BackgroundPanel để vẽ ảnh nền
+    private class BackgroundPanel extends JPanel {
+        private Image backgroundImage;
 
-        // Tạo một panel để chứa titleLabel và thêm khoảng cách bên trên
-        JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));  // Khoảng cách 10px bên trên
-        titlePanel.add(titleLabel, BorderLayout.CENTER);
+        public BackgroundPanel(Image image) {
+            this.backgroundImage = image;
+        }
 
-        return titlePanel;
-    }
-
-    public JButton getBackButton() {
-        return backButton;
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }

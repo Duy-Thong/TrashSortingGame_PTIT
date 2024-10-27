@@ -42,7 +42,7 @@ public class ProfileScreen extends JFrame {
         setLocationRelativeTo(null);
 
         // Sử dụng BackgroundPanel cho ảnh nền
-        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_notext.png")).getImage());
+        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_lobby.gif")).getImage());
         backgroundPanel.setLayout(new BorderLayout());
 
         createBackButton();
@@ -115,6 +115,7 @@ public class ProfileScreen extends JFrame {
 
     private JPanel createTitlePanel() {
         JLabel titleLabel = new JLabel("Thông tin cá nhân", JLabel.CENTER);
+        titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(pixelFont.deriveFont(Font.BOLD, 18f));
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setOpaque(false);
@@ -202,7 +203,7 @@ public class ProfileScreen extends JFrame {
         }
 
         // Create a panel with a background image
-        BackgroundPanel editPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/popup.gif")).getImage());
+        BackgroundPanel editPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/pop.gif")).getImage());
         editPanel.setLayout(new GridBagLayout()); // Use GridBagLayout for better control over positioning
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); // Add some padding

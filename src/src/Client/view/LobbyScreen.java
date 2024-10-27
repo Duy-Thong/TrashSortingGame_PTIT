@@ -81,7 +81,7 @@ public class LobbyScreen {
         btnHistory.addActionListener(e -> {
             JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử người chơi");
             lobbyFrame.dispose();
-            new HistoryScreen(playerID);
+            new HistoryScreen(playerID, username);
         });
 
         btnRanking.addActionListener(e -> {
