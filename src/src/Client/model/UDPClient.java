@@ -34,10 +34,10 @@ public class UDPClient {
     public void listenForResponses() {
         // Sử dụng thread riêng để không bị khóa chương trình
         new Thread(() -> {
-            while (true) {
-                try (DatagramSocket socket = new DatagramSocket(12349)) {
-                    byte[] receiveBuffer = new byte[1024];
-                    DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+            try {
+                byte[] buffer = new byte[1024];
+                while (true) {
+                    DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
                     socket.receive(receivePacket); // Nhận phản hồi từ server
 
                     String response = new String(receivePacket.getData(), 0, receivePacket.getLength());
@@ -47,9 +47,9 @@ public class UDPClient {
                     if (mUpdateUI != null) {
                         mUpdateUI.updateScorePlayer(); // Cập nhật UI
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start(); // Bắt đầu luồng lắng nghe
     }
