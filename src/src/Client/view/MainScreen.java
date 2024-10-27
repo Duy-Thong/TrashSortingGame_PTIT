@@ -28,11 +28,8 @@ public class MainScreen {
         frame.setSize(810, 540);
         frame.setLocationRelativeTo(null);
 
-        // Load and scale background image
-        ImageIcon originalIcon = new ImageIcon(getClass().getResource("../assets/back.png")); // Update the path to your image
-        Image scaledImage = originalIcon.getImage().getScaledInstance(810, 540, Image.SCALE_SMOOTH);
-        ImageIcon backgroundIcon = new ImageIcon(scaledImage);
-
+        // Load and set GIF background
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../assets/back.gif")); // Update the path to your GIF
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setLayout(new BorderLayout()); // Use BorderLayout to position components
 

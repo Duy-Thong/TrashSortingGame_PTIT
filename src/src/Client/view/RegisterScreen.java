@@ -1,12 +1,8 @@
 package Client.view;
 
 import Client.controller.RegisterController;
-import Client.model.Account;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -25,12 +21,11 @@ public class RegisterScreen {
         registerFrame.setSize(810, 540);
         registerFrame.setLocationRelativeTo(null);
 
-        // Load background image and resize it
-        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../assets/back_notext.png"));
-        Image backgroundImage = backgroundIcon.getImage();
-        backgroundIcon = new ImageIcon(backgroundImage.getScaledInstance(810, 540, Image.SCALE_SMOOTH));
+        // Load animated GIF background (same as LoginScreen)
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../assets/back_login.gif"));
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setLayout(new GridBagLayout());
+        backgroundLabel.setPreferredSize(new Dimension(810, 540));
 
         // Main panel with transparent background
         JPanel panel = new JPanel(new GridBagLayout());
@@ -44,7 +39,7 @@ public class RegisterScreen {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JLabel titleLabel = new JLabel("Đăng ký", JLabel.CENTER);
-        titleLabel.setFont(customFont.deriveFont(Font.BOLD, 32));
+        titleLabel.setFont(customFont.deriveFont(Font.BOLD, 22));
         titleLabel.setForeground(Color.WHITE);
         panel.add(titleLabel, gbc);
 
@@ -53,13 +48,13 @@ public class RegisterScreen {
         gbc.gridx = 0;
         gbc.gridy = 1;
         JLabel usernameLabel = new JLabel("Tên đăng nhập:");
-        usernameLabel.setFont(customFont.deriveFont(Font.PLAIN, 18));
+        usernameLabel.setFont(customFont.deriveFont(Font.PLAIN, 16));
         usernameLabel.setForeground(Color.WHITE);
         panel.add(usernameLabel, gbc);
 
         gbc.gridx = 1;
         JTextField usernameField = new JTextField(15);
-        usernameField.setFont(customFont.deriveFont(Font.PLAIN, 16));
+        usernameField.setFont(customFont.deriveFont(Font.PLAIN, 14));
         usernameField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
         panel.add(usernameField, gbc);
 
@@ -67,13 +62,13 @@ public class RegisterScreen {
         gbc.gridx = 0;
         gbc.gridy = 2;
         JLabel passwordLabel = new JLabel("Mật khẩu:");
-        passwordLabel.setFont(customFont.deriveFont(Font.PLAIN, 18));
+        passwordLabel.setFont(customFont.deriveFont(Font.PLAIN, 16));
         passwordLabel.setForeground(Color.WHITE);
         panel.add(passwordLabel, gbc);
 
         gbc.gridx = 1;
         JPasswordField passwordField = new JPasswordField(15);
-        passwordField.setFont(customFont.deriveFont(Font.PLAIN, 16));
+        passwordField.setFont(customFont.deriveFont(Font.PLAIN, 14));
         passwordField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
         panel.add(passwordField, gbc);
 
@@ -81,25 +76,20 @@ public class RegisterScreen {
         gbc.gridx = 0;
         gbc.gridy = 3;
         JLabel confirmPasswordLabel = new JLabel("Xác nhận mật khẩu:");
-        confirmPasswordLabel.setFont(customFont.deriveFont(Font.PLAIN, 18));
+        confirmPasswordLabel.setFont(customFont.deriveFont(Font.PLAIN, 16));
         confirmPasswordLabel.setForeground(Color.WHITE);
         panel.add(confirmPasswordLabel, gbc);
 
         gbc.gridx = 1;
         JPasswordField confirmPasswordField = new JPasswordField(15);
-        confirmPasswordField.setFont(customFont.deriveFont(Font.PLAIN, 16));
+        confirmPasswordField.setFont(customFont.deriveFont(Font.PLAIN, 14));
         confirmPasswordField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
         panel.add(confirmPasswordField, gbc);
 
         // Back button
         gbc.gridx = 0;
         gbc.gridy = 4;
-        gbc.gridwidth = 1;
         JButton btnBack = createButton("Trở về", customFont, new Color(204, 0, 0));
-        btnBack.addActionListener(e -> {
-            registerFrame.dispose();
-            new MainScreen(); // Open main screen
-        });
         panel.add(btnBack, gbc);
 
         // Register button
@@ -112,6 +102,12 @@ public class RegisterScreen {
 
         // Add background to frame
         registerFrame.add(backgroundLabel);
+
+        // Back button action
+        btnBack.addActionListener(e -> {
+            registerFrame.dispose();
+            new MainScreen(); // Open main screen
+        });
 
         // Register button action
         btnSubmit.addActionListener(e -> {
@@ -146,7 +142,7 @@ public class RegisterScreen {
     // Create a button with custom font and background color
     private JButton createButton(String text, Font font, Color backgroundColor) {
         JButton button = new JButton(text);
-        button.setFont(font.deriveFont(Font.BOLD, 12));
+        button.setFont(font.deriveFont(Font.BOLD, 16));
         button.setForeground(Color.WHITE);
         button.setBackground(backgroundColor);
         button.setFocusPainted(false);
