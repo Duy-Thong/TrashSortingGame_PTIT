@@ -74,21 +74,25 @@ public class LobbyScreen {
         // Add Action Listeners to Buttons
         btnProfile.addActionListener(e -> {
             JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem Profile cá nhân");
-            new ProfileScreen(playerID);
+            lobbyFrame.dispose();
+            new ProfileScreen(playerID, username);
         });
 
         btnHistory.addActionListener(e -> {
             JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử người chơi");
+            lobbyFrame.dispose();
             new HistoryScreen(playerID);
         });
 
         btnRanking.addActionListener(e -> {
             JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Bảng xếp hạng");
+            lobbyFrame.dispose();
             new RankScreen();
         });
 
         btnEnterGame.addActionListener(e -> {
             JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
+            lobbyFrame.dispose();
             new InviteScreen(playerID, username);
         });
 
