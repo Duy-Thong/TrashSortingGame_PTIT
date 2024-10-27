@@ -298,6 +298,26 @@ public class Server {
                             response = "add failure";
                         }
                         break;
+                    case "getTrashItemData":
+                        List<TrashItem> trashItems = getTrashItemData();
+                        StringBuilder responseTrashItem = new StringBuilder();
+                        for (TrashItem t : trashItems) {
+                            responseTrashItem.append(String.format("%s;%s;%s;%s|",
+                                    t.getId(), t.getName(), t.getType(), t.getUrl())); // Using semicolon as a delimiter
+                        }
+                        response = responseTrashItem.toString();
+                        break;
+
+                    case "getBinData":
+                        List<Bin> bins = getBinData();
+                        StringBuilder responseBin = new StringBuilder();
+                        for (Bin b : bins) {
+                            responseBin.append(String.format("%s;%s;%s;%s|",
+                                    b.getId(), b.getName(), b.getType(), b.getUrl())); // Using semicolon as a delimiter
+                        }
+                        response = responseBin.toString();
+                        break;
+
                     default:
                         response = "error: unknown request";
                 }
@@ -781,6 +801,44 @@ public class Server {
         byte[] data = message.getBytes();
         DatagramPacket packet = new DatagramPacket(data, data.length, client.getAddress(), client.getPort());
         socket.send(packet);
+    }
+    private static List<TrashItem> getTrashItemData() {
+        List<TrashItem> trashItems = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT * FROM trashitem";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String id = rs.getString("itemID");
+                    String name = rs.getString("name");
+                    String type = rs.getString("type");
+                    String url = rs.getString("img_url");
+                    trashItems.add(new TrashItem(id, name, type, url));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return trashItems;
+    }
+    private static List<Bin> getBinData() {
+        List<Bin> bins = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT * FROM trashbin";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String id = rs.getString("binID");
+                    String name = rs.getString("name");
+                    String type = rs.getString("type");
+                    String url = rs.getString("img_url");
+                    bins.add(new Bin(id, name, type, url));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bins;
     }
 
 }

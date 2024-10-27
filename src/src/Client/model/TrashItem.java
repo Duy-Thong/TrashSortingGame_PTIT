@@ -13,14 +13,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 
-/**
- *
- * @author vutuyen
- */
+
 public class TrashItem{
     private int x, y = 0;
     private int step = 3;
     private int index;
+    private String id;
+    private String name;
     private String type;
     private String url;
     private int widthImage = 40, heightImage = 40;
@@ -34,7 +33,12 @@ public class TrashItem{
         this.url = url;
         this.trashImages = urlToImage(this.url);
     }
-
+    public TrashItem(String id, String name, String type, String url) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.url = url;
+    }
     private ImageIcon urlToImage(String urlString){
         try {
             URL url = new URL(urlString);
@@ -70,6 +74,19 @@ public class TrashItem{
                 this.url
         );
     }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    
 
     public String getUrl() {
         return url;
