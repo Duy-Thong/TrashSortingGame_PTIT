@@ -3,14 +3,13 @@ package Client.view;
 import Client.Constants;
 import Client.model.Bin;
 import Client.model.TrashItem;
-import Client.controller.Data;
+import Client.controller.DataController;
 import Client.model.UDPClient;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.List;
 /**
@@ -66,7 +65,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
 
     // Load trashs, bins, indexs
     private void loadIndexs(){
-        listTypes = Data.getListTypes();
+        listTypes = DataController.getListTypesBin();
         int nBin = listTypes.size();
         int frameBin = width / nBin;
         int center = frameBin / 2;
@@ -77,14 +76,16 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     }
 
     private void loadTrashs() {
-        List<String> ls = Data.getListTrash();
+        List<String> ls = DataController.getListTrash();
+        List<String> types = DataController.getListTypesTrash();
+        List<String> names = DataController.getListNameTrash();
         for (int i = 0; i < ls.size(); i++) {
-            trashItemsDefaul.add(new TrashItem(0, 0, 0, listTypes.get(0), ls.get(i)));
+            trashItemsDefaul.add(new TrashItem(names.get(i), types.get(i), ls.get(i)));
         }
     }
 
     private void loadBins() {
-        List<String> ls = Data.getListBin();
+        List<String> ls = DataController.getListBin();
         for (int i = 0; i < listTypes.size(); i++) {
             binItemsDefaul.add(new Bin(listIndex.get(i), getHeight(), listTypes.get(i), ls.get(i)));
             Bin tmp = binItemsDefaul.getLast();

@@ -22,6 +22,7 @@ public class TrashItem{
     private int step = 3;
     private int index;
     private String type;
+    private String name;
     private String url;
     private int widthImage = 40, heightImage = 40;
     private ImageIcon trashImages;
@@ -33,6 +34,12 @@ public class TrashItem{
         this.type = type;
         this.url = url;
         this.trashImages = urlToImage(this.url);
+    }
+
+    public TrashItem(String name, String type, String url) {
+        this.name = name;
+        this.type = type;
+        this.url = url;
     }
 
     private ImageIcon urlToImage(String urlString){
@@ -133,5 +140,13 @@ public class TrashItem{
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

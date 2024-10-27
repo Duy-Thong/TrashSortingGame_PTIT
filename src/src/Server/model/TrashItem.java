@@ -18,6 +18,7 @@ import java.net.URL;
 public class TrashItem {
     private int x, y = 0;
     private int step = 1;
+    private String name;
     private int index;
     private String type;
     private String url;
@@ -31,6 +32,12 @@ public class TrashItem {
         this.type = type;
         this.url = url;
         this.trashImages = urlToImage(this.url);
+    }
+
+    public TrashItem(String name, String type, String url) {
+        this.name = name;
+        this.type = type;
+        this.url = url;
     }
 
     private ImageIcon urlToImage(String urlString){
@@ -131,5 +138,13 @@ public class TrashItem {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

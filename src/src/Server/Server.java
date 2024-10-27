@@ -298,6 +298,29 @@ public class Server {
                             response = "add failure";
                         }
                         break;
+                    case "getTrashs":
+                        System.out.println("GetTrashs...");
+                        List<TrashItem> trashItems = getListTrashs();
+                        StringBuilder responseTrashs = new StringBuilder();
+                        for (TrashItem a : trashItems) {
+                            responseTrashs.append(String.format("name=%s&type=%s&img_url=%s|",
+                                    a.getName(), a.getType(), a.getUrl()));
+                        }
+                        response = responseTrashs.toString();
+                        System.out.println("Sucessed getTrashs");
+                        break;
+
+                    case "getBins":
+                        System.out.println("GetBins...");
+                        List<Bin> bins = getListBins();
+                        StringBuilder responseBins = new StringBuilder();
+                        for (Bin a : bins) {
+                            responseBins.append(String.format("name=%s&type=%s&img_url=%s|",
+                                    a.getName(), a.getType(), a.getUrl()));
+                        }
+                        response = responseBins.toString();
+                        System.out.println("Sucessed getBins");
+                        break;
                     default:
                         response = "error: unknown request";
                 }
@@ -398,6 +421,54 @@ public class Server {
         } catch (Exception e) {
             e.printStackTrace();
             return "error: server error";
+        }
+    }
+
+    // get list trashs
+    private static List<TrashItem> getListTrashs() {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT t.name, t.type, t.img_url "
+                    + "FROM trashitem t";
+            List<TrashItem> listTrashs = new ArrayList<>();
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while(rs.next()) {
+                    String name = rs.getString("name");
+                    String type = rs.getString("type");
+                    String img_url = rs.getString("img_url"); // Lấy timestamp cho created_at
+
+                    // Trả về đối tượng Player với các thông tin đã lấy
+                    listTrashs.add(new TrashItem(name, type, img_url));
+                }
+                return listTrashs;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Hoặc trả về một đối tượng lỗi nếu cần
+        }
+    }
+
+    // get list bins
+    private static List<Bin> getListBins() {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT t.name, t.type, t.img_url "
+                    + "FROM trashbin t";
+            List<Bin> listBins = new ArrayList<>();
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while(rs.next()) {
+                    String name = rs.getString("name");
+                    String type = rs.getString("type");
+                    String img_url = rs.getString("img_url"); // Lấy timestamp cho created_at
+
+                    // Trả về đối tượng Player với các thông tin đã lấy
+                    listBins.add(new Bin(name, type, img_url));
+                }
+                return listBins;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Hoặc trả về một đối tượng lỗi nếu cần
         }
     }
 

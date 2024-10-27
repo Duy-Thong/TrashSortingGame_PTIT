@@ -19,6 +19,7 @@ public class Bin {
     private String type;
     private int x, y;
     private String url;
+    private String name;
     private ImageIcon binImage;
     private int widthImage = 64, heightImage = 64;
 
@@ -28,6 +29,12 @@ public class Bin {
         this.y = y;
         this.url = url;
         this.binImage = urlToImage(url);
+    }
+
+    public Bin(String name, String type, String url) {
+        this.name = name;
+        this.type = type;
+        this.url = url;
     }
 
     private ImageIcon urlToImage(String urlString){
@@ -59,6 +66,14 @@ public class Bin {
                 this.type,
                 this.url
         );
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getType() {
