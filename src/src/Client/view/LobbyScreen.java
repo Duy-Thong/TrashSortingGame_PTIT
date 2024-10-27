@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -29,43 +28,42 @@ public class LobbyScreen {
         lobbyFrame.setSize(810, 540);
         lobbyFrame.setLocationRelativeTo(null);
 
-        // Load background image and resize it
-        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../assets/back.png"));
-        Image backgroundImage = backgroundIcon.getImage();
-        backgroundIcon = new ImageIcon(backgroundImage.getScaledInstance(810, 540, Image.SCALE_SMOOTH));
+        // Load GIF background
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../assets/back.gif")); // Path to your GIF file
         JLabel backgroundLabel = new JLabel(backgroundIcon);
-        backgroundLabel.setLayout(new GridBagLayout()); // Add components to the background
+        backgroundLabel.setLayout(new GridBagLayout()); // Use GridBagLayout for the background
 
         // Main panel with transparent background
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setOpaque(false); // Make the panel transparent
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20); // Adjusting the spacing between buttons (top, left, bottom, right)
+        gbc.insets = new Insets(10, 10, 10, 10); // Adjusting the spacing between buttons (top, left, bottom, right)
 
-        // Personal Profile Button (Square)
+        // Personal Profile Button (Top Left)
         JButton btnProfile = createCustomButton("Trang cá nhân", customFont);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
         panel.add(btnProfile, gbc);
 
-        // History Button
+        // History Button (Top Right)
         JButton btnHistory = createCustomButton("Xem lịch sử", customFont);
         gbc.gridx = 1;
+        gbc.gridy = 0;
         panel.add(btnHistory, gbc);
 
-        // Ranking Button
+        // Ranking Button (Bottom Left)
         JButton btnRanking = createCustomButton("Xem bảng xếp hạng", customFont);
         gbc.gridx = 0;
         gbc.gridy = 1;
         panel.add(btnRanking, gbc);
 
-        // Enter Game Button
+        // Enter Game Button (Bottom Right)
         JButton btnEnterGame = createCustomButton("Vào game", customFont);
         gbc.gridx = 1;
+        gbc.gridy = 1;
         panel.add(btnEnterGame, gbc);
 
-        // Logout Button
+        // Logout Button (Centered)
         JButton btnLogout = createCustomButton("Đăng xuất", customFont);
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -109,7 +107,6 @@ public class LobbyScreen {
     }
 
     // Method to create a custom button
-    // Method to create a custom button
     private JButton createCustomButton(String text, Font customFont) {
         JButton button = new JButton(text);
         button.setFont(customFont.deriveFont(Font.BOLD, 12)); // Use custom font with smaller size
@@ -120,7 +117,6 @@ public class LobbyScreen {
         button.setPreferredSize(new Dimension(200, 50)); // Adjust width to make buttons longer
         return button;
     }
-
 
     // Load custom font method
     private Font loadCustomFont(String fontPath) {
