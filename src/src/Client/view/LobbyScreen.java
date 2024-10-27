@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class LobbyScreen {
     private final String playerID; // Add playerID field
@@ -17,106 +20,118 @@ public class LobbyScreen {
         this.playerID = playerID;
         this.username = username;
 
-        // Tạo JFrame cho màn hình lobby
+        // Load custom font
+        Font customFont = loadCustomFont("../assets/FVF.ttf"); // Adjust the path to your font file
+
+        // Create JFrame for the lobby screen
         JFrame lobbyFrame = new JFrame("Lobby");
         lobbyFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         lobbyFrame.setSize(810, 540);
         lobbyFrame.setLocationRelativeTo(null);
 
-        // Tạo panel chính
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 20, 20, 20); // Adjusting the spacing between buttons
+        // Load background image and resize it
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../assets/back.png"));
+        Image backgroundImage = backgroundIcon.getImage();
+        backgroundIcon = new ImageIcon(backgroundImage.getScaledInstance(810, 540, Image.SCALE_SMOOTH));
+        JLabel backgroundLabel = new JLabel(backgroundIcon);
+        backgroundLabel.setLayout(new GridBagLayout()); // Add components to the background
 
-        // Nút Trang cá nhân (hình vuông)
-        JButton btnProfile = new JButton("Trang cá nhân");
-        btnProfile.setPreferredSize(new Dimension(150, 150)); // Nút hình vuông
+        // Main panel with transparent background
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setOpaque(false); // Make the panel transparent
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 20, 10, 20); // Adjusting the spacing between buttons (top, left, bottom, right)
+
+        // Personal Profile Button (Square)
+        JButton btnProfile = createCustomButton("Trang cá nhân", customFont);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.BOTH;
         panel.add(btnProfile, gbc);
 
-        // Nút Xem lịch sử
-        JButton btnHistory = new JButton("Xem lịch sử");
-        btnHistory.setPreferredSize(new Dimension(150, 50));
+        // History Button
+        JButton btnHistory = createCustomButton("Xem lịch sử", customFont);
         gbc.gridx = 1;
-        gbc.gridy = 0;
         panel.add(btnHistory, gbc);
 
-        // Nút Xem bảng xếp hạng
-        JButton btnRanking = new JButton("Xem bảng xếp hạng");
+        // Ranking Button
+        JButton btnRanking = createCustomButton("Xem bảng xếp hạng", customFont);
         gbc.gridx = 0;
         gbc.gridy = 1;
         panel.add(btnRanking, gbc);
 
-        // Nút Vào game
-        JButton btnEnterGame = new JButton("Vào game");
+        // Enter Game Button
+        JButton btnEnterGame = createCustomButton("Vào game", customFont);
         gbc.gridx = 1;
-        gbc.gridy = 1;
         panel.add(btnEnterGame, gbc);
 
-        // Nút Đăng xuất
-        JButton btnLogout = new JButton("Đăng xuất");
+        // Logout Button
+        JButton btnLogout = createCustomButton("Đăng xuất", customFont);
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2; // Make the button span across both columns
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(btnLogout, gbc);
 
-        // Hành động khi bấm nút Trang cá nhân
-        btnProfile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Chuyển đến màn hình Trang cá nhân và in ra playerID
-                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem Profile cá nhân");
-                new ProfileScreen(playerID);
-            }
+        // Add Action Listeners to Buttons
+        btnProfile.addActionListener(e -> {
+            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem Profile cá nhân");
+            new ProfileScreen(playerID);
         });
 
-        // Hành động khi bấm nút Xem lịch sử
-        btnHistory.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Chuyển đến màn hình Xem lịch sử
-                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử người chơi");
-                new HistoryScreen(playerID);
-            }
+        btnHistory.addActionListener(e -> {
+            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử người chơi");
+            new HistoryScreen(playerID);
         });
 
-        // Hành động khi bấm nút Xem bảng xếp hạng
-        btnRanking.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Chuyển đến màn hình Bảng xếp hạng
-                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Bảng xếp hạng");
-                new RankScreen();
-            }
+        btnRanking.addActionListener(e -> {
+            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Bảng xếp hạng");
+            new RankScreen();
         });
 
-        // Hành động khi bấm nút Vào game
-        btnEnterGame.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Chuyển đến màn hình game
-                JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
-                new InviteScreen(playerID, username);
-            }
+        btnEnterGame.addActionListener(e -> {
+            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
+            new InviteScreen(playerID, username);
         });
 
-        // Hành động khi bấm nút Đăng xuất
-        btnLogout.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Chuyển về màn hình đăng nhập
-                loginController.logout(playerID);
-                lobbyFrame.dispose(); // Đóng màn hình lobby
-                new LoginScreen(); // Mở lại màn hình đăng nhập
-            }
+        btnLogout.addActionListener(e -> {
+            loginController.logout(playerID);
+            lobbyFrame.dispose(); // Close lobby screen
+            new LoginScreen(); // Open login screen
         });
 
-        // Thêm panel vào frame và hiển thị màn hình
-        lobbyFrame.add(panel);
+        // Add panel to background
+        backgroundLabel.add(panel);
+
+        // Add background to frame
+        lobbyFrame.add(backgroundLabel);
         lobbyFrame.setVisible(true);
+    }
+
+    // Method to create a custom button
+    // Method to create a custom button
+    private JButton createCustomButton(String text, Font customFont) {
+        JButton button = new JButton(text);
+        button.setFont(customFont.deriveFont(Font.BOLD, 12)); // Use custom font with smaller size
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(0, 102, 204)); // Customize button color
+        button.setFocusPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.setPreferredSize(new Dimension(200, 50)); // Adjust width to make buttons longer
+        return button;
+    }
+
+
+    // Load custom font method
+    private Font loadCustomFont(String fontPath) {
+        try (InputStream is = getClass().getResourceAsStream(fontPath)) {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(customFont);
+            return customFont;
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+            return new Font("Serif", Font.PLAIN, 18); // Fallback to default font if loading fails
+        }
     }
 }
