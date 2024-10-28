@@ -79,6 +79,6 @@ public class AdminDashboardScreen {
 
     private void openItemManagement() {
         // Implement log viewer logic here
-//        new ItemManagementScreen();
+        new ItemManagementScreen();
     }
 }
