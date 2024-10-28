@@ -37,9 +37,15 @@ public class LoginScreen {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Add empty border to create space
+        panel.setBorder(BorderFactory.createEmptyBorder(120, 0, 0, 0)); // 50 pixels top margin
+
+        // Set the initial vertical position
+        gbc.gridy = 0; // Start from row 0
+
         // Add title
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = 0; // No change needed here
         gbc.gridwidth = 2;
         JLabel titleLabel = new JLabel("Đăng nhập", JLabel.CENTER);
         titleLabel.setFont(customFont.deriveFont(Font.BOLD, 18)); // Use custom font
@@ -49,7 +55,7 @@ public class LoginScreen {
         // Username label and field
         gbc.gridwidth = 1;
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 1; // Move down by one row
         JLabel usernameLabel = new JLabel("Tên đăng nhập:");
         usernameLabel.setFont(customFont.deriveFont(Font.PLAIN, 12)); // Use custom font
         usernameLabel.setForeground(Color.WHITE);
@@ -63,7 +69,7 @@ public class LoginScreen {
 
         // Password label and field
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 2; // Move down by another row
         JLabel passwordLabel = new JLabel("Mật khẩu:");
         passwordLabel.setFont(customFont.deriveFont(Font.PLAIN, 12)); // Use custom font
         passwordLabel.setForeground(Color.WHITE);
@@ -77,7 +83,7 @@ public class LoginScreen {
 
         // Back button
         gbc.gridx = 0; // Move back button to the first cell
-        gbc.gridy = 3;
+        gbc.gridy = 3; // Move down by another row
         gbc.gridwidth = 1; // Allow the button to take one grid cell width
         JButton btnBack = createButton("Trở về", customFont, new Color(204, 0, 0));
         panel.add(btnBack, gbc);

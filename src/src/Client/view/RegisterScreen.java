@@ -33,7 +33,7 @@ public class RegisterScreen {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0)); // 50 pixels top margin
         // Add title
         gbc.gridx = 0;
         gbc.gridy = 0;
