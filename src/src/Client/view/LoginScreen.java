@@ -42,7 +42,7 @@ public class LoginScreen {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JLabel titleLabel = new JLabel("Đăng nhập", JLabel.CENTER);
-        titleLabel.setFont(customFont.deriveFont(Font.BOLD, 22)); // Use custom font
+        titleLabel.setFont(customFont.deriveFont(Font.BOLD, 18)); // Use custom font
         titleLabel.setForeground(Color.WHITE);
         panel.add(titleLabel, gbc);
 
@@ -51,13 +51,13 @@ public class LoginScreen {
         gbc.gridx = 0;
         gbc.gridy = 1;
         JLabel usernameLabel = new JLabel("Tên đăng nhập:");
-        usernameLabel.setFont(customFont.deriveFont(Font.PLAIN, 16)); // Use custom font
+        usernameLabel.setFont(customFont.deriveFont(Font.PLAIN, 12)); // Use custom font
         usernameLabel.setForeground(Color.WHITE);
         panel.add(usernameLabel, gbc);
 
         gbc.gridx = 1;
         JTextField usernameField = new JTextField(15);
-        usernameField.setFont(customFont.deriveFont(Font.PLAIN, 14)); // Use custom font
+        usernameField.setFont(customFont.deriveFont(Font.PLAIN, 12)); // Use custom font
         usernameField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
         panel.add(usernameField, gbc);
 
@@ -65,13 +65,13 @@ public class LoginScreen {
         gbc.gridx = 0;
         gbc.gridy = 2;
         JLabel passwordLabel = new JLabel("Mật khẩu:");
-        passwordLabel.setFont(customFont.deriveFont(Font.PLAIN, 16)); // Use custom font
+        passwordLabel.setFont(customFont.deriveFont(Font.PLAIN, 12)); // Use custom font
         passwordLabel.setForeground(Color.WHITE);
         panel.add(passwordLabel, gbc);
 
         gbc.gridx = 1;
         JPasswordField passwordField = new JPasswordField(15);
-        passwordField.setFont(customFont.deriveFont(Font.PLAIN, 14)); // Use custom font
+        passwordField.setFont(customFont.deriveFont(Font.PLAIN, 12)); // Use custom font
         passwordField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
         panel.add(passwordField, gbc);
 
@@ -139,12 +139,12 @@ public class LoginScreen {
     // Create a button with custom font and background color
     private JButton createButton(String text, Font font, Color backgroundColor) {
         JButton button = new JButton(text);
-        button.setFont(font.deriveFont(Font.BOLD, 16));
+        button.setFont(font.deriveFont(Font.BOLD, 12));
         button.setForeground(Color.WHITE);
         button.setBackground(backgroundColor);
         button.setFocusPainted(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(120, 40));
+        button.setPreferredSize(new Dimension(120, 30));
         return button;
     }
 

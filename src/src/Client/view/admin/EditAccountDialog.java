@@ -11,21 +11,26 @@ import java.awt.event.ActionListener;
 public class EditAccountDialog extends JDialog {
     private JTextField txtAccountID;
     private JTextField txtUsername;
-    private JTextField txtPassword;
+    private JPasswordField txtPassword; // Sử dụng JPasswordField cho mật khẩu
     private JComboBox<String> comboRole;
     private AccountManagementController accountManagementController;
     private String accountID;
 
     public EditAccountDialog(JFrame parent, String accountID) {
-        super(parent, "Edit Account", true);
+        super(parent, "Sửa tài khoản", true);
         this.accountID = accountID;
 
         accountManagementController = new AccountManagementController();
         Account account = accountManagementController.getAccountByID(accountID);
+        if (account == null) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy tài khoản.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            dispose(); // Đóng hộp thoại nếu không tìm thấy tài khoản
+            return;
+        }
 
         setLayout(new BorderLayout());
 
-        // Create form
+        // Tạo form
         JPanel formPanel = new JPanel(new GridLayout(4, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -34,62 +39,60 @@ public class EditAccountDialog extends JDialog {
         txtAccountID.setEditable(false);  // ID không được chỉnh sửa
         formPanel.add(txtAccountID);
 
-        formPanel.add(new JLabel("Username:"));
+        formPanel.add(new JLabel("Tên đăng nhập:"));
         txtUsername = new JTextField(account.getUsername());
         formPanel.add(txtUsername);
 
-        formPanel.add(new JLabel("Password:"));
-        txtPassword = new JTextField(account.getPassword());
+        formPanel.add(new JLabel("Mật khẩu:"));
+        txtPassword = new JPasswordField(account.getPassword()); // Sử dụng JPasswordField
         formPanel.add(txtPassword);
 
-        formPanel.add(new JLabel("Role:"));
+        formPanel.add(new JLabel("Vai trò:"));
         comboRole = new JComboBox<>(new String[]{"admin", "player"});
         comboRole.setSelectedItem(account.getRole());
         formPanel.add(comboRole);
 
         add(formPanel, BorderLayout.CENTER);
 
-        // Create button panel
+        // Tạo panel cho nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnSave = new JButton("Save");
-        JButton btnCancel = new JButton("Cancel");
+        JButton btnSave = new JButton("Lưu");
+        JButton btnCancel = new JButton("Hủy");
 
         buttonPanel.add(btnSave);
         buttonPanel.add(btnCancel);
 
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Action listeners for buttons
-        btnSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveAccount();
-            }
-        });
-
-        btnCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();  // Close the dialog
-            }
-        });
+        // Thêm Action Listener cho nút
+        btnSave.addActionListener(e -> saveAccount());
+        btnCancel.addActionListener(e -> dispose());  // Đóng hộp thoại
 
         pack();
-        setLocationRelativeTo(parent);  // Center on parent frame
+        setLocationRelativeTo(parent);  // Căn giữa trên khung cha
     }
 
     private void saveAccount() {
         String username = txtUsername.getText();
-        String password = txtPassword.getText();
+        String password = new String(txtPassword.getPassword()); // Lấy mật khẩu
         String role = (String) comboRole.getSelectedItem();
 
+        // Kiểm tra hợp lệ
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username and Password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Tên đăng nhập và Mật khẩu không được để trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (username.length() < 3) {
+            JOptionPane.showMessageDialog(this, "Tên đăng nhập phải có ít nhất 3 ký tự.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (password.length() < 6) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu phải có ít nhất 6 ký tự.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         accountManagementController.updateAccount(accountID, username, password, role);
-        JOptionPane.showMessageDialog(this, "Account updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-        dispose();  // Close the dialog after saving
+        JOptionPane.showMessageDialog(this, "Tài khoản đã được cập nhật thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        dispose();  // Đóng hộp thoại sau khi lưu
     }
 }

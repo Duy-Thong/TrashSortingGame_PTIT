@@ -3,23 +3,29 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Server.model;
-
-import javax.imageio.ImageIO;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 import javax.swing.*;
 import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URL;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 
 /**
  *
  * @author vutuyen
  */
-public class Bin {
+public class Bin{
     private String type;
     private int x, y;
-    private String url;
+    private String id;
     private String name;
+    private String url;
     private ImageIcon binImage;
     private int widthImage = 64, heightImage = 64;
 
@@ -37,6 +43,12 @@ public class Bin {
         this.url = url;
     }
 
+    public Bin(String id, String name, String type, String url) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.url = url;
+    }
     private ImageIcon urlToImage(String urlString){
         try {
             URL url = new URL(urlString);
@@ -66,6 +78,18 @@ public class Bin {
                 this.type,
                 this.url
         );
+    }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getName() {

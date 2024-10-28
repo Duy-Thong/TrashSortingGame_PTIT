@@ -13,7 +13,7 @@ public class AddAccountDialog extends JDialog {
     private AccountManagementController accountManagementController;
 
     public AddAccountDialog(JFrame parent) {
-        super(parent, "Add Account", true);
+        super(parent, "Thêm tài khoản", true);
         accountManagementController = new AccountManagementController();
 
         setLayout(new BorderLayout());
@@ -22,15 +22,15 @@ public class AddAccountDialog extends JDialog {
         JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        formPanel.add(new JLabel("Username:"));
+        formPanel.add(new JLabel("Tên tài khoản:"));
         txtUsername = new JTextField();
         formPanel.add(txtUsername);
 
-        formPanel.add(new JLabel("Password:"));
-        txtPassword = new JTextField();
+        formPanel.add(new JLabel("Mật khẩu:"));
+        txtPassword = new JPasswordField(); // Changed to JPasswordField for better security
         formPanel.add(txtPassword);
 
-        formPanel.add(new JLabel("Role:"));
+        formPanel.add(new JLabel("Vai trò:"));
         comboRole = new JComboBox<>(new String[]{"admin", "player"});
         formPanel.add(comboRole);
 
@@ -38,8 +38,8 @@ public class AddAccountDialog extends JDialog {
 
         // Create button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnSave = new JButton("Save");
-        JButton btnCancel = new JButton("Cancel");
+        JButton btnSave = new JButton("Lưu");
+        JButton btnCancel = new JButton("Hủy");
 
         buttonPanel.add(btnSave);
         buttonPanel.add(btnCancel);
@@ -63,6 +63,7 @@ public class AddAccountDialog extends JDialog {
 
         pack();
         setLocationRelativeTo(parent);  // Center on parent frame
+        setResizable(false); // Optional: Prevent resizing
     }
 
     private void saveAccount() {
@@ -71,17 +72,17 @@ public class AddAccountDialog extends JDialog {
         String role = (String) comboRole.getSelectedItem();
 
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username and Password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Tên tài khoản và Mật khẩu không được để trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Assuming the AccountManagementController has a method to add a new account
         boolean success = accountManagementController.addAccount(username, password, role);
         if (success) {
-            JOptionPane.showMessageDialog(this, "Account added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Thêm tài khoản thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
             dispose();  // Close the dialog after saving
         } else {
-            JOptionPane.showMessageDialog(this, "Failed to add account. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Thêm tài khoản thất bại. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

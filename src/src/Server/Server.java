@@ -321,6 +321,89 @@ public class Server {
                         response = responseBins.toString();
                         System.out.println("Sucessed getBins");
                         break;
+                    case "getTrashItemData":
+                        List<TrashItem> trashItems = getTrashItemData();
+                        StringBuilder responseTrashItem = new StringBuilder();
+                        for (TrashItem t : trashItems) {
+                            responseTrashItem.append(String.format("%s;%s;%s;%s|",
+                                    t.getId(), t.getName(), t.getType(), t.getUrl())); // Using semicolon as a delimiter
+                        }
+                        response = responseTrashItem.toString();
+                        break;
+
+                    case "getBinData":
+                        List<Bin> bins = getBinData();
+                        StringBuilder responseBin = new StringBuilder();
+                        for (Bin b : bins) {
+                            responseBin.append(String.format("%s;%s;%s;%s|",
+                                    b.getId(), b.getName(), b.getType(), b.getUrl())); // Using semicolon as a delimiter
+                        }
+                        response = responseBin.toString();
+                        break;
+                    case "addTrashItem":
+                        String name = parts[1].split("=")[1];
+                        type = parts[2].split("=")[1];
+                        String url = parts[3].split("=")[1];
+                        if (addTrashItem(name, type, url)) {
+                            response = "add success";
+                        } else {
+                            response = "add failure";
+                        }
+                        break;
+
+                    case "addBin":
+                        name = parts[1].split("=")[1];
+                        type = parts[2].split("=")[1];
+                        url = parts[3].split("=")[1];
+                        if (addBin(name, type, url)) {
+                            response = "add success";
+                        } else {
+                            response = "add failure";
+                        }
+                        break;
+
+                    case "deleteTrashItem":
+                        String id = parts[1].split("=")[1];
+                        if (deleteTrashItem(id)) {
+                            response = "delete success";
+                        } else {
+                            response = "delete failure";
+                        }
+                        break;
+
+                    case "deleteBin":
+                        id = parts[1].split("=")[1];
+                        if (deleteBin(id)) {
+                            response = "delete success";
+                        } else {
+                            response = "delete failure";
+                        }
+                        break;
+
+                    case "updateTrashItem":
+                        id = parts[1].split("=")[1];
+                        name = parts[2].split("=")[1];
+                        type = parts[3].split("=")[1];
+                        url = parts[4].split("=")[1];
+                        if (updateTrashItem(id, name, type, url)) {
+                            response = "update success";
+                        } else {
+                            response = "update failure";
+                        }
+                        break;
+
+                    case "updateBin":
+                        id = parts[1].split("=")[1];
+                        name = parts[2].split("=")[1];
+                        type = parts[3].split("=")[1];
+                        url = parts[4].split("=")[1];
+                        if (updateBin(id, name, type, url)) {
+                            response = "update success";
+                        } else {
+                            response = "update failure";
+                        }
+                        break;
+
                     default:
                         response = "error: unknown request";
                 }
@@ -725,7 +808,7 @@ public class Server {
     private static List<Account> getAllAccount() {
         List<Account> accountList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT * FROM account";
+            String query = "SELECT * FROM account ORDER BY username";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
@@ -853,5 +936,128 @@ public class Server {
         DatagramPacket packet = new DatagramPacket(data, data.length, client.getAddress(), client.getPort());
         socket.send(packet);
     }
-
+    private static List<TrashItem> getTrashItemData() {
+        List<TrashItem> trashItems = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT * FROM trashitem ORDER BY type";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String id = rs.getString("itemID");
+                    String name = rs.getString("name");
+                    String type = rs.getString("type");
+                    String url = rs.getString("img_url");
+                    trashItems.add(new TrashItem(id, name, type, url));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return trashItems;
+    }
+    private static List<Bin> getBinData() {
+        List<Bin> bins = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT * FROM trashbin ORDER BY type";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String id = rs.getString("binID");
+                    String name = rs.getString("name");
+                    String type = rs.getString("type");
+                    String url = rs.getString("img_url");
+                    bins.add(new Bin(id, name, type, url));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bins;
+    }
+    public static boolean addTrashItem(String name, String type, String url) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String itemID = UUID.randomUUID().toString();
+            String query = "INSERT INTO trashitem (itemID, name, type, img_url) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, itemID);
+                stmt.setString(2, name);
+                stmt.setString(3, type);
+                stmt.setString(4, url);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public static boolean addBin(String name, String type, String url) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String binID = UUID.randomUUID().toString();
+            String query = "INSERT INTO trashbin (binID, name, type, img_url) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, binID);
+                stmt.setString(2, name);
+                stmt.setString(3, type);
+                stmt.setString(4, url);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public static boolean deleteTrashItem(String itemID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "DELETE FROM trashitem WHERE itemID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, itemID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public static boolean deleteBin(String binID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "DELETE FROM trashbin WHERE binID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, binID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public static boolean updateTrashItem(String itemID, String name, String type, String url) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "UPDATE trashitem SET name = ?, type = ?, img_url = ?WHERE itemID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, name);
+                stmt.setString(2, type);
+                stmt.setString(3, url);
+                stmt.setString(4, itemID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public static boolean updateBin(String binID, String name, String type, String url) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "UPDATE trashbin SET name = ?, type = ?, img_url = ? WHERE binID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, name);
+                stmt.setString(2, type);
+                stmt.setString(3, url);
+                stmt.setString(4, binID);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

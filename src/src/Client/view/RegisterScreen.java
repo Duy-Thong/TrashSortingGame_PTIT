@@ -48,13 +48,13 @@ public class RegisterScreen {
         gbc.gridx = 0;
         gbc.gridy = 1;
         JLabel usernameLabel = new JLabel("Tên đăng nhập:");
-        usernameLabel.setFont(customFont.deriveFont(Font.PLAIN, 16));
+        usernameLabel.setFont(customFont.deriveFont(Font.PLAIN, 12));
         usernameLabel.setForeground(Color.WHITE);
         panel.add(usernameLabel, gbc);
 
         gbc.gridx = 1;
         JTextField usernameField = new JTextField(15);
-        usernameField.setFont(customFont.deriveFont(Font.PLAIN, 14));
+        usernameField.setFont(customFont.deriveFont(Font.PLAIN, 12));
         usernameField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
         panel.add(usernameField, gbc);
 
@@ -62,13 +62,13 @@ public class RegisterScreen {
         gbc.gridx = 0;
         gbc.gridy = 2;
         JLabel passwordLabel = new JLabel("Mật khẩu:");
-        passwordLabel.setFont(customFont.deriveFont(Font.PLAIN, 16));
+        passwordLabel.setFont(customFont.deriveFont(Font.PLAIN, 12));
         passwordLabel.setForeground(Color.WHITE);
         panel.add(passwordLabel, gbc);
 
         gbc.gridx = 1;
         JPasswordField passwordField = new JPasswordField(15);
-        passwordField.setFont(customFont.deriveFont(Font.PLAIN, 14));
+        passwordField.setFont(customFont.deriveFont(Font.PLAIN, 12));
         passwordField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
         panel.add(passwordField, gbc);
 
@@ -76,13 +76,13 @@ public class RegisterScreen {
         gbc.gridx = 0;
         gbc.gridy = 3;
         JLabel confirmPasswordLabel = new JLabel("Xác nhận mật khẩu:");
-        confirmPasswordLabel.setFont(customFont.deriveFont(Font.PLAIN, 16));
+        confirmPasswordLabel.setFont(customFont.deriveFont(Font.PLAIN, 12));
         confirmPasswordLabel.setForeground(Color.WHITE);
         panel.add(confirmPasswordLabel, gbc);
 
         gbc.gridx = 1;
         JPasswordField confirmPasswordField = new JPasswordField(15);
-        confirmPasswordField.setFont(customFont.deriveFont(Font.PLAIN, 14));
+        confirmPasswordField.setFont(customFont.deriveFont(Font.PLAIN, 12));
         confirmPasswordField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
         panel.add(confirmPasswordField, gbc);
 
@@ -142,12 +142,12 @@ public class RegisterScreen {
     // Create a button with custom font and background color
     private JButton createButton(String text, Font font, Color backgroundColor) {
         JButton button = new JButton(text);
-        button.setFont(font.deriveFont(Font.BOLD, 16));
+        button.setFont(font.deriveFont(Font.BOLD, 12));
         button.setForeground(Color.WHITE);
         button.setBackground(backgroundColor);
         button.setFocusPainted(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(120, 40));
+        button.setPreferredSize(new Dimension(120, 30));
         return button;
     }
 
