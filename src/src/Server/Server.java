@@ -322,9 +322,9 @@ public class Server {
                         System.out.println("Sucessed getBins");
                         break;
                     case "getTrashItemData":
-                        List<TrashItem> trashItems = getTrashItemData();
+                        List<TrashItem> trashItems1 = getTrashItemData();
                         StringBuilder responseTrashItem = new StringBuilder();
-                        for (TrashItem t : trashItems) {
+                        for (TrashItem t : trashItems1) {
                             responseTrashItem.append(String.format("%s;%s;%s;%s|",
                                     t.getId(), t.getName(), t.getType(), t.getUrl())); // Using semicolon as a delimiter
                         }
@@ -332,9 +332,9 @@ public class Server {
                         break;
 
                     case "getBinData":
-                        List<Bin> bins = getBinData();
+                        List<Bin> bins1 = getBinData();
                         StringBuilder responseBin = new StringBuilder();
-                        for (Bin b : bins) {
+                        for (Bin b : bins1) {
                             responseBin.append(String.format("%s;%s;%s;%s|",
                                     b.getId(), b.getName(), b.getType(), b.getUrl())); // Using semicolon as a delimiter
                         }

@@ -158,12 +158,4 @@ public class TrashItem{
     public void setIndex(int index) {
         this.index = index;
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }
