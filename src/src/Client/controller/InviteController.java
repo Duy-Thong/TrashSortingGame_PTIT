@@ -3,7 +3,6 @@ package Client.controller;
 import Client.Constants;
 import Client.model.Player;
 import Client.view.RunGame;
-import Client.view.WasteSortingGame;
 
 import java.net.*;
 import java.sql.Timestamp;

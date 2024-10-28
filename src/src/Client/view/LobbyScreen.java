@@ -12,6 +12,7 @@ public class LobbyScreen {
     private final String username;
     private final LoginController loginController = new LoginController();
 
+    // Constructor accepting playerID
     public LobbyScreen(String playerID, String username) {
         this.playerID = playerID;
         this.username = username;
@@ -90,6 +91,30 @@ public class LobbyScreen {
         panel.add(btnLogout, gbc);
 
         // Add Action Listeners to Buttons
+        btnProfile.addActionListener(e -> {
+            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem Profile cá nhân");
+            lobbyFrame.dispose();
+            new ProfileScreen(playerID, username);
+        });
+
+        btnHistory.addActionListener(e -> {
+            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử người chơi");
+            lobbyFrame.dispose();
+            new HistoryScreen(playerID, username);
+        });
+
+        btnRanking.addActionListener(e -> {
+            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Bảng xếp hạng");
+            lobbyFrame.dispose();
+            new RankScreen(playerID, username);
+        });
+
+        btnEnterGame.addActionListener(e -> {
+            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
+            lobbyFrame.dispose();
+            new InviteScreen(playerID, username);
+        });
+
         btnProfile.addActionListener(e -> new ProfileScreen(playerID));
         btnHistory.addActionListener(e -> new HistoryScreen(playerID));
         btnRanking.addActionListener(e -> new RankScreen());
