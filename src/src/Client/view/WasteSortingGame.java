@@ -32,7 +32,7 @@ public class WasteSortingGame extends JFrame {
         JPanel ok = new JPanel(new GridLayout(1, 1));
         JButton button = new JButton("OK");
         button.addActionListener((ActionEvent e) -> {
-            game = new RunGame("roomId","idPlayer");
+            game = new RunGame("roomId","idPlayer", "idplayer2");
             this.setVisible(false);
             game.setVisible(true);
         });
