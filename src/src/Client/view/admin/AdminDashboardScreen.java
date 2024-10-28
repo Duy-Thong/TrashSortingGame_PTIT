@@ -26,7 +26,7 @@ public class AdminDashboardScreen {
         adminFrame.setLocationRelativeTo(null);
 
         // Load GIF background
-        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../../assets/back.gif")); // Path to your GIF file
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../../assets/new_back.gif")); // Path to your GIF file
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setLayout(new GridBagLayout()); // Use GridBagLayout for the background
 

@@ -737,7 +737,7 @@ public class Server {
     private static List<Account> getAllAccount() {
         List<Account> accountList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT * FROM account";
+            String query = "SELECT * FROM account ORDER BY username";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {

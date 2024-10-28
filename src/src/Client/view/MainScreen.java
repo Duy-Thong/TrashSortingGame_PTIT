@@ -29,7 +29,7 @@ public class MainScreen {
         frame.setLocationRelativeTo(null);
 
         // Load and set GIF background
-        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../assets/back.gif")); // Update the path to your GIF
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../assets/new_back.gif")); // Update the path to your GIF
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setLayout(new BorderLayout()); // Use BorderLayout to position components
 
