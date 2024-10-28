@@ -111,20 +111,18 @@ public class LobbyScreen {
 
         btnEnterGame.addActionListener(e -> {
             JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
-            lobbyFrame.dispose();
             new InviteScreen(playerID, username);
         });
+        btnHelp.addActionListener(e -> {
+            new HelpScreen();
+        });
 
-        btnProfile.addActionListener(e -> new ProfileScreen(playerID));
-        btnHistory.addActionListener(e -> new HistoryScreen(playerID));
-        btnRanking.addActionListener(e -> new RankScreen());
-        btnEnterGame.addActionListener(e -> new InviteScreen(playerID, username));
-        btnHelp.addActionListener(e -> new HelpScreen());
         btnLogout.addActionListener(e -> {
             loginController.logout(playerID);
             lobbyFrame.dispose();
             new LoginScreen();
         });
+
 
         // Add panel to background
         backgroundLabel.add(panel);

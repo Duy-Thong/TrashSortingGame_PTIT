@@ -12,11 +12,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import javax.imageio.ImageIO;
+import javax.swing.border.EmptyBorder;
 
 public class HelpScreen {
     private JFrame helpFrame;
-    private int widthImage = 100;  // Specify desired width
-    private int heightImage = 100; // Specify desired height
+    private int widthImage = 70;  // Specify desired width
+    private int heightImage = 70; // Specify desired height
 
     public HelpScreen() {
         helpFrame = new JFrame("Hướng dẫn");
@@ -35,14 +36,14 @@ public class HelpScreen {
         JTextArea instructions = new JTextArea();
         instructions.setText("Hướng dẫn chơi:\n\n"
                 + "1. Mục tiêu của trò chơi là phân loại rác thành đúng thùng rác.\n"
-                + "2. Rác sẽ rơi từ trên xuống, và bạn phải nhấn nút tương ứng để chọn thùng rác phù hợp.\n"
+                + "2. Rác sẽ rơi từ trên xuống, và bạn phải nhấn nút tương ứng ( trái, phải, xuống ) để di chuyển rác đến thùng rác phù hợp.\n"
                 + "3. Bạn sẽ nhận điểm cho mỗi lần phân loại đúng.\n"
-                + "4. Nếu bạn phân loại sai, điểm sẽ bị trừ.\n"
-                + "5. Hãy cố gắng đạt điểm cao nhất trước khi thời gian kết thúc!");
+                + "4. Hãy cố gắng đạt điểm cao nhất trước khi thời gian kết thúc!");
         instructions.setLineWrap(true);
         instructions.setWrapStyleWord(true);
         instructions.setEditable(false);
-        instructions.setFont(customFont.deriveFont(Font.PLAIN, 16)); // Set custom font for instructions
+        instructions.setFont(customFont.deriveFont(Font.PLAIN, 12)); // Set custom font for instructions
+        instructions.setBorder(new EmptyBorder(10, 20, 10, 20)); // Adds padding of 10px top/bottom and 20px left/right
         JScrollPane scrollPane = new JScrollPane(instructions);
         instructionPanel.add(scrollPane, BorderLayout.CENTER);
         helpFrame.add(instructionPanel, BorderLayout.NORTH);
@@ -172,6 +173,7 @@ public class HelpScreen {
             BufferedImage originalImage = ImageIO.read(url);
             Image scaledImage = originalImage.getScaledInstance(widthImage, heightImage, Image.SCALE_SMOOTH);
             return new ImageIcon(scaledImage);
+
         } catch (IOException e) {
             System.err.println("Error loading image from URL: " + e.getMessage());
             return null; // Handle loading failure
