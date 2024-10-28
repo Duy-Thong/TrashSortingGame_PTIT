@@ -87,7 +87,7 @@ public class LobbyScreen {
         btnRanking.addActionListener(e -> {
             JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Bảng xếp hạng");
             lobbyFrame.dispose();
-            new RankScreen();
+            new RankScreen(playerID, username);
         });
 
         btnEnterGame.addActionListener(e -> {

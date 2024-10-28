@@ -62,7 +62,7 @@ public class HistoryScreen extends JFrame {
         historyTable.setFont(pixelFont); // Đặt font cho bảng
 
         // Thiết lập font cho tiêu đề cột
-        historyTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f)); // Đặt font cho tiêu đề cột
+        historyTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f));
 
         // Lấy lịch sử người chơi và thêm vào bảng
         List<PlayerGame> historyList = historyController.getPlayerHistory(playerId);
@@ -87,7 +87,7 @@ public class HistoryScreen extends JFrame {
 
         // Tạo JPanel để bao quanh scrollPane và thêm khoảng cách bên trong
         JPanel panelTable = new JPanel(new BorderLayout());
-        panelTable.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15)); // Khoảng cách 5px bên trái và phải
+        panelTable.setBorder(BorderFactory.createEmptyBorder(0, 55, 5, 55)); // Khoảng cách 5px bên trái và phải
         panelTable.setOpaque(false); // Đặt không có màu nền để hòa vào ảnh nền
         panelTable.add(scrollPane, BorderLayout.CENTER); // Thêm JScrollPane vào panelTable
 
@@ -115,13 +115,14 @@ public class HistoryScreen extends JFrame {
     // Tạo panel tiêu đề
     private JPanel createTitlePanel() {
         JLabel titleLabel = new JLabel("Lịch sử người chơi", JLabel.CENTER);
-        titleLabel.setFont(pixelFont.deriveFont(Font.BOLD, 16f)); // Đặt font cho tiêu đề
+        titleLabel.setFont(pixelFont.deriveFont(Font.BOLD, 16f));
+        titleLabel.setForeground(Color.WHITE);
 
         // Tạo một panel để chứa titleLabel và thêm khoảng cách bên trên
         JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));  // Khoảng cách 10px bên trên
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 15, 0));  // Khoảng cách 10px bên trên
         titlePanel.add(titleLabel, BorderLayout.CENTER);
-        titlePanel.setOpaque(false); // Đặt panel không có màu nền
+        titlePanel.setOpaque(false);
 
         return titlePanel;
     }
@@ -130,14 +131,14 @@ public class HistoryScreen extends JFrame {
     private JPanel createBackButton() {
         backButton = new JButton("Trở về");
         backButton.setPreferredSize(new Dimension(150, 40));
-        backButton.setFont(pixelFont.deriveFont(12f)); // Đặt font cho nút
-        backButton.setBackground(Color.RED); // Đặt màu nền thành đỏ
-        backButton.setForeground(Color.WHITE); // Đặt màu chữ thành trắng
-        backButton.setFocusPainted(false); // Tắt hiệu ứng focus
+        backButton.setFont(pixelFont.deriveFont(12f));
+        backButton.setBackground(Color.RED);
+        backButton.setForeground(Color.WHITE);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         // Tạo một panel để chứa nút và căn giữa
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setOpaque(false); // Đặt panel không có màu nền
+        buttonPanel.setOpaque(false);
         buttonPanel.add(backButton);
 
         return buttonPanel;

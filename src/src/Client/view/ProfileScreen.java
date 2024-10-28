@@ -88,7 +88,7 @@ public class ProfileScreen extends JFrame {
     private void createBackButton() {
         backButton = new JButton("Trở về");
         backButton.setPreferredSize(new Dimension(150, 40));
-        backButton.setFocusPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         backButton.setBorderPainted(false);
         backButton.setFont(pixelFont.deriveFont(14f));
         backButton.setToolTipText("Trở về");
@@ -102,7 +102,7 @@ public class ProfileScreen extends JFrame {
     private void createEditButton() {
         editButton = new JButton("Chỉnh sửa");
         editButton.setPreferredSize(new Dimension(150, 40));
-        editButton.setFocusPainted(false);
+        editButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         editButton.setBorderPainted(false);
         editButton.setFont(pixelFont.deriveFont(14f));
         editButton.setToolTipText("Chỉnh sửa");
@@ -246,6 +246,7 @@ public class ProfileScreen extends JFrame {
         JButton saveButton = new JButton("Lưu");
         saveButton.setBackground(new Color(0, 123, 255)); // Blue color for save button
         saveButton.setForeground(Color.WHITE);
+        saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         saveButton.setFont(pixelFont.deriveFont(10f));
         saveButton.setPreferredSize(new Dimension(20, 25)); // Set smaller size for save button
 
@@ -253,6 +254,7 @@ public class ProfileScreen extends JFrame {
         cancelButton.setBackground(new Color(204, 0, 0)); // Red color for cancel button
         cancelButton.setForeground(Color.WHITE);
         cancelButton.setFont(pixelFont.deriveFont(10f));
+        cancelButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         cancelButton.setPreferredSize(new Dimension(20, 25)); // Set smaller size for cancel button
 
         // Add buttons to the panel
