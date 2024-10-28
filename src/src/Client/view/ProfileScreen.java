@@ -42,7 +42,7 @@ public class ProfileScreen extends JFrame {
         setLocationRelativeTo(null);
 
         // Sử dụng BackgroundPanel cho ảnh nền
-        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_notext.png")).getImage());
+        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_notext.jpg")).getImage());
         backgroundPanel.setLayout(new BorderLayout());
 
         createBackButton();
@@ -115,7 +115,7 @@ public class ProfileScreen extends JFrame {
 
     private JPanel createTitlePanel() {
         JLabel titleLabel = new JLabel("Thông tin cá nhân", JLabel.CENTER);
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(Color.BLACK);
         titleLabel.setFont(pixelFont.deriveFont(Font.BOLD, 18f));
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setOpaque(false);
@@ -179,18 +179,18 @@ public class ProfileScreen extends JFrame {
 
         JLabel label = new JLabel(labelText);
         label.setFont(pixelFont.deriveFont(12f));
-        label.setForeground(Color.WHITE); // Màu chữ trắng
+        label.setForeground(Color.BLACK); // Màu chữ trắng
         label.setOpaque(true);
-        label.setBackground(new Color(0, 0, 0, 150)); // Nền mờ màu đen
-        label.setBorder(new EmptyBorder(5, 5, 5, 85)); // Tạo padding cho nhãn
+        label.setBackground(new Color(255, 255, 255, 128)); // Nền mờ màu đen
+        label.setBorder(new EmptyBorder(5, 5, 5, 95)); // Tạo padding cho nhãn
         panel.add(label, gbc);
 
         gbc.gridx = 1;
         JLabel valueLabel = new JLabel(valueText);
         valueLabel.setFont(pixelFont.deriveFont(12f));
-        valueLabel.setForeground(Color.WHITE); // Màu chữ trắng
+        valueLabel.setForeground(Color.BLACK); // Màu chữ trắng
         valueLabel.setOpaque(true);
-        valueLabel.setBackground(new Color(0, 0, 0, 150)); // Nền mờ màu đen
+        valueLabel.setBackground(new Color(255, 255, 255, 128)); // Nền mờ màu đen
         valueLabel.setBorder(new EmptyBorder(5, 5, 5, 5)); // Tạo padding cho giá trị
         panel.add(valueLabel, gbc);
     }
@@ -203,7 +203,7 @@ public class ProfileScreen extends JFrame {
         }
 
         // Create a panel with a background image
-        BackgroundPanel editPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/pop.gif")).getImage());
+        BackgroundPanel editPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/popup.gif")).getImage());
         editPanel.setLayout(new GridBagLayout()); // Use GridBagLayout for better control over positioning
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); // Add some padding
@@ -214,7 +214,7 @@ public class ProfileScreen extends JFrame {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST; // Align to the east for label
         JLabel usernameLabel = new JLabel("Tên người dùng:");
-        usernameLabel.setForeground(Color.WHITE); // Set label color to white
+        usernameLabel.setForeground(Color.BLACK); // Set label color to white
         usernameLabel.setFont(pixelFont.deriveFont(10f));
         editPanel.add(usernameLabel, gbc);
 
@@ -231,7 +231,7 @@ public class ProfileScreen extends JFrame {
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST; // Align to the east for label
         JLabel passwordLabel = new JLabel("Mật khẩu:");
-        passwordLabel.setForeground(Color.WHITE); // Set label color to white
+        passwordLabel.setForeground(Color.BLACK); // Set label color to white
         passwordLabel.setFont(pixelFont.deriveFont(10f));
         editPanel.add(passwordLabel, gbc);
 

@@ -7,7 +7,6 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +16,7 @@ public class RankScreen extends JFrame {
     private RankController rankController;
     private JTable rankTable;
     private JButton backButton;
-    Font pixelFont;
+    private Font pixelFont;
 
     public RankScreen(String playerId, String username) {
         this.rankController = new RankController();
@@ -53,37 +52,33 @@ public class RankScreen extends JFrame {
             }
         };
 
-        rankTable = new JTable(model) {
+        rankTable = new JTable(model);
+        rankTable.setRowHeight(25);
+        rankTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        rankTable.setFont(pixelFont);
+        rankTable.setBackground(new Color(255, 255, 255, 128));
+        rankTable.setGridColor(Color.WHITE);
+
+        // Thiết lập font chữ và màu cho phần header của bảng
+        rankTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f));
+        rankTable.getTableHeader().setForeground(Color.BLACK);
+        rankTable.getTableHeader().setBackground(new Color(255, 255, 255)); // nếu muốn nền trắng
+
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
             @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component component = super.prepareRenderer(renderer, row, column);
-                if (component instanceof JComponent) {
-                    ((JComponent) component).setOpaque(false); // Đặt các ô có dữ liệu trong suốt
-                }
-                return component;
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setHorizontalAlignment(JLabel.CENTER);
+                label.setFont(pixelFont.deriveFont(Font.BOLD, 12f));  // Đặt font chữ đậm ở đây
+                label.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.WHITE)); // Đặt viền trắng
+                return label;
             }
         };
 
-        // Set the row height to make rows taller
-        rankTable.setRowHeight(25); // Set the desired height (e.g., 30 pixels)
+        for (int i = 0; i < rankTable.getColumnModel().getColumnCount(); i++) {
+            rankTable.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+        }
 
-        rankTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        rankTable.setFont(pixelFont);
-        rankTable.setOpaque(false); // Đặt bảng trong suốt
-        rankTable.setBackground(new Color(0, 0, 0, 0)); // Đặt nền bảng trong suốt
-        rankTable.setGridColor(Color.WHITE); // Đặt màu viền giữa các ô
-
-        rankTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f));
-        rankTable.getTableHeader().setOpaque(false); // Đặt tiêu đề bảng trong suốt
-        rankTable.getTableHeader().setBackground(null); // Đặt nền tiêu đề bảng trong suốt
-        rankTable.getTableHeader().setForeground(Color.BLACK); // Đặt màu chữ tiêu đề trắng
-
-        // Thiết lập màu chữ trắng cho nội dung của bảng
-        DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
-        cellRenderer.setForeground(Color.WHITE);
-        rankTable.setDefaultRenderer(Object.class, cellRenderer);
-
-        // Căn giữa cho tất cả các cột
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         for (int i = 0; i < columnNames.length; i++) {
@@ -102,13 +97,24 @@ public class RankScreen extends JFrame {
             });
         }
 
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBorder(BorderFactory.createEmptyBorder(15, 55, 5, 55));
-        JScrollPane scrollPane = new JScrollPane(rankTable);
-        scrollPane.setOpaque(false); // Đặt JScrollPane trong suốt
-        scrollPane.getViewport().setOpaque(false); // Đặt viewport của JScrollPane trong suốt
-        scrollPane.setBorder(new LineBorder(Color.WHITE, 2)); // Đặt viền trắng cho bảng
+        int maxRows = 14;
+        int currentRows = topPlayers.size();
+        for (int i = currentRows; i < maxRows; i++) {
+            model.addRow(new Object[]{
+                    "",
+                    "",
+                    "",
+                    ""
+            });
+        }
 
+        JScrollPane scrollPane = new JScrollPane(rankTable);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(new LineBorder(Color.WHITE, 2));
+
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(20, 55, 5, 55));
         tablePanel.setOpaque(false);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
         backgroundPanel.add(tablePanel, BorderLayout.CENTER);
@@ -146,7 +152,7 @@ public class RankScreen extends JFrame {
     private JPanel createTitlePanel() {
         JLabel titleLabel = new JLabel("Bảng xếp hạng người chơi", JLabel.CENTER);
         titleLabel.setFont(pixelFont.deriveFont(Font.BOLD, 16f));
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(Color.BLACK);
 
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));

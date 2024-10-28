@@ -5,6 +5,8 @@ import Client.model.Player;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.IOException;
@@ -22,7 +24,10 @@ public class InviteScreen extends JFrame {
     private JButton backButton;
     private JButton refreshButton;
     private String currentPlayerID;
+    private JPanel tablePanel;
     static Font pixelFont;
+
+    private final String[] columnNames = {"ID", "Tên người chơi", "Tổng điểm", "Trạng thái"};
 
     public InviteScreen(String playerID, String username) {
         this.inviteController = new InviteController(username);
@@ -45,13 +50,12 @@ public class InviteScreen extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_notext.png")).getImage());
+        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_notext.jpg")).getImage());
         backgroundPanel.setLayout(new BorderLayout());
 
         JPanel titlePanel = createTitlePanel();
         backgroundPanel.add(titlePanel, BorderLayout.NORTH);
 
-        String[] columnNames = {"ID", "Tên người chơi", "Tổng điểm", "Trạng thái"};
         model = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -61,13 +65,43 @@ public class InviteScreen extends JFrame {
 
         playerTable = new JTable(model);
         playerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        playerTable.setRowHeight(25);
         playerTable.setFont(pixelFont);
+        playerTable.setBackground(new Color(255, 255, 255, 128));
+        playerTable.setGridColor(Color.WHITE);
 
         playerTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f));
+        playerTable.getTableHeader().setForeground(Color.BLACK);
+        playerTable.getTableHeader().setBackground(new Color(255, 255, 255)); // nếu muốn nền trắng
+
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setHorizontalAlignment(JLabel.CENTER);
+                label.setFont(pixelFont.deriveFont(Font.BOLD, 12f));  // Đặt font chữ đậm ở đây
+                label.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.WHITE)); // Đặt viền trắng
+                return label;
+            }
+        };
+
+        for (int i = 0; i < playerTable.getColumnModel().getColumnCount(); i++) {
+            playerTable.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+        }
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < columnNames.length; i++) {
+            playerTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
 
         JScrollPane scrollPane = new JScrollPane(playerTable);
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBorder(BorderFactory.createEmptyBorder(15, 55, 5, 55));
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(new LineBorder(Color.WHITE, 2));
+
+        tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(0, 55, 10, 55));
         tablePanel.setOpaque(false);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
         backgroundPanel.add(tablePanel, BorderLayout.CENTER);
@@ -90,17 +124,18 @@ public class InviteScreen extends JFrame {
 
     private JPanel createTitlePanel() {
         JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 55, 14, 0));
 
         JLabel titleLabel = new JLabel("Danh sách bạn bè", JLabel.CENTER);
         titleLabel.setFont(pixelFont.deriveFont(Font.BOLD, 16f));
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(Color.BLACK);
         titlePanel.add(titleLabel, BorderLayout.CENTER);
 
         ImageIcon originalIcon = new ImageIcon(getClass().getResource("/Client/assets/refresh.png"));
-        Image scaledImage = originalIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH); // 35x35 là kích thước mới
+        Image scaledImage = originalIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH); // 35x35 là kích thước mới
         ImageIcon resizedIcon = new ImageIcon(scaledImage);
         refreshButton = new JButton(resizedIcon);
-        refreshButton.setPreferredSize(new Dimension(30, 30));
+        refreshButton.setPreferredSize(new Dimension(25, 25));
         refreshButton.setToolTipText("Làm mới danh sách bạn bè");
         refreshButton.setBorderPainted(false);
         refreshButton.setContentAreaFilled(false);
@@ -110,7 +145,7 @@ public class InviteScreen extends JFrame {
 
         JPanel refreshPanel = new JPanel(new BorderLayout());
         refreshPanel.add(refreshButton, BorderLayout.EAST);
-        refreshPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 55));
+        refreshPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 125));
         refreshPanel.setOpaque(false);
         titlePanel.add(refreshPanel, BorderLayout.EAST);
 
@@ -123,26 +158,26 @@ public class InviteScreen extends JFrame {
         return titlePanel;
     }
 
-
     private JPanel createButtonPanel() {
         inviteButton = new JButton("Mời");
         inviteButton.setPreferredSize(new Dimension(150, 40));
         inviteButton.setFont(pixelFont.deriveFont(12f));
-        inviteButton.setBackground(new Color(0, 102, 204));
+        inviteButton.setBackground(new Color(0, 123, 255));
         inviteButton.setForeground(Color.WHITE);
         inviteButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         backButton = new JButton("Trở về");
         backButton.setPreferredSize(new Dimension(150, 40));
         backButton.setFont(pixelFont.deriveFont(12f));
-        backButton.setBackground(Color.RED);
+        backButton.setBackground(new Color(204, 0, 0));
         backButton.setForeground(Color.WHITE);
         backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Align buttons to the center
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0)); // Align buttons to the center with 30px horizontal gap
         buttonPanel.add(inviteButton);
         buttonPanel.add(backButton);
         buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(new EmptyBorder(0, 0, 10, 0)); // Add 10px padding to the bottom
 
         inviteButton.addActionListener(e -> {
             int selectedRow = playerTable.getSelectedRow();
@@ -155,24 +190,21 @@ public class InviteScreen extends JFrame {
                 inviteController.invitePlayer(currentPlayerID, playerID, playerName, new InviteController.InviteCallback() {
                     @Override
                     public void onInviteTimeout(String playerID) {
-                        // Kích hoạt lại nút mời khi hết thời gian chờ
                         inviteButton.setEnabled(true);
                         JOptionPane.showMessageDialog(InviteScreen.this, "Thời gian mời đã hết, bạn có thể mời lại người chơi.");
                     }
 
                     @Override
                     public void onInviteAccepted(String playerID, String roomId) {
-                        // Xử lý khi lời mời được chấp nhận
-                        inviteButton.setEnabled(true); // Kích hoạt lại nút mời
+                        inviteButton.setEnabled(true);
                         JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi " + playerName + " đã chấp nhận lời mời!");
                         dispose();
-                        // Chuyển sang màn game
                         new RunGame(currentPlayerID, roomId).setVisible(true);
                     }
 
                     @Override
                     public void onInviteDeclined(String playerID) {
-                        inviteButton.setEnabled(true); // Kích hoạt lại nút mời
+                        inviteButton.setEnabled(true);
                         JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi " + playerName + " đã từ chối lời mời.");
                     }
                 });
@@ -185,11 +217,64 @@ public class InviteScreen extends JFrame {
     }
 
     private void loadListFriends() {
+        // Xóa bảng hiện tại ra khỏi `tablePanel`
+        tablePanel.removeAll();
+
+        // Tạo lại bảng và thanh cuộn mới
+        model = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        playerTable = new JTable(model);
+        playerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        playerTable.setRowHeight(25);
+        playerTable.setFont(pixelFont);
+        playerTable.setBackground(new Color(255, 255, 255, 128));
+        playerTable.setGridColor(Color.WHITE);
+
+        playerTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f));
+        playerTable.getTableHeader().setForeground(Color.BLACK);
+        playerTable.getTableHeader().setBackground(new Color(255, 255, 255)); // nếu muốn nền trắng
+
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setHorizontalAlignment(JLabel.CENTER);
+                label.setFont(pixelFont.deriveFont(Font.BOLD, 12f));  // Đặt font chữ đậm ở đây
+                label.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.WHITE)); // Đặt viền trắng
+                return label;
+            }
+        };
+
+        for (int i = 0; i < playerTable.getColumnModel().getColumnCount(); i++) {
+            playerTable.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+        }
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        playerTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        playerTable.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+        playerTable.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+
+        JScrollPane scrollPane = new JScrollPane(playerTable);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(new LineBorder(Color.WHITE, 2));
+
+        // Thêm lại bảng mới vào `tablePanel`
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Thêm dữ liệu mới vào bảng
         inviteController.getListFriends(currentPlayerID, new InviteController.AvailablePlayersCallback() {
             @Override
             public void onAvailablePlayersReceived(List<Player> players) {
-                model.setRowCount(0);
+                int cnt = 0;
                 for (Player player : players) {
+                    cnt++;
                     model.addRow(new Object[]{
                             player.getPlayerID(),
                             player.getUsername(),
@@ -197,9 +282,24 @@ public class InviteScreen extends JFrame {
                             "Online"
                     });
                 }
+
+                int maxRows = 14;
+                for (int i = cnt; i < maxRows; i++) {
+                    model.addRow(new Object[]{
+                            "",
+                            "",
+                            "",
+                            ""
+                    });
+                }
             }
         });
+
+        // Cập nhật lại giao diện
+        tablePanel.revalidate();
+        tablePanel.repaint();
     }
+
 
     private static class BackgroundPanel extends JPanel {
         private Image backgroundImage;
