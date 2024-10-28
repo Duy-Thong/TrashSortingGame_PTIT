@@ -16,8 +16,8 @@ public class AccountManagementScreen extends JFrame {
     private AccountManagementController accountManagementController;
 
     public AccountManagementScreen() {
-        setTitle("Account Management");
-        setSize(800, 600);
+        setTitle("Quản lý tài khoản");
+        setSize(800, 540);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -25,11 +25,11 @@ public class AccountManagementScreen extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
 
-        JButton btnAdd = new JButton("Add");
-        JButton btnEdit = new JButton("Edit");
-        JButton btnDelete = new JButton("Delete");
-        JButton btnRefresh = new JButton("Refresh");
-        JButton btnBack = new JButton("Back");
+        JButton btnAdd = new JButton("Thêm");
+        JButton btnEdit = new JButton("Sửa");
+        JButton btnDelete = new JButton("Xóa");
+        JButton btnRefresh = new JButton("Tải lại");
+        JButton btnBack = new JButton("Quay lại");
 
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnEdit);
@@ -38,7 +38,7 @@ public class AccountManagementScreen extends JFrame {
         buttonPanel.add(btnBack);
 
         // Create table for account data
-        String[] columnNames = {"Account ID", "Username", "Password", "Role"};
+        String[] columnNames = {"Mã tài khoản", "Tên đăng nhập", "Mật khẩu", "Vai trò"};
         tableModel = new DefaultTableModel(columnNames, 0);
         accountTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(accountTable);
@@ -73,7 +73,7 @@ public class AccountManagementScreen extends JFrame {
                     new EditAccountDialog(AccountManagementScreen.this, accountID).setVisible(true);
                     loadAccountData();
                 } else {
-                    JOptionPane.showMessageDialog(AccountManagementScreen.this, "Please select an account to edit.");
+                    JOptionPane.showMessageDialog(AccountManagementScreen.this, "Vui lòng chọn một tài khoản để sửa.");
                 }
             }
         });
@@ -87,7 +87,7 @@ public class AccountManagementScreen extends JFrame {
                     String accountID = (String) tableModel.getValueAt(selectedRow, 0);
                     deleteAccount(accountID);
                 } else {
-                    JOptionPane.showMessageDialog(AccountManagementScreen.this, "Please select an account to delete.");
+                    JOptionPane.showMessageDialog(AccountManagementScreen.this, "Vui lòng chọn một tài khoản để xóa.");
                 }
             }
         });

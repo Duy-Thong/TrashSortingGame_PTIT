@@ -20,7 +20,7 @@ public class AdminDashboardScreen {
         Font customFont = loadCustomFont("../../assets/FVF.ttf"); // Adjust the path to your font file
 
         // Create JFrame for Admin Dashboard
-        JFrame adminFrame = new JFrame("Admin Dashboard");
+        JFrame adminFrame = new JFrame("Trang quản trị");
         adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         adminFrame.setSize(810, 540);
         adminFrame.setLocationRelativeTo(null);
@@ -89,18 +89,19 @@ public class AdminDashboardScreen {
         adminFrame.add(backgroundLabel);
         adminFrame.setVisible(true);
     }
-
+    // Method to create a custom button
     // Method to create a custom button
     private JButton createCustomButton(String text, Font customFont, int width, int height) {
         JButton button = new JButton(text);
-        button.setFont(customFont.deriveFont(Font.BOLD, 12)); // Use custom font
+        button.setFont(customFont.deriveFont(Font.BOLD, 12)); // Use custom font with smaller size
         button.setForeground(Color.WHITE);
-        button.setBackground(new Color(0, 102, 204)); // Customize button color
+        button.setBackground(new Color(0, 0, 0, 150)); // Semi-transparent black (0, 0, 0 is black, 150 is the alpha value)
         button.setFocusPainted(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(new Dimension(width, height)); // Set custom size
         return button;
     }
+
 
     // Load custom font method
     private Font loadCustomFont(String fontPath) {

@@ -16,7 +16,7 @@ public class ItemDialog extends JDialog {
     private boolean isTrash;
 
     public ItemDialog(JFrame parent, Object item, boolean isTrash) {
-        super(parent, "Item", true);
+        super(parent, "Vật phẩm", true);
         this.isTrash = isTrash;
 
         if (isTrash) {
@@ -26,11 +26,11 @@ public class ItemDialog extends JDialog {
         }
 
         setLayout(new GridLayout(4, 2));
-        add(new JLabel("Name:"));
+        add(new JLabel("Tên vật phẩm:")); // Thay đổi nhãn
         txtName = new JTextField();
         add(txtName);
 
-        add(new JLabel("Type:"));
+        add(new JLabel("Loại vật phẩm:")); // Thay đổi nhãn
         txtType = new JTextField();
         add(txtType);
 
@@ -38,6 +38,7 @@ public class ItemDialog extends JDialog {
         txtUrl = new JTextField();
         add(txtUrl);
 
+        // Điền thông tin nếu có
         if (isTrash) {
             if (trashItem != null) {
                 txtName.setText(trashItem.getName());
@@ -52,11 +53,11 @@ public class ItemDialog extends JDialog {
             }
         }
 
-        JButton btnSave = new JButton("Save");
+        JButton btnSave = new JButton("Lưu");
         btnSave.addActionListener(e -> saveItem());
         add(btnSave);
 
-        JButton btnCancel = new JButton("Cancel");
+        JButton btnCancel = new JButton("Hủy");
         btnCancel.addActionListener(e -> dispose());
         add(btnCancel);
 
@@ -69,11 +70,13 @@ public class ItemDialog extends JDialog {
         String type = txtType.getText();
         String url = txtUrl.getText();
 
+        // Kiểm tra hợp lệ
         if (name.isEmpty() || type.isEmpty() || url.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Name, Type, and URL cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Tên vật phẩm, Loại và URL không được để trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
+        // Lưu thông tin vật phẩm
         if (isTrash) {
             String id = (trashItem != null) ? trashItem.getId() : java.util.UUID.randomUUID().toString();
             trashItem = new TrashItem(id, name, type, url);

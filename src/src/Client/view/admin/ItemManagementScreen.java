@@ -28,7 +28,7 @@ public class ItemManagementScreen extends JFrame {
     }
 
     private void initializeUI() {
-        setTitle("Item Management");
+        setTitle("Quản lý vật phẩm"); // Title in Vietnamese
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -39,11 +39,11 @@ public class ItemManagementScreen extends JFrame {
 
         // Trash items tab
         JPanel trashPanel = createTrashPanel();
-        tabbedPane.addTab("Trash Items", trashPanel);
+        tabbedPane.addTab("Vật phẩm rác", trashPanel); // Trash Items in Vietnamese
 
         // Bin items tab
         JPanel binPanel = createBinPanel();
-        tabbedPane.addTab("Bin Items", binPanel);
+        tabbedPane.addTab("Thùng rác", binPanel); // Bin Items in Vietnamese
 
         add(tabbedPane, BorderLayout.CENTER);
 
@@ -52,7 +52,7 @@ public class ItemManagementScreen extends JFrame {
 
     private JPanel createTrashPanel() {
         JPanel trashPanel = new JPanel(new BorderLayout());
-        trashTableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Type", "Image", "URL"}, 0) {
+        trashTableModel = new DefaultTableModel(new Object[]{"ID", "Tên", "Loại", "Hình ảnh", "URL"}, 0) {
             public Class getColumnClass(int column) {
                 return (column == 3) ? ImageIcon.class : Object.class; // Set ImageIcon class for image column
             }
@@ -70,7 +70,7 @@ public class ItemManagementScreen extends JFrame {
 
     private JPanel createBinPanel() {
         JPanel binPanel = new JPanel(new BorderLayout());
-        binTableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Type", "Image", "URL"}, 0) {
+        binTableModel = new DefaultTableModel(new Object[]{"ID", "Tên", "Loại", "Hình ảnh", "URL"}, 0) {
             public Class getColumnClass(int column) {
                 return (column == 3) ? ImageIcon.class : Object.class; // Set ImageIcon class for image column
             }
@@ -112,21 +112,20 @@ public class ItemManagementScreen extends JFrame {
 
     private JPanel createButtonPanel(boolean isTrash) {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnAdd = new JButton("Add");
-        JButton btnEdit = new JButton("Edit");
-        JButton btnDelete = new JButton("Delete");
-        JButton btnBack = new JButton("Back"); // Add the Back button
+        JButton btnAdd = new JButton("Thêm"); // Add in Vietnamese
+        JButton btnEdit = new JButton("Sửa"); // Edit in Vietnamese
+        JButton btnDelete = new JButton("Xóa"); // Delete in Vietnamese
+        JButton btnBack = new JButton("Quay lại"); // Back in Vietnamese
 
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnEdit);
         buttonPanel.add(btnDelete);
-        buttonPanel.add(btnBack); // Add Back button to panel
+        buttonPanel.add(btnBack);
 
         btnAdd.addActionListener(e -> addItem(isTrash));
         btnEdit.addActionListener(e -> editItem(isTrash));
         btnDelete.addActionListener(e -> deleteItem(isTrash));
 
-        // Add action listener for the Back button
         btnBack.addActionListener(e -> {
             dispose(); // Close the current screen
             // Optionally, you can navigate to another screen or main menu here
@@ -182,7 +181,7 @@ public class ItemManagementScreen extends JFrame {
             }
             refreshTables(); // Refresh tables after editing
         } else {
-            JOptionPane.showMessageDialog(this, "Please select an item to edit.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một vật phẩm để sửa.", "Lỗi", JOptionPane.ERROR_MESSAGE); // Error message in Vietnamese
         }
     }
 
@@ -198,7 +197,7 @@ public class ItemManagementScreen extends JFrame {
             }
             refreshTables(); // Refresh tables after deletion
         } else {
-            JOptionPane.showMessageDialog(this, "Please select an item to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một vật phẩm để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE); // Error message in Vietnamese
         }
     }
 
@@ -215,7 +214,7 @@ public class ItemManagementScreen extends JFrame {
             Image scaledImage = originalImage.getScaledInstance(widthImage, heightImage, Image.SCALE_SMOOTH);
             return new ImageIcon(scaledImage);
         } catch (IOException e) {
-            System.err.println("Error loading image from URL: " + e.getMessage());
+            System.err.println("Lỗi khi tải hình ảnh từ URL: " + e.getMessage()); // Error message in Vietnamese
             return null;
         }
     }

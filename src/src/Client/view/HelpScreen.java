@@ -21,7 +21,7 @@ public class HelpScreen {
     public HelpScreen() {
         helpFrame = new JFrame("Hướng dẫn");
         helpFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        helpFrame.setSize(810, 600); // Increased height for bin display
+        helpFrame.setSize(810, 540); // Increased height for bin display
         helpFrame.setLocationRelativeTo(null);
         helpFrame.setLayout(new BorderLayout());
 

@@ -868,7 +868,7 @@ public class Server {
     private static List<TrashItem> getTrashItemData() {
         List<TrashItem> trashItems = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT * FROM trashitem";
+            String query = "SELECT * FROM trashitem ORDER BY type";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
@@ -887,7 +887,7 @@ public class Server {
     private static List<Bin> getBinData() {
         List<Bin> bins = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT * FROM trashbin";
+            String query = "SELECT * FROM trashbin ORDER BY type";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
@@ -961,7 +961,7 @@ public class Server {
     }
     public static boolean updateTrashItem(String itemID, String name, String type, String url) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "UPDATE trashitem SET name = ?, type = ?, img_url = ?, updated_at = NOW() WHERE itemID = ?";
+            String query = "UPDATE trashitem SET name = ?, type = ?, img_url = ?WHERE itemID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, name);
                 stmt.setString(2, type);
@@ -976,7 +976,7 @@ public class Server {
     }
     public static boolean updateBin(String binID, String name, String type, String url) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "UPDATE trashbin SET name = ?, type = ?, img_url = ?, updated_at = NOW() WHERE binID = ?";
+            String query = "UPDATE trashbin SET name = ?, type = ?, img_url = ? WHERE binID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, name);
                 stmt.setString(2, type);

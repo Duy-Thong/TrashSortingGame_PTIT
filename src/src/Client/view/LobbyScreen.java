@@ -118,16 +118,18 @@ public class LobbyScreen {
     }
 
     // Method to create a custom button
+    // Method to create a custom button
     private JButton createCustomButton(String text, Font customFont, int width, int height) {
         JButton button = new JButton(text);
         button.setFont(customFont.deriveFont(Font.BOLD, 12)); // Use custom font with smaller size
         button.setForeground(Color.WHITE);
-        button.setBackground(new Color(0, 102, 204)); // Customize button color
+        button.setBackground(new Color(0, 0, 0, 120)); // Semi-transparent black (0, 0, 0 is black, 150 is the alpha value)
         button.setFocusPainted(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(new Dimension(width, height)); // Set custom size
         return button;
     }
+
 
     // Load custom font method
     private Font loadCustomFont(String fontPath) {
