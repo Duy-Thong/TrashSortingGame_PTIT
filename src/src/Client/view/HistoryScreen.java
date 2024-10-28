@@ -41,7 +41,7 @@ public class HistoryScreen extends JFrame {
         setLayout(new BorderLayout());
 
         // Sử dụng BackgroundPanel cho ảnh nền
-        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_lobby.gif")).getImage());
+        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_notext.png")).getImage());
         backgroundPanel.setLayout(new BorderLayout());
 
         // Tạo panel tiêu đề

@@ -42,7 +42,7 @@ public class ProfileScreen extends JFrame {
         setLocationRelativeTo(null);
 
         // Sử dụng BackgroundPanel cho ảnh nền
-        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_lobby.gif")).getImage());
+        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_notext.png")).getImage());
         backgroundPanel.setLayout(new BorderLayout());
 
         createBackButton();

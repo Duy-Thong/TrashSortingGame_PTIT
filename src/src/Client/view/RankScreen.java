@@ -39,7 +39,7 @@ public class RankScreen extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_lobby.gif")).getImage());
+        BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_notext.jpg")).getImage());
         backgroundPanel.setLayout(new BorderLayout());
 
         JPanel titlePanel = createTitlePanel();
@@ -64,30 +64,28 @@ public class RankScreen extends JFrame {
             }
         };
 
+        // Set the row height to make rows taller
+        rankTable.setRowHeight(25); // Set the desired height (e.g., 30 pixels)
+
         rankTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         rankTable.setFont(pixelFont);
         rankTable.setOpaque(false); // Đặt bảng trong suốt
         rankTable.setBackground(new Color(0, 0, 0, 0)); // Đặt nền bảng trong suốt
-        rankTable.setGridColor(Color.LIGHT_GRAY); // Đặt màu viền giữa các ô
+        rankTable.setGridColor(Color.WHITE); // Đặt màu viền giữa các ô
 
-        // Thiết lập màu chữ cho header của bảng
-        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
-        headerRenderer.setForeground(Color.BLACK); // Màu đen cho chữ trong header
-        headerRenderer.setBackground(null); // Đặt nền tiêu đề bảng trong suốt
-        headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        rankTable.getTableHeader().setDefaultRenderer(headerRenderer);
         rankTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f));
+        rankTable.getTableHeader().setOpaque(false); // Đặt tiêu đề bảng trong suốt
+        rankTable.getTableHeader().setBackground(null); // Đặt nền tiêu đề bảng trong suốt
+        rankTable.getTableHeader().setForeground(Color.BLACK); // Đặt màu chữ tiêu đề trắng
 
-        // Thiết lập màu chữ cho các ô dữ liệu thành trắng
+        // Thiết lập màu chữ trắng cho nội dung của bảng
         DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
-        cellRenderer.setForeground(Color.WHITE); // Màu trắng cho chữ trong các ô dữ liệu
+        cellRenderer.setForeground(Color.WHITE);
         rankTable.setDefaultRenderer(Object.class, cellRenderer);
 
         // Căn giữa cho tất cả các cột
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-
-        // Căn giữa cho tất cả các cột
         for (int i = 0; i < columnNames.length; i++) {
             rankTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
@@ -97,7 +95,7 @@ public class RankScreen extends JFrame {
         for (Player player : topPlayers) {
             model.addRow(new Object[]{
                     stt++,
-                    player.getUsername(), // Cột "Tên người chơi" cũng sẽ có chữ màu trắng
+                    player.getUsername(),
                     player.getTotalScore(),
                     player.getTotalWins(),
                     player.getTotalGames()
@@ -134,7 +132,7 @@ public class RankScreen extends JFrame {
         backButton = new JButton("Trở về");
         backButton.setPreferredSize(new Dimension(150, 40));
         backButton.setFont(pixelFont.deriveFont(12f));
-        backButton.setBackground(Color.RED);
+        backButton.setBackground(new Color(204, 0, 0));
         backButton.setForeground(Color.WHITE);
         backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
