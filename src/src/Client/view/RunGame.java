@@ -188,7 +188,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
         for(int i = 0;i < binItemsDefaul.size(); i++)
         {
             Bin bin = binItemsDefaul.get(i);
-            return (trash.getType().equals(bin.getType()) && trash.getX() == bin.getX());
+            if (trash.getType().equals(bin.getType()) && trash.getX() == bin.getX()) return true;
         }
         return false;
     }
