@@ -7,8 +7,21 @@ import java.awt.*;
  * @author vutuyen
  */
 public class EndGame extends JFrame {
-    public EndGame(RunGame parentGame, String winner) {
-        setTitle("WIN!");
+
+    String namePlayer1;
+    String namePlayer2;
+    int scorePlayer1;
+    int scorePlayer2;
+    String result;
+    public EndGame(RunGame parentGame, String result, String namePlayer1, String namePlayer2, int scorePlayer1, int scorePlayer2) {
+
+        this.namePlayer1 = namePlayer1;
+        this.namePlayer2 = namePlayer2;
+        this.scorePlayer1 = scorePlayer1;
+        this.scorePlayer2 = scorePlayer2;
+        this.result = result;
+
+        setTitle(result);
         setSize(810, 540);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -26,13 +39,14 @@ public class EndGame extends JFrame {
         };
         add(panel, BorderLayout.CENTER);
 
-        JLabel scoreLabel = new JLabel("Điểm: " + winner, SwingConstants.CENTER);
+        JLabel scoreLabel = new JLabel("Điểm: " + result, SwingConstants.CENTER);
         scoreLabel.setFont(new Font("Arial", Font.BOLD, 24));
         add(scoreLabel, BorderLayout.NORTH);
 
         JButton restartButton = new JButton("Trở về");
         restartButton.addActionListener(e -> {
-            parentGame.restartGame();
+//            parentGame.restartGame();
+            new LobbyScreen(parentGame.playerId, parentGame.namePlayer1);
             this.dispose();
         });
         add(restartButton, BorderLayout.SOUTH);

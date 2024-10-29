@@ -66,4 +66,29 @@ public class UDPClient {
     public void setmUpdateUI(updateUI mUpdateUI) {
         this.mUpdateUI = mUpdateUI;
     }
+
+    // Cập nhật player_game
+    public void sendScoreUpdatePlayerGame(String playerId, String gameId, int score, String result) {
+        try {
+            String message = "type=update_player_game&" +"playerId="+ playerId + "&" + "gameId=" + gameId + "&" + "score=" + score + "&" + "result=" + result ;
+            byte[] sendData = message.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
+            socket.send(sendPacket);
+            System.out.println("Sent to sv: " + message + " to " + serverAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendUpdatePlayer(String playerId, int score, String result) {
+        try {
+            String message = "type=update_player&" +"playerId="+ playerId + "&" + "score=" + score + "&" + "result=" + result ;
+            byte[] sendData = message.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
+            socket.send(sendPacket);
+            System.out.println("Sent to sv: " + message + " to " + serverAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
