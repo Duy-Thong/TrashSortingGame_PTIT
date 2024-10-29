@@ -6,9 +6,15 @@ import Client.model.TrashItem;
 import Client.controller.DataController;
 import Client.model.UDPClient;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.List;
@@ -36,6 +42,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     private ArrayList<Integer> listIndex = new ArrayList<>();
     private ArrayList<Bin> binItemsDefaul = new ArrayList<>();
     private List<String> listTypes = new ArrayList<>();
+    private BufferedImage backgroundImage;
     UDPClient  udpClient;
 
     // Loop game
@@ -49,10 +56,18 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        try{
+            backgroundImage = ImageIO.read(getClass().getResource("../assets/play_game3.jpg"));
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
         setTitle("Waste Sorting Game");
         setSize(width, height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setResizable(false);
         setLayout(new BorderLayout());
         addKeyListener(new KeyHandler());
         loadIndexs();
@@ -89,7 +104,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
         for (int i = 0; i < listTypes.size(); i++) {
             binItemsDefaul.add(new Bin(listIndex.get(i), getHeight(), listTypes.get(i), ls.get(i)));
             Bin tmp = binItemsDefaul.getLast();
-            tmp.setY(getHeight() - 100);
+            tmp.setY(getHeight() - 110);
         }
     }
 
@@ -99,6 +114,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
+                g.drawImage(backgroundImage, 0, 0, null);
                 if(!trashItems.isEmpty()) trashItems.getFirst().draw(g);
                 for(int i = 0;i  < binItemsDefaul.size(); i++) {
                     binItemsDefaul.get(i).draw(g);
@@ -111,9 +127,15 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     // set up topbar game
     private void setupTopPanel() {
         JPanel topPanel = new JPanel(new GridLayout(1, 3));
+        Font customFont = loadCustomFont("../assets/FVF.ttf");
+        topPanel.setOpaque(false); // Đặt panel trong suốt
         player1ScoreLabel = new JLabel("Player1: 0 points");
+        player1ScoreLabel.setFont(customFont.deriveFont(Font.BOLD, 13));
         timerLabel = new JLabel("Time:" + secondsLeft, SwingConstants.CENTER);
+        timerLabel.setFont(customFont.deriveFont(Font.BOLD, 13));
         player2ScoreLabel = new JLabel("Player2: 0 points", SwingConstants.RIGHT);
+        player2ScoreLabel.setFont(customFont.deriveFont(Font.BOLD, 13));
+
         topPanel.add(player1ScoreLabel);
         topPanel.add(timerLabel);
         topPanel.add(player2ScoreLabel);
@@ -176,7 +198,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     private void moveTrashItems() {
         TrashItem item = trashItems.getFirst();
         item.move();
-        if (item.getY() > getHeight() - 80) {
+        if (item.getY() > getHeight() - 110) {
             trashItems.removeFirst();
             if( isCorrectBin(item))
                 updateScorePlayer1();
@@ -272,5 +294,16 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
         trashTimer.restart();
         this.setVisible(true);
     }
-
+    // Load custom font method
+    private Font loadCustomFont(String fontPath) {
+        try (InputStream is = getClass().getResourceAsStream(fontPath)) {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(customFont);
+            return customFont;
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+            return new Font("Serif", Font.PLAIN, 18); // Fallback to default font if loading fails
+        }
+    }
 }
