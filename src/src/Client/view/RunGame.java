@@ -1,7 +1,9 @@
 package Client.view;
 
 import Client.Constants;
+import Client.controller.ProfileController;
 import Client.model.Bin;
+import Client.model.Player;
 import Client.model.TrashItem;
 import Client.controller.DataController;
 import Client.model.UDPClient;
@@ -37,11 +39,14 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     private ArrayList<Bin> binItemsDefaul = new ArrayList<>();
     private List<String> listTypes = new ArrayList<>();
     UDPClient  udpClient;
-
+    String playerId2 = "";
+    String namePlayer1 = "";
+    String namePlayer2 = "";
     // Loop game
-    public RunGame(String roomId, String playerId) {
+    public RunGame(String roomId, String playerId, String playerId2) {
         this.roomId = roomId;
         this.playerId = playerId;
+        this.playerId2 = playerId2;
         try {
             udpClient = new UDPClient(Constants.IP_SERVER,Constants.PORT);
             udpClient.setmUpdateUI(this);
@@ -49,6 +54,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        getNamePlayer();
         setTitle("Waste Sorting Game");
         setSize(width, height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -111,9 +117,9 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     // set up topbar game
     private void setupTopPanel() {
         JPanel topPanel = new JPanel(new GridLayout(1, 3));
-        player1ScoreLabel = new JLabel("Player1: 0 points");
+        player1ScoreLabel = new JLabel(namePlayer1 + ": 0 points");
         timerLabel = new JLabel("Time:" + secondsLeft, SwingConstants.CENTER);
-        player2ScoreLabel = new JLabel("Player2: 0 points", SwingConstants.RIGHT);
+        player2ScoreLabel = new JLabel(namePlayer2 + ": 0 points", SwingConstants.RIGHT);
         topPanel.add(player1ScoreLabel);
         topPanel.add(timerLabel);
         topPanel.add(player2ScoreLabel);
@@ -196,13 +202,13 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     // update score
     private void updateScorePlayer1() {
         player1Score += 10;
-        player1ScoreLabel.setText("Player1: " + player1Score + " points");
+        player1ScoreLabel.setText(namePlayer1 + ": " + player1Score + " points");
         udpClient.sendScoreUpdate(playerId, player1Score, roomId);
     }
 
     private void updateScorePlayer2() {
         player2Score += 10;
-        player2ScoreLabel.setText("Player2: " + player2Score + " points");
+        player2ScoreLabel.setText(namePlayer2 + ": " + player2Score + " points");
     }
 
     // show EndGame
@@ -216,9 +222,9 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     // Who win?
     private String determineWinner() {
         if (player1Score > player2Score) {
-            return "Player 1";
+            return namePlayer1;
         } else if (player2Score > player1Score) {
-            return "Player 2";
+            return namePlayer2;
         } else {
             return "It's a tie!";
         }
@@ -264,13 +270,21 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
         frametime = TIMER;
         player1Score = 0;
         player2Score = 0;
-        player1ScoreLabel.setText("Player1: 0 points");
-        player2ScoreLabel.setText("Player2: 0 points");
+        player1ScoreLabel.setText(namePlayer1+": 0 points");
+        player2ScoreLabel.setText(namePlayer2+": 0 points");
         timerLabel.setText("Time: " + secondsLeft);
         trashItems.clear();
         gameTimer.restart();
         trashTimer.restart();
         this.setVisible(true);
+    }
+
+    private void getNamePlayer() {
+        Player player1 = new ProfileController().getPlayerProfile(playerId);
+        this.namePlayer1 = player1.getUsername();
+
+        Player player2 = new ProfileController().getPlayerProfile(playerId2);
+        this.namePlayer2 = player2.getUsername();
     }
 
 }

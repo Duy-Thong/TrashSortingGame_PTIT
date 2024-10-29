@@ -200,6 +200,9 @@ public class InviteScreen extends JFrame {
                         JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi " + playerName + " đã chấp nhận lời mời!");
                         dispose();
                         new RunGame(currentPlayerID, roomId).setVisible(true);
+                        // Chuyển sang màn game
+//                        new WasteSortingGame();
+                        new RunGame(roomId,currentPlayerID,playerID).setVisible(true);
                     }
 
                     @Override
