@@ -111,6 +111,7 @@ public class LobbyScreen {
 
         btnEnterGame.addActionListener(e -> {
             JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
+            lobbyFrame.dispose();
             new InviteScreen(playerID, username);
         });
         btnHelp.addActionListener(e -> {
