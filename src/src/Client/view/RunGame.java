@@ -25,7 +25,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     private JLabel player2ScoreLabel;
     private Timer gameTimer, trashTimer;
     private JPanel gamePanel;
-    private int TIMER = 50000, TIMEPLAY = 500;
+    private int TIMER = 3000, TIMEPLAY = 30;
     private int secondsLeft = TIMEPLAY, frametime = TIMER;
     private int player1Score = 0;
     private int player2Score = 0;

@@ -197,7 +197,6 @@ public class InviteScreen extends JFrame {
                     @Override
                     public void onInviteAccepted(String playerID, String roomId) {
                         inviteButton.setEnabled(true);
-                        JOptionPane.showMessageDialog(InviteScreen.this, "Người chơi " + playerName + " đã chấp nhận lời mời!");
                         dispose();
                         // Chuyển sang màn game
                         new RunGame(roomId,currentPlayerID,playerID).setVisible(true);
