@@ -29,6 +29,10 @@ public class LoginController {
             // Xử lý phản hồi
             String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
             if (response.equals("login success")) {
+                String message2 = "type=setPlaying&playerid=" + getPlayerIDByAccountID(getAccountIDByUsername(username));
+                byte[] buffer2 = message2.getBytes();
+                DatagramPacket packet2 = new DatagramPacket(buffer2, buffer2.length, serverAddress, SERVER_PORT);
+                socket.send(packet2);
                 new Thread(new InviteController.InviteListener()).start();
                 return true;
             } else {

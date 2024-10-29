@@ -422,6 +422,11 @@ public class Server {
                             response = "update failure";
                         }
                         break;
+                    case "setPlaying":
+                        playerID = parts[1].split("=")[1];
+                        setPlaying(playerID);
+                        response = "success";
+                        break;
 
                     default:
                         response = "error: unknown request";
@@ -1116,4 +1121,16 @@ public class Server {
             return false;
         }
     }
+    public static void setPlaying(String playerID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "UPDATE player SET isPlaying = 0 WHERE playerID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, playerID);
+                stmt.executeUpdate();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
