@@ -81,8 +81,16 @@ public class EditAccountDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "Tên đăng nhập và Mật khẩu không được để trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        accountManagementController.updateAccount(accountID, username, password, role);
-        JOptionPane.showMessageDialog(this, "Tài khoản đã được cập nhật thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-        dispose();  // Đóng hộp thoại sau khi lưu
+
+        // Assuming the AccountManagementController has a method to update an account
+        if (accountManagementController.updateAccount(accountID, username, password, role)==1) {
+            JOptionPane.showMessageDialog(this, "Cập nhật tài khoản thành công.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            dispose();  // Đóng hộp thoại sau khi cập nhật thành công
+        } else if (accountManagementController.updateAccount(accountID, username, password, role)==-1) {
+            JOptionPane.showMessageDialog(this, "Tên tài khoản đã tồn tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Cập nhật tài khoản thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

@@ -73,7 +73,7 @@ public class AccountManagementController {
         Account account = loginController.getAccountByAccountID(accountID);
         return account;
     }
-    public static void updateAccount(String accountID, String username, String password, String role) {
+    public static int updateAccount(String accountID, String username, String password, String role) {
         try (DatagramSocket socket = new DatagramSocket()) {
             // Tạo gọi tin định nghĩa này
             String message = "type=updateAccount&accountID=" + accountID + "&username=" + username + "&password=" + password + "&role=" + role;
@@ -82,12 +82,26 @@ public class AccountManagementController {
             InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
             socket.send(packet);
+            // Nhận phản hồi từ server
+            byte[] responseBuffer = new byte[1024];
+            DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
+            socket.receive(responsePacket);
+            String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
+            if(response.equals("update success")){
+                return 1;
+            }else if(response.equals("name existed")){
+                return -1;
+            }
+            else {
+                return 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return 0;
     }
 
-    public boolean addAccount(String username, String password, String role) {
+    public int addAccount(String username, String password, String role) {
         try (DatagramSocket socket = new DatagramSocket()) {
             // Tạo gọi tin định nghĩa này
             String message = "type=addAccount&username=" + username + "&password=" + password + "&role=" + role;
@@ -96,10 +110,22 @@ public class AccountManagementController {
             InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
             socket.send(packet);
+            // Nhận phản hồi từ server
+            byte[] responseBuffer = new byte[1024];
+            DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
+            socket.receive(responsePacket);
+            String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
+            if(response.equals("add success")){
+                return 1;
+            }else if(response.equals("name existed")){
+                return -1;
+            }
+            else {
+                return 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 0;
         }
-        return true;
     }
 }

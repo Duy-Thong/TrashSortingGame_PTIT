@@ -308,9 +308,13 @@ public class Server {
                         username = parts[2].split("=")[1];
                         password = parts[3].split("=")[1];
                         String role = parts[4].split("=")[1];
-                        if (updateAccount(accountID, username, password, role)) {
+                        if(updateAccount(accountID, username, password, role)==1) {
                             response = "update success";
-                        } else {
+                        }
+                        else if(updateAccount(accountID, username, password, role)==-1) {
+                            response = "name existed";
+                        }
+                        else {
                             response = "update failure";
                         }
                         break;
@@ -318,8 +322,10 @@ public class Server {
                         username = parts[1].split("=")[1];
                         password = parts[2].split("=")[1];
                         role = parts[3].split("=")[1];
-                        if (addAccount(username, password, role)) {
+                        if(addAccount(username, password, role)==1) {
                             response = "add success";
+                        } else if (addAccount(username, password, role)==-1) {
+                            response ="name existed";
                         } else {
                             response = "add failure";
                         }
@@ -902,46 +908,43 @@ public class Server {
             return false;
         }
     }
-    private static boolean updateAccount(String accountID, String username, String password, String role) {
+    private static int updateAccount(String accountID, String username, String password, String role) {
         String oldUsername = getAccountbyID(accountID).split("&")[0].split("=")[1];
-        System.out.println("Old Username: " + oldUsername);
-        System.out.println("New Username: " + username);
-
-        if (oldUsername.equals(username)) {
+        // Check if the old username matches the new username or if the new username is unique
+        if (oldUsername.equals(username) || !isUsernameExists(username)) {
             return updateAccountInDB(accountID, username, password, role);
         } else {
-            if (isUsernameExists(username)) {
-                return false;
-            } else {
-                return updateAccountInDB(accountID, username, password, role);
-            }
+            // Username already exists, return error code
+            return -1;
         }
     }
 
+    // Method to perform the database update for the account
+    private static int updateAccountInDB(String accountID, String username, String password, String role) {
+        String query = "UPDATE account SET username = ?, password = ?, role = ?, updated_at = NOW() WHERE accountID = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
 
-    // Phương thức để thực hiện cập nhật tài khoản trong cơ sở dữ liệu
-    private static boolean updateAccountInDB(String accountID, String username, String password, String role) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "UPDATE account SET username = ?, password = ?, role = ?, updated_at = NOW() WHERE accountID = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, username);
-                stmt.setString(2, password);
-                stmt.setString(3, role);
-                stmt.setString(4, accountID);
-                return stmt.executeUpdate() > 0;
-            }
-        } catch (Exception e) {
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            stmt.setString(3, role);
+            stmt.setString(4, accountID);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0 ? 1 : 0;
+
+        } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 
-    private static boolean addAccount(String username, String password, String role) {
+
+    private static int addAccount(String username, String password, String role) {
         // Kiểm tra xem tên đăng nhập đã tồn tại chưa
         if (isUsernameExists(username)) {
-            return false; // Tên đăng nhập đã tồn tại, không thêm tài khoản
+            return -1; // Tên đăng nhập đã tồn tại, không thêm tài khoản
         }
-
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String accountID = UUID.randomUUID().toString();
             String query = "INSERT INTO account (accountID, username, password, role, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
@@ -950,11 +953,19 @@ public class Server {
                 stmt.setString(2, username);
                 stmt.setString(3, password);
                 stmt.setString(4, role);
-                return stmt.executeUpdate() > 0; // Thêm thành công
+
+                // Execute the insert statement
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    return createPlayer(accountID); // Call to createPlayer only if account creation was successful
+                } else {
+                    return 0; // Failed to insert account
+                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-            return false; // Thêm thất bại
+            return 0; // Handle exceptions accordingly
         }
     }
     private static boolean isUsernameExists(String username) {

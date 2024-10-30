@@ -77,12 +77,14 @@ public class AddAccountDialog extends JDialog {
         }
 
         // Assuming the AccountManagementController has a method to add a new account
-        boolean success = accountManagementController.addAccount(username, password, role);
-        if (success) {
-            JOptionPane.showMessageDialog(this, "Thêm tài khoản thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-            dispose();  // Close the dialog after saving
+        int result = accountManagementController.addAccount(username, password, role);
+        if (result == 1) {
+            JOptionPane.showMessageDialog(this, "Thêm tài khoản thành công.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            dispose();  // Close the dialog
+        } else if (result == -1) {
+            JOptionPane.showMessageDialog(this, "Tên tài khoản đã tồn tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(this, "Thêm tài khoản thất bại. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Thêm tài khoản thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
