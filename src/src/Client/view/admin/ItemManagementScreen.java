@@ -11,7 +11,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ItemManagementScreen extends JFrame {
     private JTable trashTable;
@@ -21,6 +23,7 @@ public class ItemManagementScreen extends JFrame {
     private ItemManagementController itemManagementController;
     private final int widthImage = 50;
     private final int heightImage = 50;
+    private Map<String, ImageIcon> imageCache = new HashMap<>(); // Bộ nhớ cache cho hình ảnh
 
     public ItemManagementScreen() {
         itemManagementController = new ItemManagementController();
@@ -53,7 +56,7 @@ public class ItemManagementScreen extends JFrame {
     private JPanel createTrashPanel() {
         JPanel trashPanel = new JPanel(new BorderLayout());
         trashTableModel = new DefaultTableModel(new Object[]{"ID", "Tên", "Loại", "Hình ảnh", "URL"}, 0) {
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 return (column == 3) ? ImageIcon.class : Object.class; // Set ImageIcon class for image column
             }
         };
@@ -71,7 +74,7 @@ public class ItemManagementScreen extends JFrame {
     private JPanel createBinPanel() {
         JPanel binPanel = new JPanel(new BorderLayout());
         binTableModel = new DefaultTableModel(new Object[]{"ID", "Tên", "Loại", "Hình ảnh", "URL"}, 0) {
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 return (column == 3) ? ImageIcon.class : Object.class; // Set ImageIcon class for image column
             }
         };
@@ -87,7 +90,7 @@ public class ItemManagementScreen extends JFrame {
     }
 
     private void hideUrlColumn(JTable table) {
-        table.getColumnModel().getColumn(4).setMinWidth(0); // Hide the URL column
+        table.getColumnModel().getColumn(4).setMinWidth(0);
         table.getColumnModel().getColumn(4).setMaxWidth(0);
         table.getColumnModel().getColumn(4).setWidth(0);
     }
@@ -96,8 +99,9 @@ public class ItemManagementScreen extends JFrame {
         List<TrashItem> trashItems = itemManagementController.fetchTrashItemData();
         trashTableModel.setRowCount(0);
         for (TrashItem item : trashItems) {
-            ImageIcon imageIcon = urlToImage(item.getUrl());
-            trashTableModel.addRow(new Object[]{item.getId(), item.getName(), item.getType(), imageIcon, item.getUrl()});
+            loadImageAsync(item.getUrl(), trashTableModel, new Object[]{
+                    item.getId(), item.getName(), item.getType(), null, item.getUrl()
+            });
         }
     }
 
@@ -105,17 +109,18 @@ public class ItemManagementScreen extends JFrame {
         List<Bin> binItems = itemManagementController.fetchBinData();
         binTableModel.setRowCount(0);
         for (Bin bin : binItems) {
-            ImageIcon imageIcon = urlToImage(bin.getUrl());
-            binTableModel.addRow(new Object[]{bin.getId(), bin.getName(), bin.getType(), imageIcon, bin.getUrl()});
+            loadImageAsync(bin.getUrl(), binTableModel, new Object[]{
+                    bin.getId(), bin.getName(), bin.getType(), null, bin.getUrl()
+            });
         }
     }
 
     private JPanel createButtonPanel(boolean isTrash) {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnAdd = new JButton("Thêm"); // Add in Vietnamese
-        JButton btnEdit = new JButton("Sửa"); // Edit in Vietnamese
-        JButton btnDelete = new JButton("Xóa"); // Delete in Vietnamese
-        JButton btnBack = new JButton("Quay lại"); // Back in Vietnamese
+        JButton btnAdd = new JButton("Thêm");
+        JButton btnEdit = new JButton("Sửa");
+        JButton btnDelete = new JButton("Xóa");
+        JButton btnBack = new JButton("Quay lại");
 
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnEdit);
@@ -125,11 +130,7 @@ public class ItemManagementScreen extends JFrame {
         btnAdd.addActionListener(e -> addItem(isTrash));
         btnEdit.addActionListener(e -> editItem(isTrash));
         btnDelete.addActionListener(e -> deleteItem(isTrash));
-
-        btnBack.addActionListener(e -> {
-            dispose(); // Close the current screen
-            // Optionally, you can navigate to another screen or main menu here
-        });
+        btnBack.addActionListener(e -> dispose());
 
         return buttonPanel;
     }
@@ -139,13 +140,12 @@ public class ItemManagementScreen extends JFrame {
         dialog.setVisible(true);
         if (dialog.isSucceeded()) {
             if (isTrash) {
-                TrashItem newItem = dialog.getTrashItem();
-                itemManagementController.addTrashItem(newItem);
+                itemManagementController.addTrashItem(dialog.getTrashItem());
+                loadTrashItems();
             } else {
-                Bin newBin = dialog.getBin();
-                itemManagementController.addBin(newBin);
+                itemManagementController.addBin(dialog.getBin());
+                loadBinItems();
             }
-            refreshTables(); // Refresh tables after adding
         }
     }
 
@@ -154,59 +154,81 @@ public class ItemManagementScreen extends JFrame {
         if (selectedRow >= 0) {
             if (isTrash) {
                 TrashItem selectedItem = new TrashItem(
-                        (String) trashTableModel.getValueAt(selectedRow, 0), // id
-                        (String) trashTableModel.getValueAt(selectedRow, 1), // name
-                        (String) trashTableModel.getValueAt(selectedRow, 2), // type
-                        (String) trashTableModel.getValueAt(selectedRow, 4)  // url (stored in hidden column)
+                        (String) trashTableModel.getValueAt(selectedRow, 0),
+                        (String) trashTableModel.getValueAt(selectedRow, 1),
+                        (String) trashTableModel.getValueAt(selectedRow, 2),
+                        (String) trashTableModel.getValueAt(selectedRow, 4)
                 );
                 ItemDialog dialog = new ItemDialog(this, selectedItem, true);
                 dialog.setVisible(true);
                 if (dialog.isSucceeded()) {
-                    TrashItem updatedItem = dialog.getTrashItem();
-                    itemManagementController.updateTrashItem(updatedItem);
+                    itemManagementController.updateTrashItem(dialog.getTrashItem());
+                    loadTrashItems();
                 }
             } else {
                 Bin selectedBin = new Bin(
-                        (String) binTableModel.getValueAt(selectedRow, 0), // id
-                        (String) binTableModel.getValueAt(selectedRow, 1), // name
-                        (String) binTableModel.getValueAt(selectedRow, 2), // type
-                        (String) binTableModel.getValueAt(selectedRow, 4)  // url (stored in hidden column)
+                        (String) binTableModel.getValueAt(selectedRow, 0),
+                        (String) binTableModel.getValueAt(selectedRow, 1),
+                        (String) binTableModel.getValueAt(selectedRow, 2),
+                        (String) binTableModel.getValueAt(selectedRow, 4)
                 );
                 ItemDialog dialog = new ItemDialog(this, selectedBin, false);
                 dialog.setVisible(true);
                 if (dialog.isSucceeded()) {
-                    Bin updatedBin = dialog.getBin();
-                    itemManagementController.updateBin(updatedBin);
+                    itemManagementController.updateBin(dialog.getBin());
+                    loadBinItems();
                 }
             }
-            refreshTables(); // Refresh tables after editing
         } else {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một vật phẩm để sửa.", "Lỗi", JOptionPane.ERROR_MESSAGE); // Error message in Vietnamese
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một vật phẩm để sửa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void deleteItem(boolean isTrash) {
         int selectedRow = isTrash ? trashTable.getSelectedRow() : binTable.getSelectedRow();
         if (selectedRow >= 0) {
+            String id = isTrash ? (String) trashTableModel.getValueAt(selectedRow, 0) : (String) binTableModel.getValueAt(selectedRow, 0);
             if (isTrash) {
-                String id = (String) trashTableModel.getValueAt(selectedRow, 0);
                 itemManagementController.deleteTrashItem(id);
+                loadTrashItems();
             } else {
-                String id = (String) binTableModel.getValueAt(selectedRow, 0);
                 itemManagementController.deleteBin(id);
+                loadBinItems();
             }
-            refreshTables(); // Refresh tables after deletion
         } else {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một vật phẩm để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE); // Error message in Vietnamese
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một vật phẩm để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void refreshTables() {
-        loadTrashItems();
-        loadBinItems();
+    private void loadImageAsync(String urlString, DefaultTableModel tableModel, Object[] rowData) {
+        if (imageCache.containsKey(urlString)) {
+            rowData[3] = imageCache.get(urlString);
+            tableModel.addRow(rowData);
+        } else {
+            SwingWorker<ImageIcon, Void> worker = new SwingWorker<ImageIcon, Void>() {
+                @Override
+                protected ImageIcon doInBackground() {
+                    return urlToImage(urlString);
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        ImageIcon icon = get();
+                        if (icon != null) {
+                            imageCache.put(urlString, icon);
+                            rowData[3] = icon;
+                            tableModel.addRow(rowData);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Lỗi khi tải hình ảnh: " + e.getMessage());
+                    }
+                }
+            };
+            worker.execute();
+        }
     }
 
-    // Method to load an image from a URL and return an ImageIcon
     private ImageIcon urlToImage(String urlString) {
         try {
             URL url = new URL(urlString);
@@ -214,7 +236,7 @@ public class ItemManagementScreen extends JFrame {
             Image scaledImage = originalImage.getScaledInstance(widthImage, heightImage, Image.SCALE_SMOOTH);
             return new ImageIcon(scaledImage);
         } catch (IOException e) {
-            System.err.println("Lỗi khi tải hình ảnh từ URL: " + e.getMessage()); // Error message in Vietnamese
+            System.err.println("Lỗi khi tải hình ảnh từ URL: " + e.getMessage());
             return null;
         }
     }
