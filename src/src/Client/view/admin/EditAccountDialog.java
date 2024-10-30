@@ -74,23 +74,13 @@ public class EditAccountDialog extends JDialog {
 
     private void saveAccount() {
         String username = txtUsername.getText();
-        String password = new String(txtPassword.getPassword()); // Lấy mật khẩu
+        String password = new String(txtPassword.getPassword());
         String role = (String) comboRole.getSelectedItem();
 
-        // Kiểm tra hợp lệ
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Tên đăng nhập và Mật khẩu không được để trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (username.length() < 3) {
-            JOptionPane.showMessageDialog(this, "Tên đăng nhập phải có ít nhất 3 ký tự.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        if (password.length() < 6) {
-            JOptionPane.showMessageDialog(this, "Mật khẩu phải có ít nhất 6 ký tự.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         accountManagementController.updateAccount(accountID, username, password, role);
         JOptionPane.showMessageDialog(this, "Tài khoản đã được cập nhật thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
         dispose();  // Đóng hộp thoại sau khi lưu

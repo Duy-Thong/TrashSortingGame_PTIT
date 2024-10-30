@@ -166,7 +166,14 @@ public class Server {
                     case "register":
                         username = parts[1].split("=")[1];
                         password = parts[2].split("=")[1];
-                        response = register(username, password) ? "registration_success" : "registration failure";
+                        int result = register(username, password);
+                        if(result == 1) {
+                            response = "register_success";
+                        } else if(result == -1) {
+                            response = "register_failed_name_exist";
+                        } else {
+                            response = "register_failed";
+                        }
                         break;
                     case "getAccountID":
                         username = parts[1].split("=")[1];
@@ -467,14 +474,14 @@ public class Server {
     }
 
     // Register a new user with username and password
-    private static boolean register(String username, String password) {
+    private static int register(String username, String password) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             // Check if username already exists
             String checkQuery = "SELECT * FROM account WHERE username = ?";
             try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {
                 checkStmt.setString(1, username);
                 ResultSet rs = checkStmt.executeQuery();
-                if (rs.next()) return false;
+                if (rs.next()) return -1;
             }
 
             // Insert new account
@@ -487,17 +494,15 @@ public class Server {
                 insertAccountStmt.setString(4, "player");
                 insertAccountStmt.executeUpdate();
             }
-
             return createPlayer(accountUUID);
-
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 
     // Create a new player linked to an account
-    private static boolean createPlayer(String accountID) {
+    private static int createPlayer(String accountID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String playerID = UUID.randomUUID().toString();
             String insertPlayerQuery = "INSERT INTO player (playerID, accountID, total_games, total_wins, total_score, average_score, created_at, updated_at) VALUES (?, ?, 0, 0, 0, 0, NOW(), NOW())";
@@ -505,11 +510,11 @@ public class Server {
                 insertPlayerStmt.setString(1, playerID);
                 insertPlayerStmt.setString(2, accountID);
                 insertPlayerStmt.executeUpdate();
-                return true;
+                return 1;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 

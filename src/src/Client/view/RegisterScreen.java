@@ -5,6 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class RegisterScreen {
     private final RegisterController registerController;
@@ -34,6 +36,7 @@ public class RegisterScreen {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0)); // 50 pixels top margin
+
         // Add title
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -115,21 +118,37 @@ public class RegisterScreen {
             String password = new String(passwordField.getPassword());
             String confirmPassword = new String(confirmPasswordField.getPassword());
 
+            // Check if any fields are empty
             if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 JOptionPane.showMessageDialog(registerFrame, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
+            // Password regex pattern
+            String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
+            Pattern pattern = Pattern.compile(passwordPattern);
+            Matcher matcher = pattern.matcher(password);
+
+            // Check if the password meets the regex requirements
+            if (!matcher.matches()) {
+                JOptionPane.showMessageDialog(registerFrame, "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Check if passwords match
             if (!password.equals(confirmPassword)) {
                 JOptionPane.showMessageDialog(registerFrame, "Xác nhận mật khẩu không hợp lệ!", "Lỗi", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             // Register the account
-            if (registerController.register(username, password)) {
+            int result = registerController.register(username, password);
+            if (result == 1) {
                 JOptionPane.showMessageDialog(registerFrame, "Đăng ký thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 registerFrame.dispose();
-                new MainScreen(); // Go back to the main screen
+                new LoginScreen(); // Open login screen
+            } else if (result == -1) {
+                JOptionPane.showMessageDialog(registerFrame, "Tên đăng nhập đã tồn tại!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(registerFrame, "Đăng ký thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }

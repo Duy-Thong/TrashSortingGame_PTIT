@@ -10,7 +10,7 @@ public class RegisterController {
     private static final String SERVER_ADDRESS = Constants.IP_SERVER; // Thay đổi nếu server chạy trên máy khác
     private static final int SERVER_PORT = Constants.PORT; // Cổng server
 
-    public boolean register(String username, String password) {
+    public int register(String username, String password) {
         try (DatagramSocket socket = new DatagramSocket()) {
             // Tạo thông điệp đăng ký
             String message = "type=register&username=" + username + "&password=" + password;
@@ -27,11 +27,16 @@ public class RegisterController {
             DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
             socket.receive(responsePacket);
             String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
-
-            return response.equals("registration_success");
+            System.out.println(response);
+            if(response.equals("register_success"))
+                return 1;
+            else if(response.equals("register_failed_name_exist"))
+                return -1;
+            else
+                return 0;
         } catch (Exception e) {
             e.printStackTrace();
-            return false; // Trả về false nếu có lỗi
+            return 0;
         }
     }
 }
