@@ -48,21 +48,9 @@ public class RankController {
                     int averageScore = Integer.parseInt(playerData[5].split("=")[1]);
                     int status = Integer.parseInt(playerData[6].split("=")[1]);
                     int isPlaying = Integer.parseInt(playerData[7].split("=")[1]);
+                    topPlayers.add(new Player(playerID, username, totalGames, totalWins, totalScore, averageScore, status, isPlaying));
 
-                    // Chuyển đổi chuỗi thành Timestamp
-                    String timestampStr = playerData[8].split("=")[1];
 
-                    // Kiểm tra và bổ sung phần thời gian nếu thiếu
-                    if (timestampStr.length() == 10) {  // Nếu chỉ có yyyy-MM-dd
-                        timestampStr += " 00:00:00";    // Thêm thời gian mặc định
-                    }
-
-                    try {
-                        Timestamp createdAt = Timestamp.valueOf(timestampStr);  // Parse string to Timestamp
-                        topPlayers.add(new Player(playerID, username, totalGames, totalWins, totalScore, averageScore, status, isPlaying, createdAt));
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Invalid timestamp format: " + timestampStr);
-                    }
                 }
             }
         } catch (Exception e) {

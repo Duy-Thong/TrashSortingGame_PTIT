@@ -44,86 +44,97 @@ public class LobbyScreen {
         gbc.weighty = 1.0; // Pushes the buttons down
         panel.add(Box.createVerticalStrut(50), gbc); // Adjust the strut size for more spacing
 
+        // Title label background panel
+        JPanel titlePanel = new JPanel();
+        titlePanel.setBackground(new Color(0, 169, 114, 180)); // Semi-transparent black background
+        titlePanel.setLayout(new GridBagLayout());
+
+        // Title label
+        JLabel titleLabel = new JLabel("Phân loại rác, vì tương lai xanh !", JLabel.CENTER);
+        titleLabel.setFont(customFont.deriveFont(Font.BOLD, 12));
+        titleLabel.setForeground(Color.WHITE);
+        titlePanel.add(titleLabel); // Add titleLabel to titlePanel
+
+        gbc.gridy = 1; // Move to the next row for the title panel
+        gbc.gridwidth = 2; // Title panel spans both columns
+        panel.add(titlePanel, gbc); // Add titlePanel to the main panel
+
         // Adjusting button positioning and size
         int buttonWidth = 150;
         int buttonHeight = 40;
 
         // Personal Profile Button (Top Left)
         JButton btnProfile = createCustomButton("Trang cá nhân", customFont, buttonWidth, buttonHeight);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2; // Adjust row for buttons
         gbc.gridwidth = 1;
-        gbc.weighty = 0;
         panel.add(btnProfile, gbc);
 
         // History Button (Top Right)
         JButton btnHistory = createCustomButton("Xem lịch sử", customFont, buttonWidth, buttonHeight);
         gbc.gridx = 1;
-        gbc.gridy = 1;
         panel.add(btnHistory, gbc);
 
         // Ranking Button (Bottom Left)
         JButton btnRanking = createCustomButton("Bảng xếp hạng", customFont, buttonWidth, buttonHeight);
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         panel.add(btnRanking, gbc);
 
         // Enter Game Button (Bottom Right)
         JButton btnEnterGame = createCustomButton("Vào game", customFont, buttonWidth, buttonHeight);
         gbc.gridx = 1;
-        gbc.gridy = 2;
         panel.add(btnEnterGame, gbc);
 
         // Help Button (Above Logout Button)
         JButton btnHelp = createCustomButton("Hướng dẫn", customFont, buttonWidth, buttonHeight);
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(btnHelp, gbc);
 
         // Logout Button (Centered)
         JButton btnLogout = createCustomButton("Đăng xuất", customFont, buttonWidth, buttonHeight);
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.gridy = 5; // Move to the next row
         panel.add(btnLogout, gbc);
 
         // Add Action Listeners to Buttons
         btnProfile.addActionListener(e -> {
-            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem Profile cá nhân");
             lobbyFrame.dispose();
             new ProfileScreen(playerID, username);
         });
 
         btnHistory.addActionListener(e -> {
-            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Xem lịch sử người chơi");
             lobbyFrame.dispose();
             new HistoryScreen(playerID, username);
         });
 
         btnRanking.addActionListener(e -> {
-            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Bảng xếp hạng");
             lobbyFrame.dispose();
             new RankScreen(playerID, username);
         });
 
         btnEnterGame.addActionListener(e -> {
-            JOptionPane.showMessageDialog(lobbyFrame, "Chuyển đến Game");
             lobbyFrame.dispose();
             new InviteScreen(playerID, username);
         });
+
         btnHelp.addActionListener(e -> {
             new HelpScreen();
         });
 
         btnLogout.addActionListener(e -> {
-            loginController.logout(playerID);
-            lobbyFrame.dispose();
-            new LoginScreen();
+            int confirm = JOptionPane.showConfirmDialog(lobbyFrame,
+                    "Bạn có chắc chắn muốn đăng xuất?",
+                    "Xác nhận đăng xuất",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+            if (confirm == JOptionPane.YES_OPTION) {
+                loginController.logout(playerID);
+                lobbyFrame.dispose();
+                new LoginScreen();
+            }
         });
-
 
         // Add panel to background
         backgroundLabel.add(panel);

@@ -156,7 +156,7 @@ public class HelpScreen {
         helpFrame.add(mainScrollPane, BorderLayout.CENTER); // Add scrollable main panel
 
         // Create a Close button at the bottom
-        JButton btnClose = new JButton("Đóng");
+        JButton btnClose = createButton("Đóng", customFont, new Color(204, 0, 0));
         btnClose.setFont(customFont.deriveFont(Font.BOLD, 14)); // Set custom font for Close button
         btnClose.addActionListener(e -> helpFrame.dispose());
         JPanel buttonPanel = new JPanel();
@@ -165,6 +165,16 @@ public class HelpScreen {
 
         // Set frame visibility
         helpFrame.setVisible(true);
+    }
+    private JButton createButton(String text, Font font, Color backgroundColor) {
+        JButton button = new JButton(text);
+        button.setFont(font.deriveFont(Font.BOLD, 12));
+        button.setForeground(Color.WHITE); // Set text color to white
+        button.setBackground(backgroundColor); // Set custom background color
+        button.setFocusPainted(false); // Remove focus border
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Set hand cursor
+        button.setPreferredSize(new Dimension(120, 30)); // Set button size
+        return button;
     }
 
     private ImageIcon urlToImage(String urlString) {

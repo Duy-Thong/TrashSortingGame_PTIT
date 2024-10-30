@@ -25,6 +25,17 @@ public class Player {
         this.isPlaying = isPlaying;
         this.createdAt = createdAt;
     }
+    public Player(String playerID, String username, int totalGames, int totalWins, int totalScore, int averageScore, int status, int isPlaying) {
+        this.playerID = playerID;
+        this.username = username;
+        this.totalGames = totalGames;
+        this.totalWins = totalWins;
+        this.totalScore = totalScore;
+        this.averageScore = averageScore;
+        this.status = status;
+        this.isPlaying = isPlaying;
+    }
+
 
     // Getters and Setters
     public String getPlayerID() {

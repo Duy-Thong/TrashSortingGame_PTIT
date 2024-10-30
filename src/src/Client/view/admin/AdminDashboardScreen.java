@@ -40,38 +40,37 @@ public class AdminDashboardScreen {
         int buttonWidth = 250;
         int buttonHeight = 40;
 
+        // Title label background panel
+        JPanel titlePanel = new JPanel();
+        titlePanel.setBackground(new Color(0, 169, 114, 180)); // Semi-transparent background
+        titlePanel.setLayout(new GridBagLayout());
+
         // Title label
-        JLabel titleLabel = new JLabel("Admin Dashboard");
-        titleLabel.setFont(customFont.deriveFont(Font.BOLD, 20));
+        JLabel titleLabel = new JLabel("Phân loại rác, vì tương lai xanh !", JLabel.CENTER);
+        titleLabel.setFont(customFont.deriveFont(Font.BOLD, 12)); // Font size adjusted to 12
         titleLabel.setForeground(Color.WHITE);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        panel.add(titleLabel, gbc);
+        titlePanel.add(titleLabel); // Add titleLabel to titlePanel
+
+        gbc.gridy = 0; // Set to the first row for the title panel
+        gbc.gridwidth = 2; // Title panel spans both columns
+        panel.add(titlePanel, gbc); // Add titlePanel to the main panel
 
         // Manage User Accounts button
         JButton btnManageUsers = createCustomButton("Quản lý tài khoản", customFont, buttonWidth, buttonHeight);
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
+        gbc.gridy = 1; // Move to the next row for the button
+        gbc.gridwidth = 1; // Reset gridwidth
         panel.add(btnManageUsers, gbc);
 
         // Item Management button
         JButton btnItemManagement = createCustomButton("Quản lý vật phẩm", customFont, buttonWidth, buttonHeight);
-        gbc.gridy = 2;
+        gbc.gridy = 2; // Move to the next row for the button
         panel.add(btnItemManagement, gbc);
-
-
 
         // Logout button
         JButton btnLogout = createCustomButton("Đăng xuất", customFont, buttonWidth, buttonHeight);
-
-// Reset gridwidth to 1 before adding the logout button
-        gbc.gridwidth = 1;
-        gbc.gridy = 4;
+        gbc.gridy = 4; // Move to the next row for the logout button
         gbc.anchor = GridBagConstraints.CENTER; // Keep it centered
         panel.add(btnLogout, gbc);
-
 
         // Add Action Listeners to buttons
         btnManageUsers.addActionListener(e -> openUserManagement());
@@ -89,19 +88,18 @@ public class AdminDashboardScreen {
         adminFrame.add(backgroundLabel);
         adminFrame.setVisible(true);
     }
-    // Method to create a custom button
+
     // Method to create a custom button
     private JButton createCustomButton(String text, Font customFont, int width, int height) {
         JButton button = new JButton(text);
         button.setFont(customFont.deriveFont(Font.BOLD, 12)); // Use custom font with smaller size
         button.setForeground(Color.WHITE);
-        button.setBackground(new Color(0, 0, 0, 150)); // Semi-transparent black (0, 0, 0 is black, 150 is the alpha value)
+        button.setBackground(new Color(0, 0, 0, 150)); // Semi-transparent black
         button.setFocusPainted(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(new Dimension(width, height)); // Set custom size
         return button;
     }
-
 
     // Load custom font method
     private Font loadCustomFont(String fontPath) {

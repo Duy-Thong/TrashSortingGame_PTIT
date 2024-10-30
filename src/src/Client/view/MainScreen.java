@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.IOException;
 
 public class MainScreen {
@@ -32,6 +31,31 @@ public class MainScreen {
         ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("../assets/new_back.gif")); // Update the path to your GIF
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setLayout(new BorderLayout()); // Use BorderLayout to position components
+
+        // Title panel
+        JPanel titlePanel = new JPanel();
+        titlePanel.setBackground(new Color(0, 169, 114, 0)); // Semi-transparent background
+        titlePanel.setLayout(new GridBagLayout());
+
+        // Create a panel for the slogan with a semi-transparent black background
+        JPanel sloganBackgroundPanel = new JPanel();
+        sloganBackgroundPanel.setBackground(new Color(0, 0, 0, 0)); // Black with 50% opacity
+        sloganBackgroundPanel.setOpaque(true); // Ensure the panel is opaque
+        sloganBackgroundPanel.setLayout(new GridBagLayout());
+
+        // Slogan label with padding
+        // Updated slogan label with HTML styling for background color
+        JLabel sloganLabel = new JLabel("<html><span style='background-color:rgba(0, 169, 114, 0.4); padding: 5px;'>Phân loại rác, vì tương lai xanh ! </span></html>", JLabel.CENTER);
+        sloganLabel.setFont(customFont.deriveFont(Font.ITALIC, 14)); // Set font style and size
+        sloganLabel.setForeground(Color.WHITE);
+        sloganLabel.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0)); // Set top padding of 50px
+//        sloganLabel.setOpaque(true); // Set top padding of 50px
+
+        // Add slogan label to slogan background panel
+        sloganBackgroundPanel.add(sloganLabel); // Add sloganLabel to sloganBackgroundPanel
+
+        // Add slogan background panel to title panel
+        titlePanel.add(sloganBackgroundPanel); // Add the background panel to the titlePanel
 
         // Create buttons with different background colors
         JButton btnLogin = createCustomButton("Đăng nhập", new Color(0, 102, 204), new Color(0, 153, 255));
@@ -60,6 +84,8 @@ public class MainScreen {
         buttonPanel.add(btnLogin);
         buttonPanel.add(btnRegister);
 
+        // Add title panel to the top of the background label
+        backgroundLabel.add(titlePanel, BorderLayout.NORTH); // Add title to the top
         // Add button panel to the bottom of the background label
         backgroundLabel.add(buttonPanel, BorderLayout.SOUTH); // Add buttons to the bottom
 
