@@ -42,8 +42,15 @@ public class AccountManagementScreen extends JFrame {
         tableModel = new DefaultTableModel(columnNames, 0);
         accountTable = new JTable(tableModel);
 
+        // Set properties for the table
+        accountTable.setRowHeight(30); // Set a specific row height
+        accountTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS); // Auto-resize columns
+
         // Set JScrollPane to handle both vertical and horizontal scrolling as needed
-        JScrollPane scrollPane = new JScrollPane(accountTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane scrollPane = new JScrollPane(accountTable);
+        scrollPane.setPreferredSize(new Dimension(750, 400)); // Set preferred size for the scroll pane
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         // Add components to frame
         add(buttonPanel, BorderLayout.NORTH);
