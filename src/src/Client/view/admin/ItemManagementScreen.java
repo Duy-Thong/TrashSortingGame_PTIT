@@ -1,6 +1,6 @@
 package Client.view.admin;
 
-import Client.controller.HelpController;
+import Client.controller.admin.ItemManagementController;
 import Client.model.Bin;
 import Client.model.TrashItem;
 
@@ -18,12 +18,12 @@ public class ItemManagementScreen extends JFrame {
     private JTable binTable;
     private DefaultTableModel trashTableModel;
     private DefaultTableModel binTableModel;
-    private HelpController helpController;
+    private ItemManagementController itemManagementController;
     private final int widthImage = 50;
     private final int heightImage = 50;
 
     public ItemManagementScreen() {
-        helpController = new HelpController();
+        itemManagementController = new ItemManagementController();
         initializeUI();
     }
 
@@ -93,7 +93,7 @@ public class ItemManagementScreen extends JFrame {
     }
 
     private void loadTrashItems() {
-        List<TrashItem> trashItems = helpController.fetchTrashItemData();
+        List<TrashItem> trashItems = itemManagementController.fetchTrashItemData();
         trashTableModel.setRowCount(0);
         for (TrashItem item : trashItems) {
             ImageIcon imageIcon = urlToImage(item.getUrl());
@@ -102,7 +102,7 @@ public class ItemManagementScreen extends JFrame {
     }
 
     private void loadBinItems() {
-        List<Bin> binItems = helpController.fetchBinData();
+        List<Bin> binItems = itemManagementController.fetchBinData();
         binTableModel.setRowCount(0);
         for (Bin bin : binItems) {
             ImageIcon imageIcon = urlToImage(bin.getUrl());
@@ -140,10 +140,10 @@ public class ItemManagementScreen extends JFrame {
         if (dialog.isSucceeded()) {
             if (isTrash) {
                 TrashItem newItem = dialog.getTrashItem();
-                helpController.addTrashItem(newItem);
+                itemManagementController.addTrashItem(newItem);
             } else {
                 Bin newBin = dialog.getBin();
-                helpController.addBin(newBin);
+                itemManagementController.addBin(newBin);
             }
             refreshTables(); // Refresh tables after adding
         }
@@ -163,7 +163,7 @@ public class ItemManagementScreen extends JFrame {
                 dialog.setVisible(true);
                 if (dialog.isSucceeded()) {
                     TrashItem updatedItem = dialog.getTrashItem();
-                    helpController.updateTrashItem(updatedItem);
+                    itemManagementController.updateTrashItem(updatedItem);
                 }
             } else {
                 Bin selectedBin = new Bin(
@@ -176,7 +176,7 @@ public class ItemManagementScreen extends JFrame {
                 dialog.setVisible(true);
                 if (dialog.isSucceeded()) {
                     Bin updatedBin = dialog.getBin();
-                    helpController.updateBin(updatedBin);
+                    itemManagementController.updateBin(updatedBin);
                 }
             }
             refreshTables(); // Refresh tables after editing
@@ -190,10 +190,10 @@ public class ItemManagementScreen extends JFrame {
         if (selectedRow >= 0) {
             if (isTrash) {
                 String id = (String) trashTableModel.getValueAt(selectedRow, 0);
-                helpController.deleteTrashItem(id);
+                itemManagementController.deleteTrashItem(id);
             } else {
                 String id = (String) binTableModel.getValueAt(selectedRow, 0);
-                helpController.deleteBin(id);
+                itemManagementController.deleteBin(id);
             }
             refreshTables(); // Refresh tables after deletion
         } else {

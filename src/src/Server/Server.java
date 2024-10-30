@@ -440,6 +440,14 @@ public class Server {
                         setPlaying(playerID);
                         response = "success";
                         break;
+                        case "getTrashTypes":
+                        List<String> trashTypes = getTrashTypes();
+                        StringBuilder responseTrashTypes = new StringBuilder();
+                        for (String t : trashTypes) {
+                            responseTrashTypes.append(String.format("%s;", t));
+                        }
+                        response = responseTrashTypes.toString();
+                        break;
 
                     default:
                         response = "error: unknown request";
@@ -450,6 +458,23 @@ public class Server {
         } catch (Exception e) {
             e.printStackTrace();
             sendResponse("error: server error", packet, socket);
+        }
+    }
+
+    private static List<String> getTrashTypes() {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT DISTINCT type FROM trashitem";
+            List<String> trashTypes = new ArrayList<>();
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    trashTypes.add(rs.getString("type"));
+                }
+                return trashTypes;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
