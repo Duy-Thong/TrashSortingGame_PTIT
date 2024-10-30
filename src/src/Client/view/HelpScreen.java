@@ -21,8 +21,8 @@ import java.util.Map;
 
 public class HelpScreen {
     private JFrame helpFrame;
-    private int widthImage = 70;  // Desired image size
-    private int heightImage = 70; // Desired image size
+    private int widthImage = 50;  // Desired image size
+    private int heightImage = 50; // Desired image size
     private Map<String, ImageIcon> imageCache = new HashMap<>(); // Image cache
     private Font customFont;
 
@@ -38,43 +38,43 @@ public class HelpScreen {
 
         // Create a background panel
         BackgroundPanel backgroundPanel = new BackgroundPanel(new ImageIcon(getClass().getClassLoader().getResource("Client/assets/back_lobby1.jpg")).getImage());
-        backgroundPanel.setLayout(new BorderLayout());
+        backgroundPanel.setLayout(new BoxLayout(backgroundPanel, BoxLayout.Y_AXIS)); // Use BoxLayout for vertical stacking
         helpFrame.add(backgroundPanel);
 
         // Instructions panel
         JPanel instructionPanel = new JPanel();
         instructionPanel.setLayout(new BoxLayout(instructionPanel, BoxLayout.Y_AXIS));
         instructionPanel.setOpaque(false); // Set to transparent
-        instructionPanel.setBorder(new EmptyBorder(20, 20, 20, 20)); // Add padding
+        instructionPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Add padding
 
         JLabel titleLabel = new JLabel("Hướng Dẫn Chơi");
         titleLabel.setFont(customFont.deriveFont(Font.BOLD, 18));
-        titleLabel.setForeground(Color.WHITE); // Title color
+        titleLabel.setForeground(Color.BLACK); // Title color
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         instructionPanel.add(titleLabel);
 
         JTextArea instructions = new JTextArea();
-        instructions.setText("Mục tiêu của trò chơi là phân loại rác thành đúng thùng rác.\n"
-                + "Rác sẽ rơi từ trên xuống, và bạn phải nhấn nút tương ứng để di chuyển rác đến thùng rác phù hợp.\n"
-                + "Bạn sẽ nhận điểm cho mỗi lần phân loại đúng.\n"
-                + "Hãy cố gắng đạt điểm cao nhất trước khi thời gian kết thúc!");
+        instructions.setText("+1. Mục tiêu của trò chơi là phân loại rác thành đúng thùng rác.\n"
+                + "+2. Rác sẽ rơi từ trên xuống,hãy dùng nút trái/phải/xuống để di chuyển rác đến thùng rác phù hợp.\n"
+                + "+3. Bạn sẽ nhận 10 điểm cho mỗi lần phân loại đúng.\n"
+                + "+4. Mỗi ván chơi kéo dài 2 phu, hãy cố gắng đạt điểm cao nhất trước khi thời gian kết thúc");
         instructions.setLineWrap(true);
         instructions.setWrapStyleWord(true);
         instructions.setEditable(false);
-        instructions.setFont(customFont.deriveFont(Font.PLAIN, 14));
+        instructions.setFont(customFont.deriveFont(Font.PLAIN, 12)); // Adjusted font size
         instructions.setForeground(Color.BLACK); // Set text color
-        instructions.setBackground(new Color(255, 255, 255, 100)); // Semi-transparent background with alpha 100
+        instructions.setBackground(new Color(255, 255, 255, 100)); // Semi-transparent background
         instructions.setBorder(new EmptyBorder(10, 10, 10, 10));
-        instructions.setAlignmentX(Component.LEFT_ALIGNMENT);
+        instructions.setAlignmentX(Component.CENTER_ALIGNMENT); // Center alignment for instructions
 
-        JScrollPane scrollPane = new JScrollPane(instructions);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setPreferredSize(new Dimension(760, 150)); // Adjusted height for scrolling
-        instructionPanel.add(scrollPane);
+        instructionPanel.add(instructions); // Add instructions directly to the panel
 
-        // Add the instruction panel to the background
-        backgroundPanel.add(instructionPanel, BorderLayout.NORTH);
+        // Add a label for "Danh sách item"
+        JLabel itemListLabel = new JLabel("Danh sách thùng rác và rác");
+        itemListLabel.setFont(customFont.deriveFont(Font.BOLD, 16));
+        itemListLabel.setForeground(Color.BLACK); // Label color
+        itemListLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instructionPanel.add(itemListLabel);
 
         // Load bin and trash data
         HelpController helpController = new HelpController();
@@ -91,7 +91,7 @@ public class HelpScreen {
         };
         JTable combinedTable = new JTable(tableModel);
         combinedTable.setRowHeight(heightImage + 10); // Set row height for images
-        combinedTable.setFont(customFont.deriveFont(Font.PLAIN, 12));
+        combinedTable.setFont(customFont.deriveFont(Font.PLAIN, 12)); // Adjusted font size
         combinedTable.setOpaque(false); // Set table to be transparent
         combinedTable.setBackground(new Color(255, 255, 255, 100)); // Semi-transparent background
         combinedTable.setForeground(Color.BLACK); // Set text color to black for better visibility
@@ -136,11 +136,16 @@ public class HelpScreen {
             }
         });
 
-        // Add combined scroll pane to the main frame
+        // Add padding around the table using EmptyBorder
         JScrollPane combinedScrollPane = new JScrollPane(combinedTable);
         combinedScrollPane.setOpaque(false);
         combinedScrollPane.getViewport().setOpaque(false);
-        backgroundPanel.add(combinedScrollPane, BorderLayout.CENTER);
+        combinedScrollPane.setBorder(new EmptyBorder(0, 10, 0, 10)); // Padding around the table
+        combinedScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align scroll pane
+        instructionPanel.add(combinedScrollPane); // Add the scroll pane to the instruction panel
+
+        // Add flexible space to push the button to the bottom
+        instructionPanel.add(Box.createVerticalGlue()); // Add flexible space before the button panel
 
         // Close button
         JButton btnClose = createButton("Đóng", customFont, new Color(204, 0, 0));
@@ -148,9 +153,14 @@ public class HelpScreen {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setOpaque(false); // Set to transparent
         buttonPanel.add(btnClose);
-        buttonPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
         buttonPanel.setBackground(new Color(255, 255, 255, 100)); // Semi-transparent background with alpha 90
-        backgroundPanel.add(buttonPanel, BorderLayout.SOUTH);
+        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align button panel
+        buttonPanel.setMaximumSize(new Dimension(120, 40)); // Set maximum size if needed
+
+        instructionPanel.add(buttonPanel); // Add button panel to instruction panel
+
+        // Add the instruction panel to the background
+        backgroundPanel.add(instructionPanel);
 
         helpFrame.setVisible(true);
         helpFrame.setAlwaysOnTop(true); // Keep the window on top if needed
@@ -184,12 +194,9 @@ public class HelpScreen {
                         if (icon != null) {
                             imageCache.put(urlString, icon);
                             table.setValueAt(icon, row, column);
-                        } else {
-                            table.setValueAt(null, row, column); // Set to null if image fails to load
                         }
                     } catch (Exception e) {
-                        System.err.println("Error loading image asynchronously: " + e.getMessage());
-                        table.setValueAt(null, row, column); // Set to null if there's an error
+                        e.printStackTrace();
                     }
                 }
             };
@@ -200,11 +207,11 @@ public class HelpScreen {
     private ImageIcon urlToImage(String urlString) {
         try {
             URL url = new URL(urlString);
-            BufferedImage originalImage = ImageIO.read(url);
-            Image scaledImage = originalImage.getScaledInstance(widthImage, heightImage, Image.SCALE_SMOOTH);
-            return new ImageIcon(scaledImage); // Load the image normally
+            BufferedImage img = ImageIO.read(url);
+            Image scaledImage = img.getScaledInstance(widthImage, heightImage, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaledImage);
         } catch (IOException e) {
-            System.err.println("Error loading image from URL: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -214,17 +221,17 @@ public class HelpScreen {
             InputStream fontStream = getClass().getResourceAsStream(fontPath);
             return Font.createFont(Font.TRUETYPE_FONT, fontStream);
         } catch (Exception e) {
-            System.err.println("Error loading custom font: " + e.getMessage());
-            return new Font("Arial", Font.PLAIN, 12);
+            e.printStackTrace();
+            return new Font("Arial", Font.PLAIN, 12); // Fallback to default font
         }
     }
 
-    private class BackgroundPanel extends JPanel {
+    // Background panel to set the image as background
+    static class BackgroundPanel extends JPanel {
         private Image backgroundImage;
 
-        public BackgroundPanel(Image image) {
-            this.backgroundImage = image;
-            setLayout(new BorderLayout());
+        public BackgroundPanel(Image backgroundImage) {
+            this.backgroundImage = backgroundImage;
         }
 
         @Override
