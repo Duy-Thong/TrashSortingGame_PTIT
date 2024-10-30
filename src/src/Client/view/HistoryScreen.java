@@ -3,13 +3,16 @@ package Client.view;
 import Client.controller.HistoryController;
 import Client.model.PlayerGame;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -17,13 +20,15 @@ public class HistoryScreen extends JFrame {
     private String playerId;
     private HistoryController historyController;
     private JButton backButton;
+    private final int widthImage = 60;
+    private final int heightImage = 30;
     Font pixelFont;
 
     public HistoryScreen(String playerId, String username) {
         this.playerId = playerId;
         this.historyController = new HistoryController();
 
-        // Tải phông chữ
+        // Load font
         try {
             InputStream is = getClass().getClassLoader().getResourceAsStream("Client/assets/FVF.ttf");
             if (is != null) {
@@ -31,13 +36,13 @@ public class HistoryScreen extends JFrame {
                 GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
                 ge.registerFont(pixelFont);
             } else {
-                System.out.println("Tệp phông chữ không được tìm thấy.");
+                System.out.println("Font file not found.");
             }
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
         }
 
-        setTitle("Lịch sử người chơi");
+        setTitle("Player History");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -47,32 +52,41 @@ public class HistoryScreen extends JFrame {
         JPanel titlePanel = createTitlePanel();
         backgroundPanel.add(titlePanel, BorderLayout.NORTH);
 
-        String[] columnNames = {"STT", "Thời gian tham gia", "Điểm số", "Kết quả"};
+        // Updated table columns
+        String[] columnNames = {"STT", "Thời gian", "Điểm", "Kết quả", "Đối thủ", "Điểm đối thủ"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Không cho phép chỉnh sửa ô trong bảng
+                return false; // Prevent cell editing
             }
         };
 
         JTable historyTable = new JTable(model);
         historyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        historyTable.setRowHeight(25);
+        historyTable.setRowHeight(40); // Chiều cao hàng mới
         historyTable.setFont(pixelFont);
         historyTable.setBackground(new Color(255, 255, 255, 128));
         historyTable.setGridColor(Color.WHITE);
 
+        // Đặt chiều rộng cột
+        historyTable.getColumnModel().getColumn(0).setPreferredWidth(50); // Cột STT
+        historyTable.getColumnModel().getColumn(1).setPreferredWidth(150); // Cột Thời gian
+        historyTable.getColumnModel().getColumn(2).setPreferredWidth(80); // Cột Điểm
+        historyTable.getColumnModel().getColumn(3).setPreferredWidth(50); // Cột Kết quả
+        historyTable.getColumnModel().getColumn(4).setPreferredWidth(120); // Cột Đối thủ
+        historyTable.getColumnModel().getColumn(5).setPreferredWidth(80); // Cột Điểm đối thủ
+
         historyTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f));
         historyTable.getTableHeader().setForeground(Color.BLACK);
-        historyTable.getTableHeader().setBackground(new Color(255, 255, 255)); // nếu muốn nền trắng
+        historyTable.getTableHeader().setBackground(new Color(255, 255, 255));
 
         DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 label.setHorizontalAlignment(JLabel.CENTER);
-                label.setFont(pixelFont.deriveFont(Font.BOLD, 12f));  // Đặt font chữ đậm ở đây
-                label.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.WHITE)); // Đặt viền trắng
+                label.setFont(pixelFont.deriveFont(Font.BOLD, 12f));
+                label.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.WHITE));
                 return label;
             }
         };
@@ -87,24 +101,58 @@ public class HistoryScreen extends JFrame {
             historyTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
 
-        // Lấy lịch sử người chơi
+        // Fetch player history with opponent information
         List<PlayerGame> historyList = historyController.getPlayerHistory(playerId);
         int stt = 1;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (PlayerGame game : historyList) {
+            String OpponentPlayerID = historyController.getOpponentPlayerID(game.getPlayerID(), game.getGameID());
+            String OpponentAccountID = historyController.getOpponentAccountID(OpponentPlayerID);
+            String OpponentName = historyController.getOpponentName(OpponentAccountID);
+            int OpponentScore = historyController.getOpponentScore(OpponentPlayerID, game.getGameID());
             String formattedJoinTime = sdf.format(game.getJoinTime());
+
+            // Load the corresponding image based on the result
+            ImageIcon resultIcon;
+            if ("win".equalsIgnoreCase(game.getResult())) {
+                resultIcon = new ImageIcon(getClass().getClassLoader().getResource("Client/assets/victory.png"));
+            } else if ("lose".equalsIgnoreCase(game.getResult())) {
+                resultIcon = new ImageIcon(getClass().getClassLoader().getResource("Client/assets/defeat.png"));
+            } else {
+                resultIcon = new ImageIcon(getClass().getClassLoader().getResource("Client/assets/draw.png"));
+            }
+            Image scaledIcon = resultIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH); // Kích thước icon mới
+            resultIcon = new ImageIcon(scaledIcon);
             model.addRow(new Object[]{
                     stt++,
                     formattedJoinTime,
                     game.getScore(),
-                    game.getResult()
+                    resultIcon,
+                    OpponentName,
+                    OpponentScore,
             });
         }
 
+        // Change the column class of the "Kết quả" column to ImageIcon
+        historyTable.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                if (value instanceof ImageIcon) {
+                    JLabel label = new JLabel((ImageIcon) value);
+                    label.setHorizontalAlignment(JLabel.CENTER);
+                    return label;
+                }
+                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            }
+        });
+
+        // Fill empty rows if necessary
         int maxRows = 14;
         int currentRows = historyList.size();
         for (int i = currentRows; i < maxRows; i++) {
             model.addRow(new Object[]{
+                    "",
+                    "",
                     "",
                     "",
                     "",
@@ -139,12 +187,12 @@ public class HistoryScreen extends JFrame {
     }
 
     private JPanel createTitlePanel() {
-        JLabel titleLabel = new JLabel("Lịch sử người chơi", JLabel.CENTER);
+        JLabel titleLabel = new JLabel("Lịch sử chơi", JLabel.CENTER);
         titleLabel.setFont(pixelFont.deriveFont(Font.BOLD, 16f));
         titleLabel.setForeground(Color.BLACK);
 
         JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));  // Khoảng cách 10px bên trên
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
         titlePanel.add(titleLabel, BorderLayout.CENTER);
         titlePanel.setOpaque(false);
 
@@ -177,6 +225,18 @@ public class HistoryScreen extends JFrame {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+
+    private ImageIcon urlToImage(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            BufferedImage originalImage = ImageIO.read(url);
+            Image scaledImage = originalImage.getScaledInstance(widthImage, heightImage, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaledImage);
+        } catch (IOException e) {
+            System.err.println("Lỗi khi tải hình ảnh từ URL: " + e.getMessage()); // Error message in Vietnamese
+            return null;
         }
     }
 }

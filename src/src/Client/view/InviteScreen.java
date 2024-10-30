@@ -26,6 +26,7 @@ public class InviteScreen extends JFrame {
     private String currentPlayerID;
     private JPanel tablePanel;
     static Font pixelFont;
+    private Timer refreshTimer;
 
     private final String[] columnNames = {"ID", "Tên người chơi", "Tổng điểm", "Trạng thái"};
 
@@ -298,6 +299,8 @@ public class InviteScreen extends JFrame {
         // Cập nhật lại giao diện
         tablePanel.revalidate();
         tablePanel.repaint();
+        refreshTimer = new Timer(5000, e -> loadListFriends());
+        refreshTimer.start();
     }
 
 

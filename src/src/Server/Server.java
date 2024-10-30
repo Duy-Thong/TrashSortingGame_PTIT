@@ -448,6 +448,28 @@ public class Server {
                         }
                         response = responseTrashTypes.toString();
                         break;
+                    case "getOpponentPlayerID":
+                        playerID = parts[1].split("=")[1];
+                        String gameID = parts[2].split("=")[1];
+                        String opponentPlayerID = getOpponentPlayerID(playerID, gameID);
+                        response = "opponentPlayerID=" + opponentPlayerID;
+                        break;
+                    case "getOpponentAccountID":
+                        playerID = parts[1].split("=")[1];
+                        String opponentID = getOpponentAccountID(playerID);
+                        response = "opponentID=" + opponentID;
+                        break;
+                    case "getOpponentName":
+                        playerID = parts[1].split("=")[1];
+                        String opponentName = getOpponentName(playerID);
+                        response = "opponentName=" + opponentName;
+                        break;
+                    case "getGameScore":
+                        playerID = parts[1].split("=")[1];
+                        gameID = parts[2].split("=")[1];
+                        int score = getGameScore(playerID, gameID);
+                        response = "score=" + score;
+                        break;
 
                     default:
                         response = "error: unknown request";
@@ -460,6 +482,75 @@ public class Server {
             sendResponse("error: server error", packet, socket);
         }
     }
+    public static String getOpponentPlayerID(String playerID, String gameID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT playerID FROM player_game WHERE gameID = ? AND playerID != ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, gameID);
+                stmt.setString(2, playerID);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getString("playerID");
+                }
+                return "error: opponent not found";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error: server error";
+        }
+    }
+    public static String getOpponentAccountID(String playerID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT accountID FROM player WHERE playerID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, playerID);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getString("accountID");
+                }
+                return "error: opponent not found";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error: server error";
+        }
+    }
+    public static String getOpponentName(String accountID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT username FROM account WHERE accountID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, accountID);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getString("username");
+                }
+                return "error: opponent not found";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error: server error";
+        }
+    }
+
+    private static int getGameScore(String playerID, String gameID) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT score FROM player_game WHERE playerID = ? AND gameID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, playerID);
+                stmt.setString(2, gameID);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt("score");
+                }
+                return 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
 
     private static List<String> getTrashTypes() {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {

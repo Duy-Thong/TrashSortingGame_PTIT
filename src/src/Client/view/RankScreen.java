@@ -44,7 +44,7 @@ public class RankScreen extends JFrame {
         JPanel titlePanel = createTitlePanel();
         backgroundPanel.add(titlePanel, BorderLayout.NORTH);
 
-        String[] columnNames = {"Top", "Tên người chơi", "Tổng điểm", "Tổng bàn thắng", "Tổng số trận"};
+        String[] columnNames = {"Top", "Tên người chơi", "Tổng điểm", "Số trận thắng", "Tổng số trận"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
