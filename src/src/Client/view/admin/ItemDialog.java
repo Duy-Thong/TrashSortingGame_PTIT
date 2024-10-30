@@ -68,7 +68,8 @@ public class ItemDialog extends JDialog {
         JButton btnCancel = new JButton("Hủy");
         btnCancel.addActionListener(e -> dispose());
         add(btnCancel);
-
+        setPreferredSize(new Dimension(400, 150));
+        setSize(400, 150);
         pack();
         setLocationRelativeTo(parent);
     }
