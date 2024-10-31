@@ -872,14 +872,17 @@ public class    Server {
     private static List<Player> getAllPlayers() {
         List<Player> playerList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT p.playerID, p.total_games, p.total_wins, p.total_score, a.username, p.average_score, p.status, p.isPlaying, p.created_at"
-                    + " FROM player p"
-                    + " JOIN account a ON p.accountID = a.accountID" + "WHERE a.role = 'player'"; // Lọc ra tất cả các người chơi
+            String query = "SELECT p.playerID, p.total_games, p.total_wins, p.total_score, a.username, p.average_score, p.status, p.isPlaying, p.created_at "
+                    + "FROM player p "
+                    + "JOIN account a ON p.accountID = a.accountID "
+                    + "WHERE a.role = 'player'";
+            // Lọc ra tất cả các người chơi
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     String playerID = rs.getString("playerID");
                     String username = rs.getString("username");
+                    String role = rs.getString("role");
                     int totalGames = rs.getInt("total_games");
                     int totalWins = rs.getInt("total_wins");
                     int totalScore = rs.getInt("total_score");
@@ -887,8 +890,9 @@ public class    Server {
                     int status = rs.getInt("status");
                     int isPlaying = rs.getInt("isPlaying");
                     Timestamp createdAt = rs.getTimestamp("created_at");  // Lấy timestamp cho created_at
-
-                    playerList.add(new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, status, isPlaying, createdAt));
+                    if(role == "player") {
+                        playerList.add(new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, status, isPlaying, createdAt));
+                    }
                 }
             }
         } catch (Exception e) {
