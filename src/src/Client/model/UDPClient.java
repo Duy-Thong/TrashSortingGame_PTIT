@@ -37,11 +37,11 @@ public class UDPClient {
         // Sử dụng thread riêng để không bị khóa chương trình
         new Thread(() -> {
             while (true) {
-                try (DatagramSocket socket = new DatagramSocket(12349)) {
+                try {
                     byte[] receiveBuffer = new byte[1024];
                     DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-                    socket.receive(receivePacket); // Nhận phản hồi từ server
-                    socketListen = socket;
+                    socketListen = new DatagramSocket(12349);
+                    socketListen.receive(receivePacket); // Nhận phản hồi từ server
                     String response = new String(receivePacket.getData(), 0, receivePacket.getLength());
                     System.out.println("Received: " + response);
                     if(response.equals("type=end_socket")) {
