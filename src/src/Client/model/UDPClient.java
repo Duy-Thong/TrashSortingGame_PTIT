@@ -5,9 +5,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
+import java.util.Random;
 
 public class UDPClient {
     private DatagramSocket socket;
+    private DatagramSocket socketListen;
     private InetAddress serverAddress;
     private int serverPort;
     private updateUI mUpdateUI;
@@ -39,14 +41,20 @@ public class UDPClient {
                     byte[] receiveBuffer = new byte[1024];
                     DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                     socket.receive(receivePacket); // Nhận phản hồi từ server
-
+                    socketListen = socket;
                     String response = new String(receivePacket.getData(), 0, receivePacket.getLength());
                     System.out.println("Received: " + response);
-
-                    // Gọi update UI nếu có phản hồi liên quan đến điểm số
-                    if (mUpdateUI != null) {
-                        mUpdateUI.updateScorePlayer(); // Cập nhật UI
+                    if(response.equals("type=end_socket")) {
+                        socket.close();
+                        break;
                     }
+                    else {
+                        // Gọi update UI nếu có phản hồi liên quan đến điểm số
+                        if (mUpdateUI != null) {
+                            mUpdateUI.updateScorePlayer(); // Cập nhật UI
+                        }
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -65,5 +73,34 @@ public class UDPClient {
 
     public void setmUpdateUI(updateUI mUpdateUI) {
         this.mUpdateUI = mUpdateUI;
+    }
+
+    // Cập nhật player_game
+    public void sendScoreUpdatePlayerGame(String playerId, String gameId, int score, String result) {
+        try {
+            String message = "type=update_player_game&" +"playerId="+ playerId + "&" + "gameId=" + gameId + "&" + "score=" + score + "&" + "result=" + result ;
+            byte[] sendData = message.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
+            socket.send(sendPacket);
+            System.out.println("Sent to sv: " + message + " to " + serverAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendUpdatePlayer(String playerId, int score, String result) {
+        try {
+            String message = "type=update_player&" +"playerId="+ playerId + "&" + "score=" + score + "&" + "result=" + result ;
+            byte[] sendData = message.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
+            socket.send(sendPacket);
+            System.out.println("Sent to sv: " + message + " to " + serverAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void endSocket() {
+        socketListen.close();
     }
 }

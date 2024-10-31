@@ -31,11 +31,11 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     private JLabel player2ScoreLabel;
     private Timer gameTimer, trashTimer;
     private JPanel gamePanel;
-    private int TIMER = 3000, TIMEPLAY = 30;
+    private int TIMER = 500, TIMEPLAY = 5;
     private int secondsLeft = TIMEPLAY, frametime = TIMER;
     private int player1Score = 0;
     private int player2Score = 0;
-    private String playerId;
+    public String playerId;
     private String roomId;
     private int width = 810, height = 540;
     private Random random = new Random();
@@ -235,7 +235,9 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
 
     // show EndGame
     private void showEndGame() {
-        EndGame endGame = new EndGame(this, determineWinner());
+        udpClient.sendScoreUpdatePlayerGame(playerId,roomId,player1Score,determineWinner());
+        udpClient.sendUpdatePlayer(playerId,player1Score,determineWinner());
+        EndGame endGame = new EndGame(this, determineWinner(),namePlayer1, namePlayer2, player1Score,player2Score);
         endGame.setVisible(true);
         this.setVisible(false);
     }
@@ -244,9 +246,9 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     // Who win?
     private String determineWinner() {
         if (player1Score > player2Score) {
-            return namePlayer1;
+            return "WIN";
         } else if (player2Score > player1Score) {
-            return namePlayer2;
+            return "LOSE";
         } else {
             return "It's a tie!";
         }

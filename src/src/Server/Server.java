@@ -148,7 +148,40 @@ public class Server {
                 }
 
             }
+            else if (type.equals("update_player_game")) {
+                // id player gửi điểm đi
+                String playerId = parts[1].split("=")[1];
+                String gameId = parts[2].split("=")[1];
+                String score = parts[3].split("=")[1];
+                String result = parts[4].split("=")[1];
+                updatePlayer_game(playerId, gameId, Integer.parseInt(score), result);
+                response = "type=end_socket";
+                for (Room room : rooms) {
+                    if(room.getRoomId().equals(gameId))
+                    {
+                        String idPlayerTaget = room.getPlayerId1();;
+                        ClientInfo clientInfo = findClientByPlayerID(idPlayerTaget);
+                        if (clientInfo != null) {
+                            DatagramPacket updateScorePacket = new DatagramPacket(response.getBytes(), response.length(),
+                                    clientInfo.getAddress(), 12349);
+                            socket.send(updateScorePacket);
+                            System.out.println("Response to client: "+ clientInfo.getAddress() + "response:" +response);
+                        } else {
+                            System.out.println("Không tìm thấy người chơi với ID: " + room.getPlayerId2());
+                        }
+                        break;
+                    }
+                }
 
+
+            }
+            else if (type.equals("update_player")) {
+                // id player gửi điểm đi
+                String playerId = parts[1].split("=")[1];
+                String score = parts[2].split("=")[1];
+                String result = parts[3].split("=")[1];
+                updatePlayerStats(playerId, Integer.parseInt(score), result);
+            }
             else {
                 switch (type) {
                     case "login":
@@ -1329,5 +1362,90 @@ public class Server {
             e.printStackTrace();
         }
     }
+
+    private static boolean updatePlayer_game(String playerId, String gameId, int score, String result) {
+        // Kết nối tới cơ sở dữ liệu và thực hiện câu lệnh UPDATE
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            // Câu lệnh UPDATE cho các trường score, result, updatedAt theo playerId và gameId
+            String query = "UPDATE player_game SET score = ?, result = ?, is_final = 1,play_duration = 120 , leave_time = ? WHERE playerID = ? AND gameID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                // Thiết lập giá trị cho các tham số
+                stmt.setInt(1, score);
+                stmt.setString(2, result);
+                stmt.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis())); // Cập nhật updatedAt với thời gian hiện tại
+                stmt.setString(4, playerId);
+                stmt.setString(5, gameId);
+
+                // Thực thi câu lệnh và kiểm tra kết quả
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    private static boolean updatePlayerStats(String playerID, int score,String result) {
+        Connection conn = null;
+        PreparedStatement selectStmt = null;
+        PreparedStatement updateStmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+
+            // Bước 1: Lấy dữ liệu hiện tại từ DB
+            String selectQuery = "SELECT total_games, total_wins, total_score FROM player WHERE playerID = ?";
+            selectStmt = conn.prepareStatement(selectQuery);
+            selectStmt.setString(1, playerID);
+            rs = selectStmt.executeQuery();
+            int totalWins = 0;
+            if (rs.next()) {
+                // Bước 2: Tính toán giá trị mới
+                int totalGames = rs.getInt("total_games") + 1;
+                if(result.equalsIgnoreCase("win")){
+                     totalWins = rs.getInt("total_wins") + 1;
+                } else {
+                     totalWins = rs.getInt("total_wins");
+                }
+                int totalScore = rs.getInt("total_score") + score;
+                double averageScore = totalScore / (double) totalGames;
+
+                // Bước 3: Cập nhật dữ liệu mới vào DB
+                String updateQuery = "UPDATE player SET "
+                        + "total_games = ?, "
+                        + "total_wins = ?, "
+                        + "total_score = ?, "
+                        + "average_score = ?, "
+                        + "isPlaying = 0, "
+                        + "updated_at = ? "
+                        + "WHERE playerID = ?";
+
+                updateStmt = conn.prepareStatement(updateQuery);
+                updateStmt.setInt(1, totalGames);
+                updateStmt.setInt(2, totalWins);
+                updateStmt.setInt(3, totalScore);
+                updateStmt.setInt(4, (int) averageScore);
+                updateStmt.setTimestamp(5, new java.sql.Timestamp(System.currentTimeMillis())); // updated_at với thời gian hiện tại
+                updateStmt.setString(6, playerID);
+
+                return updateStmt.executeUpdate() > 0;
+            } else {
+                System.out.println("Player ID không tồn tại.");
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            // Đóng kết nối và các tài nguyên
+            try { if (rs != null) rs.close(); } catch (Exception e) { e.printStackTrace(); }
+            try { if (selectStmt != null) selectStmt.close(); } catch (Exception e) { e.printStackTrace(); }
+            try { if (updateStmt != null) updateStmt.close(); } catch (Exception e) { e.printStackTrace(); }
+            try { if (conn != null) conn.close(); } catch (Exception e) { e.printStackTrace(); }
+        }
+    }
+
 
 }
