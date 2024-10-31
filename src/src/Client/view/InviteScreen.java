@@ -299,8 +299,8 @@ public class InviteScreen extends JFrame {
         // Cập nhật lại giao diện
         tablePanel.revalidate();
         tablePanel.repaint();
-        refreshTimer = new Timer(5000, e -> loadListFriends());
-        refreshTimer.start();
+//        refreshTimer = new Timer(5000, e -> loadListFriends());
+//        refreshTimer.start();
     }
 
 

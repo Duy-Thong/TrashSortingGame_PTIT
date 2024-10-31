@@ -83,10 +83,6 @@ public class InviteController {
                     // Gửi lời mời
                     socket.send(packet);
                     System.out.println("Invitation sent to " + invitedPlayerID);
-
-                    // Hiển thị thông báo rằng lời mời đã được gửi
-                    JOptionPane.showMessageDialog(null, "Lời mời đã được gửi đến người chơi " + invitedPlayerName + "!");
-
                     // Đặt thời gian chờ cho việc nhận
                     socket.setSoTimeout(inviteTimeout);
                     System.out.println("Waiting for response for " + inviteTimeout + " milliseconds...");
