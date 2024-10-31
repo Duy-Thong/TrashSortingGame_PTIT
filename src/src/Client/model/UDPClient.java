@@ -33,19 +33,24 @@ public class UDPClient {
     }
 
     // Phương thức lắng nghe phản hồi từ server (chạy trong luồng riêng)
-    public void listenForResponses() {
+    public void listenForResponses() throws Exception {
+        socketListen = new DatagramSocket(12349);
         // Sử dụng thread riêng để không bị khóa chương trình
         new Thread(() -> {
             while (true) {
-                try (DatagramSocket socket = new DatagramSocket(12349)) {
+                try {
                     byte[] receiveBuffer = new byte[1024];
                     DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-                    socket.receive(receivePacket); // Nhận phản hồi từ server
-                    socketListen = socket;
+                    socketListen.receive(receivePacket); // Nhận phản hồi từ server
                     String response = new String(receivePacket.getData(), 0, receivePacket.getLength());
                     System.out.println("Received: " + response);
                     if(response.equals("type=end_socket")) {
-                        socket.close();
+                        try {
+                            socketListen.close();
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         break;
                     }
                     else {
@@ -99,8 +104,25 @@ public class UDPClient {
             e.printStackTrace();
         }
     }
+    public void sendUpdateGame(String gameID, int score) {
+        try {
+            String message = "type=update_game&" +"gameID="+ gameID + "&" + "score=" + score;
+            byte[] sendData = message.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
+            socket.send(sendPacket);
+            System.out.println("Sent to sv: " + message + " to " + serverAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void endSocket() {
-        socketListen.close();
+        try {
+            socketListen.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

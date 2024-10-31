@@ -31,7 +31,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     private JLabel player2ScoreLabel;
     private Timer gameTimer, trashTimer;
     private JPanel gamePanel;
-    private int TIMER = 2000, TIMEPLAY = 20;
+    private int TIMER = 1000, TIMEPLAY = 10;
     private int secondsLeft = TIMEPLAY, frametime = TIMER;
     private int player1Score = 0;
     private int player2Score = 0;
@@ -237,6 +237,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     private void showEndGame() {
         udpClient.sendScoreUpdatePlayerGame(playerId,roomId,player1Score,determineWinner());
         udpClient.sendUpdatePlayer(playerId,player1Score,determineWinner());
+        udpClient.sendUpdateGame(roomId,player1Score+ player2Score);
         EndGame endGame = new EndGame(this, determineWinner(),namePlayer1, namePlayer2, player1Score,player2Score);
         endGame.setVisible(true);
         this.setVisible(false);
