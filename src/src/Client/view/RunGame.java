@@ -237,6 +237,7 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     private void showEndGame() {
         udpClient.sendScoreUpdatePlayerGame(playerId,roomId,player1Score,determineWinner());
         udpClient.sendUpdatePlayer(playerId,player1Score,determineWinner());
+        udpClient.sendUpdateGame(roomId,player1Score+ player2Score);
         EndGame endGame = new EndGame(this, determineWinner(),namePlayer1, namePlayer2, player1Score,player2Score);
         endGame.setVisible(true);
         this.setVisible(false);

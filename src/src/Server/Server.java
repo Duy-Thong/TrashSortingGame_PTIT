@@ -155,23 +155,23 @@ public class Server {
                 String score = parts[3].split("=")[1];
                 String result = parts[4].split("=")[1];
                 updatePlayer_game(playerId, gameId, Integer.parseInt(score), result);
-                response = "type=end_socket";
-                for (Room room : rooms) {
-                    if(room.getRoomId().equals(gameId))
-                    {
-                        String idPlayerTaget = room.getPlayerId1();;
-                        ClientInfo clientInfo = findClientByPlayerID(idPlayerTaget);
-                        if (clientInfo != null) {
-                            DatagramPacket updateScorePacket = new DatagramPacket(response.getBytes(), response.length(),
-                                    clientInfo.getAddress(), 12349);
-                            socket.send(updateScorePacket);
-                            System.out.println("Response to client: "+ clientInfo.getAddress() + "response:" +response);
-                        } else {
-                            System.out.println("Không tìm thấy người chơi với ID: " + room.getPlayerId2());
-                        }
-                        break;
-                    }
-                }
+//                response = "type=end_socket";
+//                for (Room room : rooms) {
+//                    if(room.getRoomId().equals(gameId))
+//                    {
+//                        String idPlayerTaget = room.getPlayerId1();;
+//                        ClientInfo clientInfo = findClientByPlayerID(idPlayerTaget);
+//                        if (clientInfo != null) {
+//                            DatagramPacket updateScorePacket = new DatagramPacket(response.getBytes(), response.length(),
+//                                    clientInfo.getAddress(), 12349);
+//                            socket.send(updateScorePacket);
+//                            System.out.println("Response to client: "+ clientInfo.getAddress() + "response:" +response);
+//                        } else {
+//                            System.out.println("Không tìm thấy người chơi với ID: " + room.getPlayerId2());
+//                        }
+//                        break;
+//                    }
+//                }
 
 
             }
@@ -181,6 +181,12 @@ public class Server {
                 String score = parts[2].split("=")[1];
                 String result = parts[3].split("=")[1];
                 updatePlayerStats(playerId, Integer.parseInt(score), result);
+            }
+            else if (type.equals("update_game")) {
+                // id player gửi điểm đi
+                String gameID = parts[1].split("=")[1];
+                String score = parts[2].split("=")[1];
+                updateGame(gameID, Integer.parseInt(score));
             }
             else {
                 switch (type) {
@@ -520,6 +526,7 @@ public class Server {
             sendResponse("error: server error", packet, socket);
         }
     }
+
     public static String getOpponentPlayerID(String playerID, String gameID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "SELECT playerID FROM player_game WHERE gameID = ? AND playerID != ?";
@@ -1375,6 +1382,27 @@ public class Server {
                 stmt.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis())); // Cập nhật updatedAt với thời gian hiện tại
                 stmt.setString(4, playerId);
                 stmt.setString(5, gameId);
+
+                // Thực thi câu lệnh và kiểm tra kết quả
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    private static boolean updateGame(String gameID, int score) {
+        // Kết nối tới cơ sở dữ liệu và thực hiện câu lệnh UPDATE
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            // Câu lệnh UPDATE cho các trường score, result, updatedAt theo playerId và gameId
+            String query = "UPDATE game SET status = finished, end_time = ?, total_score = ? WHERE gameID = ";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                // Thiết lập giá trị cho các tham số
+                stmt.setTimestamp(  1, new java.sql.Timestamp(System.currentTimeMillis())); // Cập nhật updatedAt với thời gian hiện tại
+                stmt.setInt(2, score);
+                stmt.setString(3, gameID);
 
                 // Thực thi câu lệnh và kiểm tra kết quả
                 return stmt.executeUpdate() > 0;
