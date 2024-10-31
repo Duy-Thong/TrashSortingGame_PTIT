@@ -57,12 +57,13 @@ public class ItemManagementController {
             String[] items = response.split("\\|"); // Split using pipe symbol
             for (String item : items) {
                 String[] parts = item.split(";"); // Split using semicolon
-                if (parts.length == 4) { // Ensure there are exactly 4 parts
+                if (parts.length == 5) { // Ensure there are exactly 4 parts
                     String id = parts[0];
                     String name = parts[1];
                     String type = parts[2];
                     String url = parts[3];
-                    trashItems.add(new TrashItem(id, name, type, url));
+                    String description = parts[4];
+                    trashItems.add(new TrashItem(id, name, type, url, description));
                 }
             }
         } catch (Exception e) {
@@ -89,66 +90,19 @@ public class ItemManagementController {
             String[] items = response.split("\\|"); // Split using pipe symbol
             for (String item : items) {
                 String[] parts = item.split(";"); // Split using semicolon
-                if (parts.length == 4) { // Ensure there are exactly 4 parts
+                if (parts.length == 5) { // Ensure there are exactly 4 parts
                     String id = parts[0];
                     String name = parts[1];
                     String type = parts[2];
                     String url = parts[3];
-                    bins.add(new Bin(id, name, type, url));
+                    String description = parts[4];
+                    bins.add(new Bin(id, name, type, url, description));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return bins;
-    }
-
-    public void addTrashItem(TrashItem newItem) {
-        try (DatagramSocket socket = new DatagramSocket()) {
-            String message = "type=addTrashItem&name=" + newItem.getName() + "&type=" + newItem.getType() + "&url=" + newItem.getUrl();
-            byte[] buffer = message.getBytes();
-            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
-            socket.send(packet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void addBin(Bin newBin) {
-        try (DatagramSocket socket = new DatagramSocket()) {
-            String message = "type=addBin&name=" + newBin.getName() + "&type=" + newBin.getType() + "&url=" + newBin.getUrl();
-            byte[] buffer = message.getBytes();
-            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
-            socket.send(packet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updateTrashItem(TrashItem updatedItem) {
-        try (DatagramSocket socket = new DatagramSocket()) {
-            String message = "type=updateTrashItem&id=" + updatedItem.getId() + "&name=" + updatedItem.getName() + "&type=" + updatedItem.getType() + "&url=" + updatedItem.getUrl();
-            byte[] buffer = message.getBytes();
-            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
-            socket.send(packet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updateBin(Bin updatedBin) {
-        try (DatagramSocket socket = new DatagramSocket()) {
-            String message = "type=updateBin&id=" + updatedBin.getId() + "&name=" + updatedBin.getName() + "&type=" + updatedBin.getType() + "&url=" + updatedBin.getUrl();
-            byte[] buffer = message.getBytes();
-            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
-            socket.send(packet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -175,4 +129,54 @@ public class ItemManagementController {
             e.printStackTrace();
         }
     }
+
+    public void addTrashItem(TrashItem trashItem) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            String message = "type=addTrashItem&id=" + trashItem.getId() + "&name=" + trashItem.getName() + "&kind=" + trashItem.getType() + "&url=" + trashItem.getUrl() + "&description=" + trashItem.getDescription();
+            System.out.println(message);
+            byte[] buffer = message.getBytes();
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addBin(Bin bin) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            String message = "type=addBin&id=" + bin.getId() + "&name=" + bin.getName() + "&kind=" + bin.getType() + "&url=" + bin.getUrl() + "&description=" + bin.getDescription();
+            byte[] buffer = message.getBytes();
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateTrashItem(TrashItem trashItem) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            String message = "type=updateTrashItem&id=" + trashItem.getId() + "&name=" + trashItem.getName() + "&kind=" + trashItem.getType() + "&url=" + trashItem.getUrl() + "&description=" + trashItem.getDescription();
+            byte[] buffer = message.getBytes();
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateBin(Bin bin) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            String message = "type=updateBin&id=" + bin.getId() + "&name=" + bin.getName() + "&kind=" + bin.getType() + "&url=" + bin.getUrl() + "&description=" + bin.getDescription();
+            byte[] buffer = message.getBytes();
+            InetAddress serverAddress = InetAddress.getByName(SERVER_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, SERVER_PORT);
+            socket.send(packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

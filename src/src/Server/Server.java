@@ -373,10 +373,12 @@ public class Server {
                         response = responseBin.toString();
                         break;
                     case "addTrashItem":
-                        String name = parts[1].split("=")[1];
-                        type = parts[2].split("=")[1];
-                        String url = parts[3].split("=")[1];
-                        if (addTrashItem(name, type, url)) {
+
+                        String name = parts[2].split("=")[1];
+                        String kind = parts[3].split("=")[1];
+                        String url = parts[4].split("=")[1];
+                        String description = parts[5].split("=")[1];
+                        if (addTrashItem(name, kind, url, description)) {
                             response = "add success";
                         } else {
                             response = "add failure";
@@ -384,10 +386,11 @@ public class Server {
                         break;
 
                     case "addBin":
-                        name = parts[1].split("=")[1];
-                        type = parts[2].split("=")[1];
-                        url = parts[3].split("=")[1];
-                        if (addBin(name, type, url)) {
+                        name = parts[2].split("=")[1];
+                        type = parts[3].split("=")[1];
+                        url = parts[4].split("=")[1];
+                        description = parts[5].split("=")[1];
+                        if (addBin(name, type, url, description)) {
                             response = "add success";
                         } else {
                             response = "add failure";
@@ -417,7 +420,8 @@ public class Server {
                         name = parts[2].split("=")[1];
                         type = parts[3].split("=")[1];
                         url = parts[4].split("=")[1];
-                        if (updateTrashItem(id, name, type, url)) {
+                        description = parts[5].split("=")[1];
+                        if (updateTrashItem(id, name, type, url, description)) {
                             response = "update success";
                         } else {
                             response = "update failure";
@@ -429,7 +433,8 @@ public class Server {
                         name = parts[2].split("=")[1];
                         type = parts[3].split("=")[1];
                         url = parts[4].split("=")[1];
-                        if (updateBin(id, name, type, url)) {
+                        description = parts[5].split("=")[1];
+                        if (updateBin(id, name, type, url, description)) {
                             response = "update success";
                         } else {
                             response = "update failure";
@@ -1169,31 +1174,44 @@ public class Server {
         }
         return bins;
     }
-    public static boolean addTrashItem(String name, String type, String url) {
+    public static boolean addTrashItem(String name, String kind, String url, String description) {
+        System.out.println("Adding trash item");
+        System.out.println(name + " " + kind + " " + url + " " + description);
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String itemID = UUID.randomUUID().toString();
-            String query = "INSERT INTO trashitem (itemID, name, type, img_url) VALUES (?, ?, ?, ?)";
+            String query = "INSERT INTO trashitem (itemID, name, type, img_url, description) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, itemID);
-                stmt.setString(2, name);
-                stmt.setString(3, type);
-                stmt.setString(4, url);
-                return stmt.executeUpdate() > 0;
+                stmt.setString(1, itemID);   // itemID
+                stmt.setString(2, name);      // name
+                stmt.setString(3, kind);      // type
+                stmt.setString(4, url);       // img_url
+                stmt.setString(5, description); // description
+
+                System.out.println(stmt);
+                int rowsAffected = stmt.executeUpdate();
+                return rowsAffected > 0;
             }
+        } catch (SQLException e) {
+            System.err.println("SQLState: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
-    public static boolean addBin(String name, String type, String url) {
+
+    public static boolean addBin(String name, String type, String url, String description) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String binID = UUID.randomUUID().toString();
-            String query = "INSERT INTO trashbin (binID, name, type, img_url) VALUES (?, ?, ?, ?)";
+            String query = "INSERT INTO trashbin (binID, name, type, img_url, description) VALUES (?, ?, ?, ?,?)";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, binID);
                 stmt.setString(2, name);
                 stmt.setString(3, type);
                 stmt.setString(4, url);
+                stmt.setString(5, description);
                 return stmt.executeUpdate() > 0;
             }
         } catch (Exception e) {
@@ -1225,14 +1243,15 @@ public class Server {
             return false;
         }
     }
-    public static boolean updateTrashItem(String itemID, String name, String type, String url) {
+    public static boolean updateTrashItem(String itemID, String name, String type, String url, String description) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "UPDATE trashitem SET name = ?, type = ?, img_url = ?WHERE itemID = ?";
+            String query = "UPDATE trashitem SET name = ?, type = ?, img_url = ? , description = ? WHERE itemID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, name);
                 stmt.setString(2, type);
                 stmt.setString(3, url);
-                stmt.setString(4, itemID);
+                stmt.setString(4, description);
+                stmt.setString(5, itemID);
                 return stmt.executeUpdate() > 0;
             }
         } catch (Exception e) {
@@ -1240,14 +1259,15 @@ public class Server {
             return false;
         }
     }
-    public static boolean updateBin(String binID, String name, String type, String url) {
+    public static boolean updateBin(String binID, String name, String type, String url, String description) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "UPDATE trashbin SET name = ?, type = ?, img_url = ? WHERE binID = ?";
+            String query = "UPDATE trashbin SET name = ?, type = ?, img_url = ?, description = ? WHERE binID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, name);
                 stmt.setString(2, type);
                 stmt.setString(3, url);
-                stmt.setString(4, binID);
+                stmt.setString(4, description);
+                stmt.setString(5, binID);
                 return stmt.executeUpdate() > 0;
             }
         } catch (Exception e) {

@@ -55,7 +55,7 @@ public class ItemManagementScreen extends JFrame {
 
     private JPanel createTrashPanel() {
         JPanel trashPanel = new JPanel(new BorderLayout());
-        trashTableModel = new DefaultTableModel(new Object[]{"ID", "Tên", "Loại", "Hình ảnh", "URL"}, 0) {
+        trashTableModel = new DefaultTableModel(new Object[]{"ID", "Tên", "Loại", "Hình ảnh", "URL","Mô tả"}, 0) {
             public Class<?> getColumnClass(int column) {
                 return (column == 3) ? ImageIcon.class : Object.class; // Set ImageIcon class for image column
             }
@@ -73,7 +73,7 @@ public class ItemManagementScreen extends JFrame {
 
     private JPanel createBinPanel() {
         JPanel binPanel = new JPanel(new BorderLayout());
-        binTableModel = new DefaultTableModel(new Object[]{"ID", "Tên", "Loại", "Hình ảnh", "URL"}, 0) {
+        binTableModel = new DefaultTableModel(new Object[]{"ID", "Tên", "Loại", "Hình ảnh", "URL","Mô tả"}, 0) {
             public Class<?> getColumnClass(int column) {
                 return (column == 3) ? ImageIcon.class : Object.class; // Set ImageIcon class for image column
             }
@@ -100,7 +100,7 @@ public class ItemManagementScreen extends JFrame {
         trashTableModel.setRowCount(0);
         for (TrashItem item : trashItems) {
             loadImageAsync(item.getUrl(), trashTableModel, new Object[]{
-                    item.getId(), item.getName(), item.getType(), null, item.getUrl()
+                    item.getId(), item.getName(), item.getType(), null, item.getUrl(), item.getDescription()
             });
         }
     }
@@ -110,7 +110,7 @@ public class ItemManagementScreen extends JFrame {
         binTableModel.setRowCount(0);
         for (Bin bin : binItems) {
             loadImageAsync(bin.getUrl(), binTableModel, new Object[]{
-                    bin.getId(), bin.getName(), bin.getType(), null, bin.getUrl()
+                    bin.getId(), bin.getName(), bin.getType(), null, bin.getUrl(), bin.getDescription()
             });
         }
     }
@@ -140,6 +140,7 @@ public class ItemManagementScreen extends JFrame {
         dialog.setVisible(true);
         if (dialog.isSucceeded()) {
             if (isTrash) {
+                System.out.println("Return from dialog: " + dialog.getTrashItem().getName() + " " + dialog.getTrashItem().getType()+ " " + dialog.getTrashItem().getUrl()+ " " + dialog.getTrashItem().getDescription());
                 itemManagementController.addTrashItem(dialog.getTrashItem());
                 loadTrashItems();
             } else {
@@ -157,7 +158,8 @@ public class ItemManagementScreen extends JFrame {
                         (String) trashTableModel.getValueAt(selectedRow, 0),
                         (String) trashTableModel.getValueAt(selectedRow, 1),
                         (String) trashTableModel.getValueAt(selectedRow, 2),
-                        (String) trashTableModel.getValueAt(selectedRow, 4)
+                        (String) trashTableModel.getValueAt(selectedRow, 4),
+                        (String) trashTableModel.getValueAt(selectedRow, 5)
                 );
                 ItemDialog dialog = new ItemDialog(this, selectedItem, true);
                 dialog.setVisible(true);
@@ -170,7 +172,8 @@ public class ItemManagementScreen extends JFrame {
                         (String) binTableModel.getValueAt(selectedRow, 0),
                         (String) binTableModel.getValueAt(selectedRow, 1),
                         (String) binTableModel.getValueAt(selectedRow, 2),
-                        (String) binTableModel.getValueAt(selectedRow, 4)
+                        (String) binTableModel.getValueAt(selectedRow, 4),
+                        (String) binTableModel.getValueAt(selectedRow, 5)
                 );
                 ItemDialog dialog = new ItemDialog(this, selectedBin, false);
                 dialog.setVisible(true);
