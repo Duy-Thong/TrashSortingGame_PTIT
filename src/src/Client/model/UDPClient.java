@@ -37,18 +37,23 @@ public class UDPClient {
         // Sử dụng thread riêng để không bị khóa chương trình
         new Thread(() -> {
             while (true) {
-                try (DatagramSocket socket = new DatagramSocket(new Random().nextInt(65000 - 12349 + 1) + 12349)) {
+                try (DatagramSocket socket = new DatagramSocket(12349)) {
                     byte[] receiveBuffer = new byte[1024];
                     DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                     socket.receive(receivePacket); // Nhận phản hồi từ server
                     socketListen = socket;
                     String response = new String(receivePacket.getData(), 0, receivePacket.getLength());
                     System.out.println("Received: " + response);
-
-                    // Gọi update UI nếu có phản hồi liên quan đến điểm số
-                    if (mUpdateUI != null) {
-                        mUpdateUI.updateScorePlayer(); // Cập nhật UI
+                    if(response.equals("type=end_socket")) {
+                        socket.close();
                     }
+                    else {
+                        // Gọi update UI nếu có phản hồi liên quan đến điểm số
+                        if (mUpdateUI != null) {
+                            mUpdateUI.updateScorePlayer(); // Cập nhật UI
+                        }
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

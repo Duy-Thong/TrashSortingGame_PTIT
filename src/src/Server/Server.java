@@ -155,6 +155,25 @@ public class Server {
                 String score = parts[3].split("=")[1];
                 String result = parts[4].split("=")[1];
                 updatePlayer_game(playerId, gameId, Integer.parseInt(score), result);
+                response = "type=end_socket";
+                for (Room room : rooms) {
+                    if(room.getRoomId().equals(gameId))
+                    {
+                        String idPlayerTaget = room.getPlayerId1();;
+                        ClientInfo clientInfo = findClientByPlayerID(idPlayerTaget);
+                        if (clientInfo != null) {
+                            DatagramPacket updateScorePacket = new DatagramPacket(response.getBytes(), response.length(),
+                                    clientInfo.getAddress(), 12349);
+                            socket.send(updateScorePacket);
+                            System.out.println("Response to client: "+ clientInfo.getAddress() + "response:" +response);
+                        } else {
+                            System.out.println("Không tìm thấy người chơi với ID: " + room.getPlayerId2());
+                        }
+                        break;
+                    }
+                }
+
+
             }
             else if (type.equals("update_player")) {
                 // id player gửi điểm đi
