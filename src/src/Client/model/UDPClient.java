@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
+import java.util.Random;
 
 public class UDPClient {
     private DatagramSocket socket;
@@ -36,7 +37,7 @@ public class UDPClient {
         // Sử dụng thread riêng để không bị khóa chương trình
         new Thread(() -> {
             while (true) {
-                try (DatagramSocket socket = new DatagramSocket(12349)) {
+                try (DatagramSocket socket = new DatagramSocket(new Random().nextInt(65000 - 12349 + 1) + 12349)) {
                     byte[] receiveBuffer = new byte[1024];
                     DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                     socket.receive(receivePacket); // Nhận phản hồi từ server
