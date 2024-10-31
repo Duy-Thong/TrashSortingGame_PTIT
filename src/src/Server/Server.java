@@ -801,7 +801,7 @@ public class Server {
         // Kết nối tới cơ sở dữ liệu và thực hiện câu lệnh UPDATE
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             // Câu lệnh UPDATE cho các trường score, result, updatedAt theo playerId và gameId
-            String query = "UPDATE player_game SET score = ?, result = ?, status = 0, updated_at = ? WHERE playerID = ? AND gameID = ?";
+            String query = "UPDATE player_game SET score = ?, result = ?, is_final = 0, leave_time = ? WHERE playerID = ? AND gameID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 // Thiết lập giá trị cho các tham số
                 stmt.setInt(1, score);
