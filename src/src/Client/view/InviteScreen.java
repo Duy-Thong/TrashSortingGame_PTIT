@@ -230,7 +230,7 @@ public class InviteScreen extends JFrame {
         };
 
         playerTable = new JTable(model);
-        playerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        playerTable.setOpaque(false);
         playerTable.setRowHeight(25);
         playerTable.setFont(pixelFont);
         playerTable.setBackground(new Color(255, 255, 255, 128));
@@ -238,7 +238,7 @@ public class InviteScreen extends JFrame {
 
         playerTable.getTableHeader().setFont(pixelFont.deriveFont(Font.BOLD, 12f));
         playerTable.getTableHeader().setForeground(Color.BLACK);
-        playerTable.getTableHeader().setBackground(new Color(255, 255, 255)); // nếu muốn nền trắng
+        playerTable.getTableHeader().setBackground(new Color(255, 255, 255));
 
         DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
             @Override

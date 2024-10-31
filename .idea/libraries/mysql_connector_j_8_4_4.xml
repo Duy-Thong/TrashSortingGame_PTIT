@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="mysql-connector-j-8.4.4">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/IdeaProjects/TrashSortingGame_PTIT/mysql-connector-j-8.4.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

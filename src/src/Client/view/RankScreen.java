@@ -54,7 +54,7 @@ public class RankScreen extends JFrame {
 
         rankTable = new JTable(model);
         rankTable.setRowHeight(25);
-        rankTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        rankTable.setOpaque(false);
         rankTable.setFont(pixelFont);
         rankTable.setBackground(new Color(255, 255, 255, 128));
         rankTable.setGridColor(Color.WHITE);

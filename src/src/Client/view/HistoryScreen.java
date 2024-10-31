@@ -62,9 +62,9 @@ public class HistoryScreen extends JFrame {
         };
 
         JTable historyTable = new JTable(model);
-        historyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         historyTable.setRowHeight(40); // Chiều cao hàng mới
         historyTable.setFont(pixelFont);
+        historyTable.setOpaque(false);
         historyTable.setBackground(new Color(255, 255, 255, 128));
         historyTable.setGridColor(Color.WHITE);
 
@@ -147,7 +147,7 @@ public class HistoryScreen extends JFrame {
         });
 
         // Fill empty rows if necessary
-        int maxRows = 14;
+        int maxRows = 9;
         int currentRows = historyList.size();
         for (int i = currentRows; i < maxRows; i++) {
             model.addRow(new Object[]{
@@ -192,7 +192,7 @@ public class HistoryScreen extends JFrame {
         titleLabel.setForeground(Color.BLACK);
 
         JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(7, 0, 15, 0));
         titlePanel.add(titleLabel, BorderLayout.CENTER);
         titlePanel.setOpaque(false);
 
