@@ -801,7 +801,7 @@ public class Server {
         // Kết nối tới cơ sở dữ liệu và thực hiện câu lệnh UPDATE
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             // Câu lệnh UPDATE cho các trường score, result, updatedAt theo playerId và gameId
-            String query = "UPDATE player_game SET score = ?, result = ?, is_final = 0, leave_time = ? WHERE playerID = ? AND gameID = ?";
+            String query = "UPDATE player_game SET score = ?, result = ?, is_final = 1,playduration = 120 , leave_time = ? WHERE playerID = ? AND gameID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 // Thiết lập giá trị cho các tham số
                 stmt.setInt(1, score);
@@ -830,7 +830,7 @@ public class Server {
             conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
 
             // Bước 1: Lấy dữ liệu hiện tại từ DB
-            String selectQuery = "SELECT total_games, total_wins, total_score FROM player_game WHERE playerID = ?";
+            String selectQuery = "SELECT total_games, total_wins, total_score FROM player WHERE playerID = ?";
             selectStmt = conn.prepareStatement(selectQuery);
             selectStmt.setString(1, playerID);
             rs = selectStmt.executeQuery();
@@ -847,7 +847,7 @@ public class Server {
                 double averageScore = totalScore / (double) totalGames;
 
                 // Bước 3: Cập nhật dữ liệu mới vào DB
-                String updateQuery = "UPDATE player_game SET "
+                String updateQuery = "UPDATE player SET "
                         + "total_games = ?, "
                         + "total_wins = ?, "
                         + "total_score = ?, "
