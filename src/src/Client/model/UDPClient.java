@@ -46,6 +46,7 @@ public class UDPClient {
                     System.out.println("Received: " + response);
                     if(response.equals("type=end_socket")) {
                         socket.close();
+                        break;
                     }
                     else {
                         // Gọi update UI nếu có phản hồi liên quan đến điểm số
