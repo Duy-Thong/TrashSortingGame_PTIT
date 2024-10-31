@@ -87,8 +87,9 @@ public class Server {
 
                     // Tạo hai bản ghi PlayerGame cho hai người chơi
                     Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-                    PlayerGame player1Game = new PlayerGame(currentPlayerID, gameID, currentTime, null, 0, 0, "", false);
-                    PlayerGame player2Game = new PlayerGame(invitedPlayerID, gameID, currentTime, null, 0, 0, "", false);
+                    Timestamp StartTime = new Timestamp(System.currentTimeMillis()+3000);
+                    PlayerGame player1Game = new PlayerGame(currentPlayerID, gameID, StartTime, null, 0, 0, "", false);
+                    PlayerGame player2Game = new PlayerGame(invitedPlayerID, gameID, StartTime, null, 0, 0, "", false);
                     savePlayerGame(player1Game);
                     savePlayerGame(player2Game);
 
@@ -97,7 +98,7 @@ public class Server {
                     updatePlayerIsPlaying(invitedPlayerID, true);
 
                     // Gửi gói tin thông báo tạo game cho hai người chơi
-                    String notificationMessage = "type=accepted&gameID=" + gameID + "&player1=" + currentPlayerID + "&player2=" + invitedPlayerID;
+                    String notificationMessage = "type=accepted&gameID=" + gameID + "&player1=" + currentPlayerID + "&player2=" + invitedPlayerID+"&startTime="+StartTime;
                     byte[] sendData = notificationMessage.getBytes();
                     rooms.add(new Room(gameID,currentPlayerID,invitedPlayerID));
 
@@ -139,7 +140,7 @@ public class Server {
                             DatagramPacket updateScorePacket = new DatagramPacket(response.getBytes(), response.length(),
                                     clientInfo.getAddress(), 12349);
                             socket.send(updateScorePacket);
-                            System.out.println("Response to client: "+ clientInfo.getAddress() + "response:" +response);
+//                            System.out.println("Response to client: "+ clientInfo.getAddress() + "response:" +response);
                         } else {
                             System.out.println("Không tìm thấy người chơi với ID: " + room.getPlayerId2());
                         }
@@ -235,7 +236,7 @@ public class Server {
                         }
 
                         response = responseBuilder.toString();
-                        System.out.println("Response to client: " + response);
+//                        System.out.println("Response to client: " + response);
                         break;
                     case "rank":
                         List<Player> playerList = getAllPlayers();
@@ -273,7 +274,7 @@ public class Server {
                         }
 
                         response = responseFriends.toString();
-                        System.out.println("Response to client: " + response);
+//                        System.out.println("Response to client: " + response);
                         break;
                     case "logout":
                         playerID = parts[1].split("=")[1];

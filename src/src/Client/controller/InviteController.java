@@ -5,9 +5,13 @@ import Client.model.Player;
 import Client.view.RunGame;
 
 import java.net.*;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 
 public class InviteController {
@@ -106,7 +110,8 @@ public class InviteController {
                             String gameId = parts[1].split("=")[1];
                             String senderId = parts[2].split("=")[1];
                             String receiverId = parts[3].split("=")[1];
-                            System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
+                            Timestamp startTime = Timestamp.valueOf(parts[4].split("=")[1]);
+                            System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId+", Start time: "+startTime);
                             callback.onInviteAccepted(invitedPlayerID, gameId);
                         } else if (parts[0].equals("type=declined")) {
                             System.out.println("Invite declined by " + invitedPlayerID);
@@ -158,9 +163,28 @@ public class InviteController {
                         String gameId = parts[1].split("=")[1];
                         String senderId = parts[2].split("=")[1];
                         String receiverId = parts[3].split("=")[1];
-                        System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId);
-                        // Chuyển sang màn game
-                        new RunGame(gameId,receiverId,senderId).setVisible(true);
+                        Timestamp startTime = Timestamp.valueOf(parts[4].split("=")[1]);
+                        System.out.println("Game ID: " + gameId + ", Sender ID: " + senderId + ", Receiver ID: " + receiverId + ", Start time: " + startTime);
+
+                        // Calculate the delay until startTime
+                        long delay = startTime.getTime() - System.currentTimeMillis();
+
+                        if (delay > 0) {
+                            // Schedule the game to start after the delay
+                            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+                            scheduler.schedule(() -> {
+                                // Ensure RunGame is executed on the EDT
+                                SwingUtilities.invokeLater(() -> {
+                                    new RunGame(gameId, receiverId, senderId).setVisible(true);
+                                });
+                            }, delay, TimeUnit.MILLISECONDS);
+                            scheduler.shutdown(); // Shutdown the scheduler after scheduling the task
+                        } else {
+                            // If the start time is in the past, start the game immediately
+                            SwingUtilities.invokeLater(() -> {
+                                new RunGame(gameId, receiverId, senderId).setVisible(true);
+                            });
+                        }
                     }
                 }
             } catch (Exception e) {
