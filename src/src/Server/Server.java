@@ -559,7 +559,7 @@ public class Server {
 
     private static List<String> getTrashTypes() {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT DISTINCT type FROM trashitem";
+            String query = "SELECT DISTINCT type FROM trashbin";
             List<String> trashTypes = new ArrayList<>();
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
@@ -866,7 +866,7 @@ public class Server {
             String query = "SELECT p.playerID, p.total_games, p.total_wins, p.total_score, a.username, p.average_score, p.status, p.isPlaying, p.created_at "
                     + "FROM player p "
                     + "JOIN account a ON p.accountID = a.accountID "
-                    + "WHERE p.status = 1 AND p.isPlaying = 0 AND p.playerID != ?"; // Lọc ra bạn bè online và không phải là bản thân
+                    + "WHERE p.status = 1 AND p.isPlaying = 0 AND p.playerID != ? AND a.role = 'player' "; // Lọc ra bạn bè online và không phải là bản thân
 
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, playerId); // Thiết lập giá trị playerID vào câu truy vấn
@@ -1203,15 +1203,21 @@ public class Server {
     }
 
     public static boolean addBin(String name, String type, String url, String description) {
+        if (!addEnumType("trashbin", "type", type)) {
+            System.err.println("Không thể thêm giá trị mới vào ENUM type.");
+            return false;
+        }
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String binID = UUID.randomUUID().toString();
-            String query = "INSERT INTO trashbin (binID, name, type, img_url, description) VALUES (?, ?, ?, ?,?)";
+            String query = "INSERT INTO trashbin (binID, name, type, img_url, description) VALUES (?, ?, ?, ?, ?)";
+
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, binID);
                 stmt.setString(2, name);
                 stmt.setString(3, type);
                 stmt.setString(4, url);
                 stmt.setString(5, description);
+                System.out.println(stmt);
                 return stmt.executeUpdate() > 0;
             }
         } catch (Exception e) {
@@ -1219,6 +1225,43 @@ public class Server {
             return false;
         }
     }
+
+    // Hàm để thêm giá trị ENUM mới vào cột nếu chưa tồn tại
+    private static boolean addEnumType(String tableName, String columnName, String enumValue) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             Statement stmt = conn.createStatement()) {
+
+            // Lấy các giá trị ENUM hiện tại của cột
+            String enumQuery = "SHOW COLUMNS FROM " + tableName + " WHERE Field = '" + columnName + "'";
+            ResultSet rs = stmt.executeQuery(enumQuery);
+
+            if (rs.next()) {
+                String enumDefinition = rs.getString("Type");
+
+                // Kiểm tra nếu enumValue đã tồn tại trong danh sách
+                if (enumDefinition.contains("'" + enumValue + "'")) {
+                    return true; // Giá trị đã tồn tại
+                }
+
+                // Bỏ "ENUM(" và ")" khỏi định nghĩa hiện tại để chuẩn bị thêm giá trị mới
+                String existingEnums = enumDefinition.substring(enumDefinition.indexOf("(") + 1, enumDefinition.lastIndexOf(")"));
+                String newEnumDefinition = "ENUM(" + existingEnums + ", '" + enumValue + "')";
+
+                // Tạo câu lệnh ALTER TABLE với giá trị mới
+                String alterQuery = "ALTER TABLE " + tableName + " MODIFY " + columnName + " " + newEnumDefinition;
+
+                // Thực hiện câu lệnh ALTER TABLE
+                stmt.execute(alterQuery);
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+
     public static boolean deleteTrashItem(String itemID) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "DELETE FROM trashitem WHERE itemID = ?";

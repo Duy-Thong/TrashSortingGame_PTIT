@@ -139,8 +139,12 @@ public class ItemManagementScreen extends JFrame {
         ItemDialog dialog = new ItemDialog(this, null, isTrash);
         dialog.setVisible(true);
         if (dialog.isSucceeded()) {
+            String url = isTrash ? dialog.getTrashItem().getUrl() : dialog.getBin().getUrl();
+            if (!isValidImageURL(url)) {
+                JOptionPane.showMessageDialog(this, "URL không hợp lệ hoặc không dẫn đến hình ảnh. Vui lòng nhập lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             if (isTrash) {
-                System.out.println("Return from dialog: " + dialog.getTrashItem().getName() + " " + dialog.getTrashItem().getType()+ " " + dialog.getTrashItem().getUrl()+ " " + dialog.getTrashItem().getDescription());
                 itemManagementController.addTrashItem(dialog.getTrashItem());
                 loadTrashItems();
             } else {
@@ -164,6 +168,11 @@ public class ItemManagementScreen extends JFrame {
                 ItemDialog dialog = new ItemDialog(this, selectedItem, true);
                 dialog.setVisible(true);
                 if (dialog.isSucceeded()) {
+                    String url = dialog.getTrashItem().getUrl();
+                    if (!isValidImageURL(url)) {
+                        JOptionPane.showMessageDialog(this, "URL không hợp lệ hoặc không dẫn đến hình ảnh. Vui lòng nhập lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     itemManagementController.updateTrashItem(dialog.getTrashItem());
                     loadTrashItems();
                 }
@@ -178,6 +187,11 @@ public class ItemManagementScreen extends JFrame {
                 ItemDialog dialog = new ItemDialog(this, selectedBin, false);
                 dialog.setVisible(true);
                 if (dialog.isSucceeded()) {
+                    String url = dialog.getBin().getUrl();
+                    if (!isValidImageURL(url)) {
+                        JOptionPane.showMessageDialog(this, "URL không hợp lệ hoặc không dẫn đến hình ảnh. Vui lòng nhập lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     itemManagementController.updateBin(dialog.getBin());
                     loadBinItems();
                 }
@@ -186,6 +200,7 @@ public class ItemManagementScreen extends JFrame {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một vật phẩm để sửa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     private void deleteItem(boolean isTrash) {
         int selectedRow = isTrash ? trashTable.getSelectedRow() : binTable.getSelectedRow();
@@ -243,4 +258,14 @@ public class ItemManagementScreen extends JFrame {
             return null;
         }
     }
+    private boolean isValidImageURL(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            BufferedImage image = ImageIO.read(url); // Try to read the image from the URL
+            return image != null; // Returns true if the image loads successfully
+        } catch (IOException e) {
+            return false; // Returns false if there's an error (e.g., URL doesn't lead to an image)
+        }
+    }
+
 }

@@ -1,6 +1,6 @@
 package Client.view.admin;
 
-import Client.controller.admin.ItemManagementController; // Import your controller
+import Client.controller.admin.ItemManagementController;
 import Client.model.Bin;
 import Client.model.TrashItem;
 
@@ -10,14 +10,15 @@ import java.util.List;
 
 public class ItemDialog extends JDialog {
     private JTextField txtName;
-    private JComboBox<String> cmbType; // Changed from JTextField to JComboBox
+    private JComboBox<String> cmbType; // For TrashItem types
+    private JTextField txtType; // For Bin type input
     private JTextField txtUrl;
     private JTextField txtDescription;
     private boolean succeeded;
     private TrashItem trashItem;
     private Bin bin;
     private boolean isTrash;
-    private ItemManagementController itemManagementController; // Controller to get types
+    private ItemManagementController itemManagementController;
 
     public ItemDialog(JFrame parent, Object item, boolean isTrash) {
         super(parent, "Vật phẩm", true);
@@ -39,24 +40,29 @@ public class ItemDialog extends JDialog {
     private void initializeComponents() {
         setLayout(new GridLayout(5, 2));
 
-        add(new JLabel("Tên vật phẩm:")); // Label for item name
+        add(new JLabel("Tên vật phẩm:"));
         txtName = new JTextField();
         add(txtName);
 
-        add(new JLabel("Loại vật phẩm:")); // Label for item type
-        cmbType = new JComboBox<>(); // Create JComboBox
-        populateTypeComboBox(); // Populate the JComboBox with types
-        add(cmbType);
+        add(new JLabel("Loại vật phẩm:"));
 
-        add(new JLabel("URL:")); // Label for URL
+        if (isTrash) {
+            cmbType = new JComboBox<>();
+            populateTypeComboBox(); // Populate JComboBox with types for TrashItem
+            add(cmbType);
+        } else {
+            txtType = new JTextField();
+            add(txtType);
+        }
+
+        add(new JLabel("URL:"));
         txtUrl = new JTextField();
         add(txtUrl);
 
-        add(new JLabel("Mô tả:")); // Label for description
+        add(new JLabel("Mô tả:"));
         txtDescription = new JTextField();
         add(txtDescription);
 
-        // Buttons
         add(createButton("Lưu", e -> saveItem()));
         add(createButton("Hủy", e -> dispose()));
     }
@@ -68,9 +74,9 @@ public class ItemDialog extends JDialog {
     }
 
     private void populateTypeComboBox() {
-        List<String> types = itemManagementController.getTrashTypes(); // Get types from the controller
+        List<String> types = itemManagementController.getTrashTypes();
         for (String type : types) {
-            cmbType.addItem(type); // Add each type to the JComboBox
+            cmbType.addItem(type);
         }
     }
 
@@ -79,7 +85,7 @@ public class ItemDialog extends JDialog {
             this.trashItem = (TrashItem) item;
             if (trashItem != null) {
                 txtName.setText(trashItem.getName());
-                cmbType.setSelectedItem(trashItem.getType()); // Select the item type from JComboBox
+                cmbType.setSelectedItem(trashItem.getType());
                 txtUrl.setText(trashItem.getUrl());
                 txtDescription.setText(trashItem.getDescription());
             }
@@ -87,7 +93,7 @@ public class ItemDialog extends JDialog {
             this.bin = (Bin) item;
             if (bin != null) {
                 txtName.setText(bin.getName());
-                cmbType.setSelectedItem(bin.getType()); // Select the bin type from JComboBox
+                txtType.setText(bin.getType()); // Set text directly for Bin type
                 txtUrl.setText(bin.getUrl());
                 txtDescription.setText(bin.getDescription());
             }
@@ -102,12 +108,12 @@ public class ItemDialog extends JDialog {
 
     private void saveItem() {
         String name = txtName.getText();
-        String type = (String) cmbType.getSelectedItem(); // Get selected item type from JComboBox
+        String type = isTrash ? (String) cmbType.getSelectedItem() : txtType.getText();
         String url = txtUrl.getText();
         String description = txtDescription.getText();
 
         // Validate input
-        if (name.isEmpty() || type == null || url.isEmpty() || description.isEmpty()) {
+        if (name.isEmpty() || type == null || type.isEmpty() || url.isEmpty() || description.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Tên vật phẩm, Loại, URL và Mô tả không được để trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
