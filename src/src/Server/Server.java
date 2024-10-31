@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Server {
+public class    Server {
     private static final int PORT = 12345;
     private static final String DB_URL = "jdbc:mysql://localhost:3306/trashsortinggame";
     private static final String DB_USER = "root";

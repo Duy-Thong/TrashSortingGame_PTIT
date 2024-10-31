@@ -4,6 +4,8 @@ import Client.controller.LoginController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class EndGame extends JFrame {
     private final String namePlayer1;
@@ -11,6 +13,7 @@ public class EndGame extends JFrame {
     private final int scorePlayer1;
     private final int scorePlayer2;
     private final String result;
+    Font customFont;
 
     public EndGame(RunGame parentGame, String result, String namePlayer1, String namePlayer2, int scorePlayer1, int scorePlayer2) {
         this.namePlayer1 = namePlayer1;
@@ -18,6 +21,9 @@ public class EndGame extends JFrame {
         this.scorePlayer1 = scorePlayer1;
         this.scorePlayer2 = scorePlayer2;
         this.result = result;
+
+        customFont = loadCustomFont("../assets/FVF.ttf");
+
 
         // Create JFrame for the end game screen
         setTitle("Game Over - " + result);
@@ -38,6 +44,7 @@ public class EndGame extends JFrame {
 
         // Button to return to lobby
         JButton restartButton = createCustomButton("Return to Lobby");
+        restartButton.setFont(customFont.deriveFont(Font.BOLD, 12));
         restartButton.addActionListener(e -> {
             new LobbyScreen(parentGame.playerId, parentGame.namePlayer1);
             this.dispose();
@@ -46,7 +53,7 @@ public class EndGame extends JFrame {
 
         // Result Title
         JLabel titleLabel = new JLabel(result.toUpperCase(), SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 50)); // Increased font size for the title
+        titleLabel.setFont(customFont.deriveFont(Font.BOLD, 50)); // Increased font size for the title
         titleLabel.setForeground(Color.YELLOW);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0)); // Add vertical padding to title
         backgroundLabel.add(titleLabel,BorderLayout.NORTH);
@@ -77,7 +84,7 @@ public class EndGame extends JFrame {
         playerPanel.setOpaque(false); // Make panel transparent
 
         JLabel playerLabel = new JLabel("<html><div style='text-align: center;'>" + playerName + "<br>Score: " + playerScore + "</div></html>", SwingConstants.CENTER);
-        playerLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        playerLabel.setFont(customFont.deriveFont(Font.BOLD, 18));
         playerLabel.setForeground(Color.BLUE);
         playerPanel.add(playerLabel, BorderLayout.NORTH);
 
@@ -86,12 +93,25 @@ public class EndGame extends JFrame {
 
     private JButton createCustomButton(String text) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 18));
+        button.setFont(customFont.deriveFont(Font.BOLD, 18));
         button.setForeground(Color.WHITE);
         button.setBackground(new Color(0, 102, 204)); // Customize button color
         button.setFocusPainted(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(new Dimension(200, 50)); // Adjust button size
         return button;
+    }
+
+    // Load custom font method
+    private Font loadCustomFont(String fontPath) {
+        try (InputStream is = getClass().getResourceAsStream(fontPath)) {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(customFont);
+            return customFont;
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+            return new Font("Serif", Font.PLAIN, 18);
+        }
     }
 }
