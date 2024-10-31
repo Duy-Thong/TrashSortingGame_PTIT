@@ -99,6 +99,18 @@ public class UDPClient {
             e.printStackTrace();
         }
     }
+    public void sendUpdateGame(String gameID, int score) {
+        try {
+            String message = "type=update_game&" +"gameID="+ gameID + "&" + "score=" + score;
+            byte[] sendData = message.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
+            socket.send(sendPacket);
+            System.out.println("Sent to sv: " + message + " to " + serverAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void endSocket() {
         socketListen.close();
