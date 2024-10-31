@@ -23,7 +23,7 @@ public class TrashItem{
     private String type;
     private String url;
     private String description;
-    private int widthImage = 40, heightImage = 40;
+    private int widthImage = 60, heightImage = 60;
     private ImageIcon trashImages;
 
     public TrashItem(int x, int y, int index, String type, String url) {
