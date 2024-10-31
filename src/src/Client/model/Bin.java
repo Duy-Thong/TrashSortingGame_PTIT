@@ -25,7 +25,7 @@ public class Bin{
     private String url;
     private String description;
     private ImageIcon binImage;
-    private int widthImage = 64, heightImage = 64;
+    private int widthImage = 80, heightImage = 80;
 
     public Bin(int x, int y, String type, String url) {
         this.type = type;
