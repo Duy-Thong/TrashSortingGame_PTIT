@@ -874,7 +874,7 @@ public class    Server {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "SELECT p.playerID, p.total_games, p.total_wins, p.total_score, a.username, p.average_score, p.status, p.isPlaying, p.created_at"
                     + " FROM player p"
-                    + " JOIN account a ON p.accountID = a.accountID";
+                    + " JOIN account a ON p.accountID = a.accountID" + "WHERE a.role = 'player'"; // Lọc ra tất cả các người chơi
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
