@@ -247,11 +247,11 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     // Who win?
     private String determineWinner() {
         if (player1Score > player2Score) {
-            return "WIN";
+            return "win";
         } else if (player2Score > player1Score) {
-            return "LOSE";
+            return "lose";
         } else {
-            return "It's a tie!";
+            return "draw";
         }
     }
 
