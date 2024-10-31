@@ -8,6 +8,7 @@ import java.net.SocketTimeoutException;
 
 public class UDPClient {
     private DatagramSocket socket;
+    private DatagramSocket socketListen;
     private InetAddress serverAddress;
     private int serverPort;
     private updateUI mUpdateUI;
@@ -39,7 +40,7 @@ public class UDPClient {
                     byte[] receiveBuffer = new byte[1024];
                     DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                     socket.receive(receivePacket); // Nhận phản hồi từ server
-
+                    socketListen = socket;
                     String response = new String(receivePacket.getData(), 0, receivePacket.getLength());
                     System.out.println("Received: " + response);
 
@@ -90,5 +91,9 @@ public class UDPClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void endSocket() {
+        socketListen.close();
     }
 }
