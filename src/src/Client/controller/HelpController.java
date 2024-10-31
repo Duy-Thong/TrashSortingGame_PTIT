@@ -35,12 +35,13 @@ public class HelpController {
             String[] items = response.split("\\|"); // Split using pipe symbol
             for (String item : items) {
                 String[] parts = item.split(";"); // Split using semicolon
-                if (parts.length == 4) { // Ensure there are exactly 4 parts
+                if (parts.length == 5) { // Ensure there are exactly 4 parts
                     String id = parts[0];
                     String name = parts[1];
                     String type = parts[2];
                     String url = parts[3];
-                    trashItems.add(new TrashItem(id, name, type, url));
+                    String description = parts[4];
+                    trashItems.add(new TrashItem(id, name, type, url, description));
                 }
             }
         } catch (Exception e) {
@@ -67,12 +68,13 @@ public class HelpController {
             String[] items = response.split("\\|"); // Split using pipe symbol
             for (String item : items) {
                 String[] parts = item.split(";"); // Split using semicolon
-                if (parts.length == 4) { // Ensure there are exactly 4 parts
+                if (parts.length == 5) { // Ensure there are exactly 4 parts
                     String id = parts[0];
                     String name = parts[1];
                     String type = parts[2];
                     String url = parts[3];
-                    bins.add(new Bin(id, name, type, url));
+                    String description = parts[4];
+                    bins.add(new Bin(id, name, type, url, description));
                 }
             }
         } catch (Exception e) {

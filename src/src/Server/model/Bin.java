@@ -26,6 +26,7 @@ public class Bin{
     private String id;
     private String name;
     private String url;
+    private String description;
     private ImageIcon binImage;
     private int widthImage = 64, heightImage = 64;
 
@@ -48,6 +49,14 @@ public class Bin{
         this.name = name;
         this.type = type;
         this.url = url;
+    }
+
+    public Bin(String id, String name, String type, String url, String description) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.url = url;
+        this.description = description;
     }
     private ImageIcon urlToImage(String urlString){
         try {
@@ -138,5 +147,12 @@ public class Bin{
 
     public void setHeightImage(int heightImage) {
         this.heightImage = heightImage;
+    }
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

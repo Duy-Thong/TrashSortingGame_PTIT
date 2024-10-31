@@ -357,8 +357,8 @@ public class Server {
                         List<TrashItem> trashItems1 = getTrashItemData();
                         StringBuilder responseTrashItem = new StringBuilder();
                         for (TrashItem t : trashItems1) {
-                            responseTrashItem.append(String.format("%s;%s;%s;%s|",
-                                    t.getId(), t.getName(), t.getType(), t.getUrl())); // Using semicolon as a delimiter
+                            responseTrashItem.append(String.format("%s;%s;%s;%s;%s|",
+                                    t.getId(), t.getName(), t.getType(), t.getUrl(),t.getDescription())); // Using semicolon as a delimiter
                         }
                         response = responseTrashItem.toString();
                         break;
@@ -367,8 +367,8 @@ public class Server {
                         List<Bin> bins1 = getBinData();
                         StringBuilder responseBin = new StringBuilder();
                         for (Bin b : bins1) {
-                            responseBin.append(String.format("%s;%s;%s;%s|",
-                                    b.getId(), b.getName(), b.getType(), b.getUrl())); // Using semicolon as a delimiter
+                            responseBin.append(String.format("%s;%s;%s;%s;%s|",
+                                    b.getId(), b.getName(), b.getType(), b.getUrl(),b.getDescription())); // Using semicolon as a delimiter
                         }
                         response = responseBin.toString();
                         break;
@@ -1140,7 +1140,8 @@ public class Server {
                     String name = rs.getString("name");
                     String type = rs.getString("type");
                     String url = rs.getString("img_url");
-                    trashItems.add(new TrashItem(id, name, type, url));
+                    String description = rs.getString("description");
+                    trashItems.add(new TrashItem(id, name, type, url,description));
                 }
             }
         } catch (Exception e) {
@@ -1159,7 +1160,8 @@ public class Server {
                     String name = rs.getString("name");
                     String type = rs.getString("type");
                     String url = rs.getString("img_url");
-                    bins.add(new Bin(id, name, type, url));
+                    String description = rs.getString("description");
+                    bins.add(new Bin(id, name, type, url,description));
                 }
             }
         } catch (Exception e) {

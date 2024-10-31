@@ -57,7 +57,7 @@ public class HelpScreen {
         instructions.setText("+1. Mục tiêu của trò chơi là phân loại rác thành đúng thùng rác.\n"
                 + "+2. Rác sẽ rơi từ trên xuống,hãy dùng nút trái/phải/xuống để di chuyển rác đến thùng rác phù hợp.\n"
                 + "+3. Bạn sẽ nhận 10 điểm cho mỗi lần phân loại đúng.\n"
-                + "+4. Mỗi ván chơi kéo dài 2 phu, hãy cố gắng đạt điểm cao nhất trước khi thời gian kết thúc");
+                + "+4. Mỗi ván chơi kéo dài 2 phút, hãy cố gắng đạt điểm cao nhất trước khi thời gian kết thúc.");
         instructions.setLineWrap(true);
         instructions.setWrapStyleWord(true);
         instructions.setEditable(false);
@@ -147,23 +147,29 @@ public class HelpScreen {
         // Add flexible space to push the button to the bottom
         instructionPanel.add(Box.createVerticalGlue()); // Add flexible space before the button panel
 
+        // Button panel to hold "Xem chi tiết" and "Đóng"
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false); // Set to transparent
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0)); // Center alignment with spacing
+
         // Close button
         JButton btnClose = createButton("Đóng", customFont, new Color(204, 0, 0));
         btnClose.addActionListener(e -> helpFrame.dispose());
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false); // Set to transparent
         buttonPanel.add(btnClose);
-        buttonPanel.setBackground(new Color(255, 255, 255, 100)); // Semi-transparent background with alpha 90
-        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align button panel
-        buttonPanel.setMaximumSize(new Dimension(120, 40)); // Set maximum size if needed
 
-        instructionPanel.add(buttonPanel); // Add button panel to instruction panel
+        // Detail button
+        JButton btnDetail = createButton("Xem chi tiết", customFont, new Color(0, 102, 204));
+        btnDetail.addActionListener(e -> showDetail(combinedTable, binData, trashData)); // Action listener for detail
+        buttonPanel.add(btnDetail);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+
+        // Add button panel to instruction panel
+        instructionPanel.add(buttonPanel);
 
         // Add the instruction panel to the background
         backgroundPanel.add(instructionPanel);
 
         helpFrame.setVisible(true);
-        helpFrame.setAlwaysOnTop(true); // Keep the window on top if needed
     }
 
     private JButton createButton(String text, Font font, Color backgroundColor) {
@@ -173,7 +179,7 @@ public class HelpScreen {
         button.setBackground(backgroundColor);
         button.setFocusPainted(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(120, 30));
+        button.setPreferredSize(new Dimension(200, 30));
         return button;
     }
 
@@ -225,6 +231,36 @@ public class HelpScreen {
             return new Font("Arial", Font.PLAIN, 12); // Fallback to default font
         }
     }
+
+    // Show details for selected item (Placeholder for detail action)
+    private void showDetail(JTable table, List<Bin> binData, List<TrashItem> trashItemData) {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow != -1) {
+            // Total number of bins
+            int totalBins = binData.size();
+
+            if (selectedRow < totalBins) {
+                // Selected row corresponds to a Bin
+                Bin bin = binData.get(selectedRow);
+                new BinDetailScreen(bin);
+            } else {
+                // Selected row corresponds to a TrashItem
+                int trashItemIndex = selectedRow - totalBins; // Adjust index for TrashItem
+                if (trashItemIndex >= 0 && trashItemIndex < trashItemData.size()) {
+                    TrashItem trashItem = trashItemData.get(trashItemIndex);
+                    new TrashItemDetailScreen(trashItem);
+                } else {
+                    // Out of bounds for trash items
+                    JOptionPane.showMessageDialog(table, "Không có thông tin chi tiết cho mục đã chọn.", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        } else {
+            // No row selected
+            JOptionPane.showMessageDialog(table, "Vui lòng chọn một mục để xem chi tiết.", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+
 
     // Background panel to set the image as background
     static class BackgroundPanel extends JPanel {

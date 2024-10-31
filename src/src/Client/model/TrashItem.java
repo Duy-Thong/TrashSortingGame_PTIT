@@ -22,6 +22,7 @@ public class TrashItem{
     private String name;
     private String type;
     private String url;
+    private String description;
     private int widthImage = 40, heightImage = 40;
     private ImageIcon trashImages;
 
@@ -46,6 +47,15 @@ public class TrashItem{
         this.type = type;
         this.url = url;
     }
+
+    public TrashItem(String id, String name, String type, String url, String description) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.url = url;
+        this.description = description;
+    }
+
     private ImageIcon urlToImage(String urlString){
         try {
             URL url = new URL(urlString);
@@ -158,4 +168,11 @@ public class TrashItem{
     public void setIndex(int index) {
         this.index = index;
     }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }
