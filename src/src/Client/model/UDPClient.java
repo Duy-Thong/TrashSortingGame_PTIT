@@ -41,24 +41,27 @@ public class UDPClient {
                 try {
                     byte[] receiveBuffer = new byte[1024];
                     DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-                    socketListen.receive(receivePacket); // Nhận phản hồi từ server
-                    String response = new String(receivePacket.getData(), 0, receivePacket.getLength());
-                    System.out.println("Received: " + response);
-                    if(response.equals("type=end_socket")) {
-                        try {
-                            socketListen.close();
+                    if(!socketListen.isClosed()) {
+                        socketListen.receive(receivePacket); // Nhận phản hồi từ server
+                        String response = new String(receivePacket.getData(), 0, receivePacket.getLength());
+                        System.out.println("Received: " + response);
+                        if(response.equals("type=end_socket")) {
+                            try {
+                                socketListen.close();
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
                         }
-                        catch (Exception e) {
-                            e.printStackTrace();
+                        else {
+                            // Gọi update UI nếu có phản hồi liên quan đến điểm số
+                            if (mUpdateUI != null) {
+                                mUpdateUI.updateScorePlayer(); // Cập nhật UI
+                            }
                         }
-                        break;
                     }
-                    else {
-                        // Gọi update UI nếu có phản hồi liên quan đến điểm số
-                        if (mUpdateUI != null) {
-                            mUpdateUI.updateScorePlayer(); // Cập nhật UI
-                        }
-                    }
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -118,11 +121,14 @@ public class UDPClient {
 
 
     public void endSocket() {
-        try {
-            socketListen.close();
+        if(!socketListen.isClosed()) {
+            try {
+                socketListen.close();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 }
