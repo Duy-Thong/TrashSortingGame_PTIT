@@ -98,22 +98,30 @@ public class ItemManagementScreen extends JFrame {
     private void loadTrashItems() {
         List<TrashItem> trashItems = itemManagementController.fetchTrashItemData();
         trashTableModel.setRowCount(0);
+        int row = 0;
         for (TrashItem item : trashItems) {
-            loadImageAsync(item.getUrl(), trashTableModel, new Object[]{
+            trashTableModel.addRow(new Object[]{
                     item.getId(), item.getName(), item.getType(), null, item.getUrl(), item.getDescription()
             });
+            loadImageAsync(item.getUrl(), trashTable, row, 3); // Pass the table, row, and column index
+            row++;
         }
     }
+
 
     private void loadBinItems() {
         List<Bin> binItems = itemManagementController.fetchBinData();
         binTableModel.setRowCount(0);
+        int row = 0;
         for (Bin bin : binItems) {
-            loadImageAsync(bin.getUrl(), binTableModel, new Object[]{
+            binTableModel.addRow(new Object[]{
                     bin.getId(), bin.getName(), bin.getType(), null, bin.getUrl(), bin.getDescription()
             });
+            loadImageAsync(bin.getUrl(), binTable, row, 3); // Pass the table, row, and column index
+            row++;
         }
     }
+
 
     private JPanel createButtonPanel(boolean isTrash) {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -218,10 +226,9 @@ public class ItemManagementScreen extends JFrame {
         }
     }
 
-    private void loadImageAsync(String urlString, DefaultTableModel tableModel, Object[] rowData) {
+    private void loadImageAsync(String urlString, JTable table, int row, int column) {
         if (imageCache.containsKey(urlString)) {
-            rowData[3] = imageCache.get(urlString);
-            tableModel.addRow(rowData);
+            table.setValueAt(imageCache.get(urlString), row, column);
         } else {
             SwingWorker<ImageIcon, Void> worker = new SwingWorker<ImageIcon, Void>() {
                 @Override
@@ -235,17 +242,17 @@ public class ItemManagementScreen extends JFrame {
                         ImageIcon icon = get();
                         if (icon != null) {
                             imageCache.put(urlString, icon);
-                            rowData[3] = icon;
-                            tableModel.addRow(rowData);
+                            table.setValueAt(icon, row, column);
                         }
                     } catch (Exception e) {
-                        System.err.println("Lỗi khi tải hình ảnh: " + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
             };
             worker.execute();
         }
     }
+
 
     private ImageIcon urlToImage(String urlString) {
         try {
