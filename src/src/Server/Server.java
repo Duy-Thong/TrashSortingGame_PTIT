@@ -88,8 +88,9 @@ public class Server {
                     // Tạo hai bản ghi PlayerGame cho hai người chơi
                     Timestamp currentTime = new Timestamp(System.currentTimeMillis());
                     Timestamp StartTime = new Timestamp(System.currentTimeMillis()+3000);
-                    PlayerGame player1Game = new PlayerGame(currentPlayerID, gameID, StartTime, null, 0, 0, "", false);
-                    PlayerGame player2Game = new PlayerGame(invitedPlayerID, gameID, StartTime, null, 0, 0, "", false);
+                    Timestamp leaveTime = new Timestamp(System.currentTimeMillis()+33000);
+                    PlayerGame player1Game = new PlayerGame(currentPlayerID, gameID, StartTime, leaveTime, 0, 0, "", false);
+                    PlayerGame player2Game = new PlayerGame(invitedPlayerID, gameID, StartTime, leaveTime, 0, 0, "", false);
                     savePlayerGame(player1Game);
                     savePlayerGame(player2Game);
 
