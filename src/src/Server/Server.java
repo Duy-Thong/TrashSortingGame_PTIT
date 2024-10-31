@@ -1397,12 +1397,12 @@ public class Server {
         // Kết nối tới cơ sở dữ liệu và thực hiện câu lệnh UPDATE
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             // Câu lệnh UPDATE cho các trường score, result, updatedAt theo playerId và gameId
-            String query = "UPDATE game SET status = finished, end_time = ?, total_score = ? WHERE gameID = ";
+            String query = "UPDATE game SET status = 'finished', end_time = ?, total_score = ? WHERE gameID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 // Thiết lập giá trị cho các tham số
-                stmt.setTimestamp(  1, new java.sql.Timestamp(System.currentTimeMillis())); // Cập nhật updatedAt với thời gian hiện tại
-                stmt.setInt(2, score);
-                stmt.setString(3, gameID);
+                stmt.setTimestamp(1, new java.sql.Timestamp(System.currentTimeMillis())); // Cập nhật end_time với thời gian hiện tại
+                stmt.setInt(2, score); // Thiết lập điểm số
+                stmt.setString(3, gameID); // Thiết lập gameID
 
                 // Thực thi câu lệnh và kiểm tra kết quả
                 return stmt.executeUpdate() > 0;
@@ -1412,6 +1412,7 @@ public class Server {
             return false;
         }
     }
+
 
 
     private static boolean updatePlayerStats(String playerID, int score,String result) {
