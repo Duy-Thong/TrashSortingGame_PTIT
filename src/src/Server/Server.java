@@ -892,6 +892,7 @@ public class    Server {
                     int isPlaying = rs.getInt("isPlaying");
                     Timestamp createdAt = rs.getTimestamp("created_at");  // Lấy timestamp cho created_at
 
+                    playerList.add(new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, status, isPlaying, createdAt));
                 }
             }
         } catch (Exception e) {
