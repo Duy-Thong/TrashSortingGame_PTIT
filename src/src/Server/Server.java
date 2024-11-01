@@ -884,7 +884,6 @@ public class    Server {
                 while (rs.next()) {
                     String playerID = rs.getString("playerID");
                     String username = rs.getString("username");
-                    String role = rs.getString("role");
                     int totalGames = rs.getInt("total_games");
                     int totalWins = rs.getInt("total_wins");
                     int totalScore = rs.getInt("total_score");
@@ -892,9 +891,7 @@ public class    Server {
                     int status = rs.getInt("status");
                     int isPlaying = rs.getInt("isPlaying");
                     Timestamp createdAt = rs.getTimestamp("created_at");  // Lấy timestamp cho created_at
-                    if(role == "player") {
-                        playerList.add(new Player(playerID, username, totalGames, totalWins, totalScore, avgScore, status, isPlaying, createdAt));
-                    }
+
                 }
             }
         } catch (Exception e) {
