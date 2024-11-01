@@ -20,7 +20,7 @@ public class InviteController {
     private static final int CLIENT_PORT = 12344;
 
     private List<Player> availablePlayers;
-    private int inviteTimeout = 60000;
+    private int inviteTimeout = 10000;
     private static RunGame game;
 
     private String username;
