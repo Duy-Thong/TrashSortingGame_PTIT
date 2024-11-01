@@ -149,8 +149,8 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
     }
 
     @Override
-    public void updateScorePlayer() {
-        updateScorePlayer2();
+    public void updateScorePlayer(String score) {
+        updateScorePlayer2(score);
     }
 
     // Handler KeyBoards
@@ -228,9 +228,9 @@ public class RunGame extends JFrame implements UDPClient.updateUI{
         udpClient.sendScoreUpdate(playerId, player1Score, roomId);
     }
 
-    private void updateScorePlayer2() {
-        player2Score += 10;
-        player2ScoreLabel.setText(namePlayer2 + ": " + player2Score + " points");
+    private void updateScorePlayer2(String score) {
+        player2Score = Integer.parseInt(score);
+        player2ScoreLabel.setText(namePlayer2 + ": " + score + " points");
     }
 
     // show EndGame
