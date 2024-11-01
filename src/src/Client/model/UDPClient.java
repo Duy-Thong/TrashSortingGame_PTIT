@@ -56,8 +56,9 @@ public class UDPClient {
                         }
                         else {
                             // Gọi update UI nếu có phản hồi liên quan đến điểm số
+                            String[] parts = response.split("&");
                             if (mUpdateUI != null) {
-                                mUpdateUI.updateScorePlayer(); // Cập nhật UI
+                                mUpdateUI.updateScorePlayer(parts[1].split("=")[1]); // Cập nhật UI
                             }
                         }
                     }
@@ -71,7 +72,7 @@ public class UDPClient {
     }
 
     public interface updateUI{
-        void updateScorePlayer();
+        void updateScorePlayer(String score);
     }
 
 
